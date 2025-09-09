@@ -12,6 +12,6 @@ jobs:
           distribution: temurin
           java-version: 21
       - name: Run Build Checks
-        run: make testForPr
+        run: make check
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

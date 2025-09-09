@@ -1,60 +1,50 @@
-SHELL=/bin/bash
+MAKEFLAGS += --always-make --warn-undefined-variables
+SHELL=/bin/bash -u
 
-.PHONY: help task targets
-help tasks targets: ## Show this help text
+red=\033[31m
+nc=\033[0m
+
+all: format check
+
+help: ## Show this help text
 	grep -h -E '^[a-z]+.*:' $(MAKEFILE_LIST) | \
-		awk -F ":|#+" '{printf "\033[31m%s \033[0m \n   %s \033[0m\n    \033[3;37mDepends On: \033[0m [ %s ]\n", $$1, $$3, $$2}'
+		awk -F ":|#+" '{printf "\033[31m%s $(nc) \n   %s $(nc)\n    \033[3;37mDepends On: $(nc) [ %s ]\n", $$1, $$3, $$2}'
 
-.PHONY: printVersions
-printVersions: ## Prints versions of system dependencies (EG: java, docker)
-	echo -e "\033[31m### Java Version on OS ###\033[0m"
-	java -version
+print-versions: ## Prints versions of system dependencies (EG: java, docker)
+	@echo -e "\n$(red)### Versions used by Gradle ###$(nc)"
+	@./gradlew --version
+	@echo -e "\n$(red)### Docker Compose Version ###$(nc)"
+	@docker compose version
 
-	echo -e "\n\033[31m### Docker Compose Version ###\033[0m"
-	docker compose version
-
-	echo -e "\n\033[31m### Versions used by Gradle ###\033[0m"
-	./gradlew --version
-
-.PHONY: format
 format: ## Runs formatting
 	./gradlew spotlessApply
 
-.PHONY: testForPr
-testForPr: ## Runs all checks used to verify a Pull-Request
-	./gradlew check
+test check: print-versions ## Runs all checks used to verify a Pull-Request
+	./gradlew spotlessApply check
 
-.PHONY: test verify
-test verify: format testForPr ## Applies formatting and runs all tests locally
-
-.PHONY: clean
 clean: ## Removes build artifacts and stops docker containers and removes docker volumes
 	./gradlew clean
 
-.PHONY: up
 up: ## Build & run server, launches a docker database
 	docker compose build flyway
 	./gradlew composeUp
 
-.PHONY: connectDb
-connectDb: up ## Connects to locally running docker database
+psql: ## Connects to locally running docker database
 	docker exec -u postgres -it support-server-database-1 psql support_db
 
-.PHONEY: serverLogs
-serverLogs: ## Util command to print the server logs
+logs: ## Util command to print the server logs
 	docker logs support-server-server-1
 
-.PHONEY: buildContainers
-buildContainers: ## Creates 'docker container' build artifacts
+local: ## Uses 'triplea' game-client dependency as built from local disc, useful if working on shared libraries between 'support-server' and 'triplea'
+	./gradlew --info --include-build ../triplea compileJava
+
+build:
 	./gradlew shadowJar
+
+docker-build: build ## Creates 'docker container' build artifacts
 	docker build database -f database/flyway.Dockerfile --tag ghcr.io/triplea-game/support-server/flyway:latest
 	docker build . --tag ghcr.io/triplea-game/support-server/server:latest
 
-.PHONEY: pushContainers
-pushContainers: buildContainers ## Pushes 'docker container' build artifacts to github docker container registry
+docker-push: docker-build ## Pushes 'docker container' build artifacts to github docker container registry
 	docker push ghcr.io/triplea-game/support-server/flyway:latest
 	docker push ghcr.io/triplea-game/support-server/server:latest
-
-.PHONEY: localBuild
-localBuild: ## Builds 'triplea' game client dependency, useful if working on shared libraries between 'support-server' and 'triplea'
-	./gradlew --info --include-build ../triplea compileJava
