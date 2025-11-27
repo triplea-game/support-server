@@ -1,4 +1,4 @@
-FROM openjdk:21-jdk-slim
+FROM eclipse-temurin:21-jdk-focal
 
 EXPOSE 8080
 ADD configuration.yml /
