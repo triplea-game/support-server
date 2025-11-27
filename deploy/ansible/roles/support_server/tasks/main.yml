@@ -1,0 +1,100 @@
+- name: create support_server group
+  become: true
+  group:
+    name: "support_server"
+
+- name: create support_server user
+  become: true
+  user:
+    name: "support_server"
+    groups: "support_server,docker"
+    create_home: no
+    system: yes
+
+- name: deploy systemctl service file to run lobby
+  become: true
+  template:
+    src: support_server.service
+    dest: /etc/systemd/system/support_server.service
+    owner: root
+    group: "{{ admin_group }}"
+    mode: 0644
+
+- name: deploy 'blue' server
+  become: true
+  template:
+    src: support_server-blue.service
+    dest: /etc/systemd/system/support_server-blue.service
+    owner: root
+    group: "{{ admin_group }}"
+    mode: 0644
+
+- name: pull latest server
+  become: true
+  shell: |
+    docker pull ghcr.io/triplea-game/support-server/server:latest
+
+- name: ensure server blue is running
+  become: true
+  service:
+    name: support_server-blue
+    state: started
+    enabled: false
+
+- name: Wait some time for startup
+  pause:
+    seconds: 30
+
+- name: switch nginx to the blue deployment
+  become: true
+  template:
+    src: etc_nginx_sites_enabled_support_server.conf
+    dest: /etc/nginx/sites-enabled/support_server.conf
+    mode: "0644"
+    owner: root
+    group: root
+  vars:
+    proxy_port: "{{ support_server_blue_port }}"
+
+- name: reload nginx
+  become: true
+  systemd:
+    name: nginx
+    state: reloaded
+    enabled: true
+
+- name: restart support_server
+  become: true
+  service:
+    name: support_server
+    state: restarted
+    enabled: true
+
+- name: Wait some time for startup
+  pause:
+    seconds: 30
+
+- name: switch nginx back to the updated green environment
+  become: true
+  template:
+    src: etc_nginx_sites_enabled_support_server.conf
+    dest: /etc/nginx/sites-enabled/support_server.conf
+    mode: "0644"
+    owner: root
+    group: root
+  vars:
+    proxy_port: "{{ lobby_port }}"
+
+- name: reload nginx
+  become: true
+  systemd:
+    name: nginx
+    state: reloaded
+    enabled: true
+
+- name: stop blue server
+  become: true
+  service:
+    name: support_server-blue
+    state: stopped
+    enabled: true

@@ -1,4 +1,4 @@
-- hosts: maps
+- hosts: server
   roles:
     - nginx_conf
-    - maps_server
+    - support_server
