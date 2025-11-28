@@ -104,7 +104,7 @@ spotless {
 val dropWizardVersion = "4.0.7"
 val feignVersion = "13.6"
 val jaxbVersion = "4.0.5"
-val junitVersion = "5.13.4"
+val junitVersion = "6.0.1"
 val mockitoVersion = "5.19.0"
 val tripleaVersion = "2.7.15062"
 
