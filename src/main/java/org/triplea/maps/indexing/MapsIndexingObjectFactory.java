@@ -16,22 +16,17 @@ public class MapsIndexingObjectFactory {
   public static Managed buildMapsIndexingSchedule(
       final SupportServerConfig configuration, final Jdbi jdbi) {
 
-    //    var githubApiClient = configuration.createGithubApiClient();
-
     return ScheduledTask.builder()
         .taskName("Map-Indexing")
         .delay(Duration.ofSeconds(10))
         .period(Duration.ofMinutes(configuration.getMapIndexingPeriodMinutes()))
-        //        .task(
-        //            MapIndexingTaskRunner.builder()
-        //                .githubApiClient(githubApiClient)
-        //                .mapIndexer(
-        //                    mapIndexingTask(
-        //                        githubApiClient,
-        //                        new SkipMapIndexingCheck(jdbi.onDemand(MapIndexDao.class))))
-        //                .mapIndexDao(jdbi.onDemand(MapIndexDao.class))
-        //                .indexingTaskDelaySeconds(configuration.getIndexingTaskDelaySeconds())
-        //                .build())
+        .task(
+            MapIndexingTaskRunner.builder()
+                .githubClient(configuration.createGithubApiClient())
+                .mapIndexer(MapIndexer.build(configuration.createGithubApiClient()))
+                .mapIndexDao(jdbi.onDemand(MapIndexDao.class))
+                .indexingTaskDelaySeconds(configuration.getIndexingTaskDelaySeconds())
+                .build())
         .build();
   }
 }
