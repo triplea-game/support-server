@@ -48,3 +48,24 @@ docker-build: build ## Creates 'docker container' build artifacts
 docker-push: docker-build ## Pushes 'docker container' build artifacts to github docker container registry
 	docker push ghcr.io/triplea-game/support-server/flyway:latest
 	docker push ghcr.io/triplea-game/support-server/server:latest
+
+vaultPassword=@echo "${TRIPLEA_ANSIBLE_VAULT_PASSWORD}" > deploy/vault-password; trap 'rm -f "deploy/vault-password"' EXIT
+runAnsible=$(vaultPassword); ANSIBLE_CONFIG="deploy/ansible.cfg" ansible-playbook --vault-password-file deploy/vault-password
+testInventory=--inventory deploy/ansible/inventory/test.inventory
+prodInventory=--inventory deploy/ansible/inventory/prod.inventory
+playbook=deploy/ansible/deploy-playbook.yml
+
+ansible-galaxy-install:
+	ansible-galaxy collection install -r deploy/ansible/requirements.yml --force
+
+diff-test: ansible-galaxy-install
+	$(runAnsible) --check --diff $(testInventory) $(playbook)
+
+deploy-test: ansible-galaxy-install
+	$(runAnsible) $(testInventory) $(playbook)
+
+diff-prod: ansible-galaxy-install
+	$(runAnsible) --check --diff $(prodInventory) $(playbook)
+
+deploy-prod: ansible-galaxy-install
+	$(runAnsible) $(prodInventory) $(playbook)

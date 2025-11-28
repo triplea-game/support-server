@@ -20,6 +20,7 @@ Warning: First make sure that the local triplea project can build cleanly.
 
 - Run `make help` for list of full commands
 - `make verify` will run formatting and all tests (unit+integ)
+- `make diff-test` does a dry-run deployment to test
 
 ### Integration Tests
 

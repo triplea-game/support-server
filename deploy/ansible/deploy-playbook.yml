@@ -1,4 +1,10 @@
-- hosts: maps
+- hosts: server
+  collections:
+    - triplea.infra
+  vars_files:
+    - vars.yml
   roles:
-    - nginx_conf
-    - maps_server
+    - triplea.infra.postgres_database
+    - triplea.infra.flyway
+    - triplea.infra.service_nginx_conf
+    - triplea.infra.service_systemctl_conf
