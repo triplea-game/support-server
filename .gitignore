@@ -6,7 +6,8 @@
 .settings
 .DS_Store
 .vscode/
-
+**/vault-password
+**/vault_password
 *.iml
 *.backup
 *.swp
