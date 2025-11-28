@@ -29,6 +29,6 @@ logSqlStatements: false
 
 database:
   driverClass: org.postgresql.Driver
-  user: ${DATABASE_USER:-maps_user}
-  password: ${DATABASE_PASSWORD:-maps_user}
-  url: jdbc:postgresql://${DB_URL:-localhost:5432/maps_db}
+  user: ${DATABASE_USER:-support_user}
+  password: ${DATABASE_PASSWORD:-support_user}
+  url: jdbc:postgresql://${DB_URL:-localhost:32768/support_db}
