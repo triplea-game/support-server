@@ -42,6 +42,7 @@ service_exec_start: |
       -e GITHUB_API_TOKEN="{{ github_api_token }}" \
       -e ERROR_REPORTING_ENABLED=true \
       -e MAP_INDEXING_ENABLED=true \
+      -e MAP_INDEXING_PERIOD_MINUTES=90 \
+      -e MAP_INDEXING_DELAY_SECONDS=5
       {{ docker_image }}
-
 service_exec_stop: docker stop {{ docker_image }}
