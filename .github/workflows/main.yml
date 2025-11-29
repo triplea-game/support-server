@@ -45,7 +45,7 @@ jobs:
       - name: Update test
         if: ${{ env.IS_MAIN_BUILD }}
         run: |
-          cat .github/workflow/host-keys/test.triplea-game.org >> ~/.ssh/known_hosts
+          cat .github/workflows/host-keys/test.triplea-game.org >> ~/.ssh/known_hosts
           pip install ansible
           ansible --version
           make deploy-test SSH_USER=deploy-support-server
@@ -55,7 +55,7 @@ jobs:
       - name: Update production
         if: ${{ env.IS_MAIN_BUILD }}
         run: |
-          cat .github/workflow/host-keys/test.triplea-game.org >> ~/.ssh/known_hosts
+          cat .github/workflows/host-keys/test.triplea-game.org >> ~/.ssh/known_hosts
           pip install ansible
           ansible --version
           # make deploy-prod SSH_USER=deploy-support-server
