@@ -7,6 +7,11 @@ on:
   push:
     branches:
       - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     env:
@@ -32,18 +37,23 @@ jobs:
       - name: build and push docker containers
         if: ${{ env.IS_MAIN_BUILD }}
         run: make docker-push
+      - uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_SUPPORT_SERVER_USER_SSH_PRIVATE_KEY }}
 
-#      - uses: webfactory/ssh-agent@v0.9.0
-#        with:
-#          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Update test
+        run: |
+          pip install ansible
+          ansible --version
+          make deploy-test SSH_USER=deploy-support-server
+        env:
+          TRIPLEA_ANSIBLE_VAULT_PASSWORD: ${{ secrets.TRIPLEA_ANSIBLE_VAULT_PASSWORD }}
 
-#      - name: Update production
-#        run: |
-#          pip install ansible
-#          # print ansible version for help debugging
-#          ansible --version
-#          cd deploy/
-#          ANSIBLE_REMOTE_USER=deploy-lobby APPLY=1 ./run.sh
-#        env:
-#          TRIPLEA_ANSIBLE_VAULT_PASSWORD: ${{ secrets.TRIPLEA_ANSIBLE_VAULT_PASSWORD }}
+      - name: Update production
+        run: |
+          pip install ansible
+          ansible --version
+          # make deploy-prod SSH_USER=deploy-support-server
+        env:
+          TRIPLEA_ANSIBLE_VAULT_PASSWORD: ${{ secrets.TRIPLEA_ANSIBLE_VAULT_PASSWORD }}
 

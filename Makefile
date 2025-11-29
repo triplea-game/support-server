@@ -3,6 +3,7 @@ SHELL=/bin/bash -u
 
 red=\033[31m
 nc=\033[0m
+SSH_USER ?= $${USER}
 
 all: format check
 
@@ -50,7 +51,7 @@ docker-push: docker-build ## Pushes 'docker container' build artifacts to github
 	docker push ghcr.io/triplea-game/support-server/server:latest
 
 vaultPassword=@echo "${TRIPLEA_ANSIBLE_VAULT_PASSWORD}" > deploy/vault-password; trap 'rm -f "deploy/vault-password"' EXIT
-runAnsible=$(vaultPassword); ANSIBLE_CONFIG="deploy/ansible.cfg" ansible-playbook --vault-password-file deploy/vault-password
+runAnsible=$(vaultPassword); ANSIBLE_CONFIG="deploy/ansible.cfg" ansible-playbook --vault-password-file deploy/vault-password -e ansible_user=$(SSH_USER)
 testInventory=--inventory deploy/ansible/inventory/test.inventory
 prodInventory=--inventory deploy/ansible/inventory/prod.inventory
 playbook=deploy/ansible/deploy-playbook.yml
