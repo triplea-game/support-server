@@ -23,6 +23,9 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
+      - uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_SUPPORT_SERVER_USER_PRIVATE_SSH_KEY }}
       - name: Login to GitHub Container Registry
         if: ${{ env.IS_MAIN_BUILD }}
         uses: docker/login-action@v1
@@ -34,14 +37,13 @@ jobs:
         run: make check
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: build and push docker containers
         if: ${{ env.IS_MAIN_BUILD }}
         run: make docker-push
-      - uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.DEPLOY_SUPPORT_SERVER_USER_SSH_PRIVATE_KEY }}
 
       - name: Update test
+        if: ${{ env.IS_MAIN_BUILD }}
         run: |
           pip install ansible
           ansible --version
@@ -50,6 +52,7 @@ jobs:
           TRIPLEA_ANSIBLE_VAULT_PASSWORD: ${{ secrets.TRIPLEA_ANSIBLE_VAULT_PASSWORD }}
 
       - name: Update production
+        if: ${{ env.IS_MAIN_BUILD }}
         run: |
           pip install ansible
           ansible --version
