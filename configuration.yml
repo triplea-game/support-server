@@ -31,4 +31,4 @@ database:
   driverClass: org.postgresql.Driver
   user: ${DATABASE_USER:-support_user}
   password: ${DATABASE_PASSWORD:-support_user}
-  url: jdbc:postgresql://${DB_URL:-localhost:32768/support_db}
+  url: jdbc:postgresql://${DB_URL:-localhost:5432/support_db}

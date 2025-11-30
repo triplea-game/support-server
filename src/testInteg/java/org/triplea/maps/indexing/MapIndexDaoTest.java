@@ -24,7 +24,7 @@ class MapIndexDaoTest {
   private final MapIndexDao mapIndexDao;
 
   MapIndexDaoTest(Jdbi jdbi) {
-    mapIndexDao = jdbi.onDemand(MapIndexDao.class);
+    mapIndexDao = new MapIndexDao(jdbi);
   }
 
   @Test

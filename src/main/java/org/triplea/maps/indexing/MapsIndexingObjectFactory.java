@@ -18,13 +18,13 @@ public class MapsIndexingObjectFactory {
 
     return ScheduledTask.builder()
         .taskName("Map-Indexing")
-        .delay(Duration.ofSeconds(10))
+        .delay(Duration.ofSeconds(20))
         .period(Duration.ofMinutes(configuration.getMapIndexingPeriodMinutes()))
         .task(
             MapIndexingTaskRunner.builder()
                 .githubClient(configuration.createGithubApiClient())
                 .mapIndexer(MapIndexer.build(configuration.createGithubApiClient()))
-                .mapIndexDao(jdbi.onDemand(MapIndexDao.class))
+                .mapIndexDao(new MapIndexDao(jdbi))
                 .indexingTaskDelaySeconds(configuration.getIndexingTaskDelaySeconds())
                 .build())
         .build();
