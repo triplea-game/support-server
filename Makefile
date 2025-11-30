@@ -26,6 +26,10 @@ test check: print-versions ## Runs all checks used to verify a Pull-Request
 clean: ## Removes build artifacts and stops docker containers and removes docker volumes
 	./gradlew clean
 
+database-up: ## Launches database
+	docker compose build flyway
+	DATABASE_PORT=5432 docker compose up database flyway
+
 up: ## Build & run server, launches a docker database
 	docker compose build flyway
 	./gradlew composeUp
