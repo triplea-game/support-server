@@ -38,14 +38,8 @@ class MapIndexingTaskRunner implements Runnable {
 
   @Override
   public void run() {
-    int totalNumberMaps;
-    long startTimeEpochMillis;
-    int mapsDeleted;
-    int mapsIndexed;
-
-    //    log.info("Map indexing started, github org: {}", githubApiClient.getOrg());
-
-    startTimeEpochMillis = System.currentTimeMillis();
+    log.info("Map indexing started");
+    long startTimeEpochMillis = System.currentTimeMillis();
 
     // get list of maps
     final Collection<MapRepoListing> mapUris =
@@ -53,10 +47,10 @@ class MapIndexingTaskRunner implements Runnable {
             .sorted(Comparator.comparing(MapRepoListing::getUri))
             .toList();
 
-    totalNumberMaps = mapUris.size();
+    int totalNumberMaps = mapUris.size();
 
     // remove deleted maps
-    mapsDeleted =
+    int mapsDeleted =
         mapIndexDao.removeMapsNotIn(
             mapUris.stream()
                 .map(MapRepoListing::getUri)
@@ -68,20 +62,22 @@ class MapIndexingTaskRunner implements Runnable {
     // indexing.
     // Sleep between iterations to avoid rate limits.
     final Deque<MapRepoListing> reposToIndex = new ArrayDeque<>(mapUris);
-    while (reposToIndex.isEmpty()) {
+    int mapsIndexed = 0;
+    while (!reposToIndex.isEmpty()) {
       var listing = reposToIndex.pop();
+      mapsIndexed++;
       IndexingResult result = index(listing);
+      log.info("Indexing map: {}", listing.getUri());
       mapIndexDao.recordIndexingStatus(listing, result);
       Interruptibles.sleep(indexingTaskDelaySeconds * 1000L);
     }
 
-    //    log.info(
-    //            "Map indexing finished in {} ms, repos found: {}, repos with map.yml: {}, maps
-    // deleted: {}",
-    //            (System.currentTimeMillis() - startTimeEpochMillis),
-    //            totalNumberMaps,
-    //            mapsIndexed,
-    //            mapsDeleted);
+    log.info(
+        "Map indexing finished in {} ms, repos found: {}, repos with map.yml: {}, maps deleted: {}",
+        (System.currentTimeMillis() - startTimeEpochMillis),
+        totalNumberMaps,
+        mapsIndexed,
+        mapsDeleted);
   }
 
   // TODO: test me
@@ -108,9 +104,6 @@ class MapIndexingTaskRunner implements Runnable {
 
   @AllArgsConstructor
   static class IndexingResult {
-    static final IndexingResult UP_TO_DATE =
-        new IndexingResult(ResultCode.INDEXING_IS_UP_TO_DATE, List.of());
-
     enum ResultCode {
       INDEXING_IS_UP_TO_DATE,
       SUCCESSFULLY_INDEXED,
@@ -120,6 +113,4 @@ class MapIndexingTaskRunner implements Runnable {
     ResultCode resultCode;
     List<String> errorDetails;
   }
-
-  private void notifyCompletion() {}
 }
