@@ -36,7 +36,7 @@ class MapIndexingTaskRunnerTest {
     when(mapIndexer.apply(listing)).thenReturn(TestData.mapIndex);
 
     MapIndexingTaskRunner runner =
-        new MapIndexingTaskRunner(jdbi.onDemand(MapIndexDao.class), mockClient, mapIndexer, 0);
+        new MapIndexingTaskRunner(new MapIndexDao(jdbi), mockClient, mapIndexer, 0);
 
     MapIndexingTaskRunner.IndexingResult result = runner.index(listing);
 

@@ -4,7 +4,7 @@ githubMapsOrgName: triplea-maps
 
 # If map indexing is enabled, it will begin shortly after server startup.
 # If disabled no map indexing will occur.
-mapIndexingEnabled: ${MAP_INDEXING_ENABLED:-false}
+mapIndexingEnabled: ${MAP_INDEXING_ENABLED:-true}
 
 # How often between map indexing runs. On each map indexing run we will
 # index all maps. If the previous map indexing run is still going
@@ -31,4 +31,4 @@ database:
   driverClass: org.postgresql.Driver
   user: ${DATABASE_USER:-support_user}
   password: ${DATABASE_PASSWORD:-support_user}
-  url: jdbc:postgresql://${DB_URL:-localhost:32768/support_db}
+  url: jdbc:postgresql://${DB_URL:-localhost:5432/support_db}
