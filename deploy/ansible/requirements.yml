@@ -3,5 +3,5 @@ collections:
 #- name: [ INSERT YOUR ABSOLUTE PATH ]/triplea-project/infrastructure-ansible-collection/
 #  type: dir
   - name: https://github.com/triplea-game/infrastructure-ansible-collection.git
-    version: 6cae100
+    version: 3dc64d02615c
     type: git
