@@ -106,7 +106,7 @@ val feignVersion = "13.6"
 val jaxbVersion = "4.0.5"
 val junitVersion = "5.13.4"
 val mockitoVersion = "5.19.0"
-val tripleaVersion = "2.7.15062"
+val tripleaVersion = "2.7.15281"
 
 dependencies {
     implementation("at.favre.lib:bcrypt:0.10.2")
