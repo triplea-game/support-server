@@ -11,6 +11,16 @@ help: ## Show this help text
 	grep -h -E '^[a-z]+.*:' $(MAKEFILE_LIST) | \
 		awk -F ":|#+" '{printf "\033[31m%s $(nc) \n   %s $(nc)\n    \033[3;37mDepends On: $(nc) [ %s ]\n", $$1, $$3, $$2}'
 
+check-setup: ## Validates local dev environment configuration
+	# Gradle properties file must exist
+	test -f ~/.gradle/gradle.properties
+	# Gradle properties file needs to have a username entry
+	grep -q "triplea.github.username" ~/.gradle/gradle.properties
+	# Gradle properties file needs to have a GH access token
+	# (Access token needs package:read)
+	grep -q "triplea.github.access.token=ghp_" ~/.gradle/gradle.properties
+	@echo "Dev config checks done, looks good so far"
+
 print-versions: ## Prints versions of system dependencies (EG: java, docker)
 	@echo -e "\n$(red)### Versions used by Gradle ###$(nc)"
 	@./gradlew --version
@@ -21,7 +31,7 @@ format: ## Runs formatting
 	./gradlew spotlessApply
 
 test check: print-versions ## Runs all checks used to verify a Pull-Request
-	./gradlew spotlessApply check
+	./gradlew spotlesousApply check
 
 clean: ## Removes build artifacts and stops docker containers and removes docker volumes
 	./gradlew clean

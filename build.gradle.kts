@@ -105,7 +105,7 @@ val feignVersion = "13.6"
 val jaxbVersion = "4.0.5"
 val junitVersion = "5.13.4"
 val mockitoVersion = "5.19.0"
-val tripleaVersion = "2.7.15281"
+val tripleaVersion = "2.7.15288"
 
 dependencies {
     implementation("at.favre.lib:bcrypt:0.10.2")
@@ -132,7 +132,6 @@ dependencies {
     implementation("triplea:lobby-client:$tripleaVersion")
     implementation("triplea:websocket-client:$tripleaVersion")
     runtimeOnly("org.postgresql:postgresql:42.7.7")
-
     testImplementation("com.github.database-rider:rider-junit5:1.44.0")
     testImplementation("com.github.npathai:hamcrest-optional:2.0.0")
     testImplementation("com.sun.mail:jakarta.mail:2.0.2")
