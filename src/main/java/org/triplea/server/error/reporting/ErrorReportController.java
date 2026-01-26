@@ -17,11 +17,11 @@ import org.triplea.http.client.error.report.CanUploadRequest;
 import org.triplea.http.client.error.report.ErrorReportClient;
 import org.triplea.http.client.error.report.ErrorReportRequest;
 import org.triplea.http.client.error.report.ErrorReportResponse;
-import org.triplea.http.client.github.GithubApiClient;
+import org.triplea.http.client.github.GithubClient;
+import org.triplea.server.IpAddressExtractor;
 import org.triplea.server.error.reporting.upload.CanUploadErrorReportStrategy;
 import org.triplea.server.error.reporting.upload.CreateIssueParams;
 import org.triplea.server.error.reporting.upload.ErrorReportModule;
-import org.triplea.spitfire.server.IpAddressExtractor;
 
 /** Http controller that binds the error upload endpoint with the error report upload handler. */
 @Path("/")
@@ -33,9 +33,9 @@ public class ErrorReportController {
   @Nonnull private final Function<CanUploadRequest, CanUploadErrorReportResponse> canReportModule;
 
   /** Factory method. */
-  public static ErrorReportController build(GithubApiClient githubApiClient, Jdbi jdbi) {
+  public static ErrorReportController build(GithubClient githubApiClient, String repo, Jdbi jdbi) {
     return ErrorReportController.builder()
-        .errorReportIngestion(ErrorReportModule.build(githubApiClient, jdbi))
+        .errorReportIngestion(ErrorReportModule.build(githubApiClient, repo, jdbi))
         .canReportModule(CanUploadErrorReportStrategy.build(jdbi))
         .build();
   }

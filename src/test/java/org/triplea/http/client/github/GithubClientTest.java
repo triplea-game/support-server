@@ -14,15 +14,16 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Collection;
+import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.triplea.test.common.TestDataFileReader;
 import ru.lanwen.wiremock.ext.WiremockResolver;
 import ru.lanwen.wiremock.ext.WiremockUriResolver;
 
 @ExtendWith({WiremockResolver.class, WiremockUriResolver.class})
-class GithubApiClientTest {
+class GithubClientTest {
 
   @Test
   void repoListing(@WiremockResolver.Wiremock final WireMockServer server) {
@@ -37,35 +38,20 @@ class GithubApiClientTest {
     stubRepoListingResponse(3, server, "[]");
 
     final Collection<MapRepoListing> repos =
-        GithubApiClient.builder()
-            .org("example-org")
-            .repo("map-repo")
-            .uri(URI.create(server.baseUrl()))
-            .build()
-            .listRepositories();
+        new GithubClient(URI.create(server.baseUrl()), "", "exmaple-org").listRepositories();
 
     assertThat(repos, hasSize(3));
-    assertThat(
-        repos,
-        hasItem(
-            MapRepoListing.builder()
-                .htmlUrl("https://github.com/triplea-maps/tutorial")
-                .name("tutorial")
-                .build()));
-    assertThat(
-        repos,
-        hasItem(
-            MapRepoListing.builder()
-                .htmlUrl("https://github.com/triplea-maps/aa_enhanced_revised")
-                .name("aa_enhanced_revised")
-                .build()));
-    assertThat(
-        repos,
-        hasItem(
-            MapRepoListing.builder()
-                .htmlUrl("https://github.com/triplea-maps/roman_invasion")
-                .name("roman_invasion")
-                .build()));
+
+    for (String uri :
+        List.of(
+            "https://github.com/triplea-maps/tutorial",
+            "https://github.com/triplea-maps/aa_enhanced_revised",
+            "https://github.com/triplea-maps/roman_invasion")) {
+
+      assertThat(
+          repos, //
+          hasItem(MapRepoListing.builder().uri(uri).defaultBranch("main").build()));
+    }
   }
 
   private void stubRepoListingResponse(
@@ -82,18 +68,13 @@ class GithubApiClientTest {
     final String exampleResponse =
         TestDataFileReader.readContents("sample_responses/branch_listing_response.json");
     server.stubFor(
-        get("/repos/example-org/map-repo/branches/master")
+        get("/repos/example-org/map-repo/branches/main")
             .withHeader("Authorization", equalTo("token test-token"))
             .willReturn(aResponse().withStatus(200).withBody(exampleResponse)));
 
     final BranchInfoResponse branchInfoResponse =
-        GithubApiClient.builder()
-            .authToken("test-token")
-            .org("example-org")
-            .repo("map-repo")
-            .uri(URI.create(server.baseUrl()))
-            .build()
-            .fetchBranchInfo("master");
+        new GithubClient(URI.create(server.baseUrl()), "test-token", "example-org")
+            .fetchBranchInfo("map-repo", "main");
 
     final Instant expectedLastCommitDate =
         LocalDateTime.of(2021, 2, 4, 19, 30, 32).atOffset(ZoneOffset.UTC).toInstant();
@@ -110,13 +91,8 @@ class GithubApiClientTest {
             .willReturn(aResponse().withStatus(200).withBody(exampleResponse)));
 
     final String latestVersion =
-        GithubApiClient.builder()
-            .authToken("test-token")
-            .org("example-org")
-            .repo("map-repo")
-            .uri(URI.create(server.baseUrl()))
-            .build()
-            .fetchLatestVersion()
+        new GithubClient(URI.create(server.baseUrl()), "example-org", "test-token")
+            .fetchLatestVersion("map-repo")
             .orElseThrow();
 
     assertThat(latestVersion, is("2.5.22294"));

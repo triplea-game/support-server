@@ -49,6 +49,7 @@ class ErrorReportModuleTest {
   void setup() {
     errorReportModule =
         ErrorReportModule.builder()
+            .targetRepo()
             .githubApiClient(githubApiClient)
             .errorReportingDao(errorReportingDao)
             .build();

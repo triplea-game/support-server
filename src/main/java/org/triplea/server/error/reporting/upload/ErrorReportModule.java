@@ -7,16 +7,18 @@ import lombok.Builder;
 import org.jdbi.v3.core.Jdbi;
 import org.triplea.http.client.error.report.ErrorReportResponse;
 import org.triplea.http.client.github.CreateIssueRequest;
-import org.triplea.http.client.github.GithubApiClient;
+import org.triplea.http.client.github.GithubClient;
 
 /** Performs the steps for uploading an error report from the point of view of the server. */
 @Builder
 public class ErrorReportModule {
-  @Nonnull private final GithubApiClient githubApiClient;
+  @Nonnull private final GithubClient githubApiClient;
+  @Nonnull private final String targetRepo;
   @Nonnull private final ErrorReportingDao errorReportingDao;
 
-  public static ErrorReportModule build(GithubApiClient githubApiClient, Jdbi jdbi) {
+  public static ErrorReportModule build(GithubClient githubApiClient, String repo, Jdbi jdbi) {
     return ErrorReportModule.builder()
+        .targetRepo(repo)
         .githubApiClient(githubApiClient)
         .errorReportingDao(jdbi.onDemand(ErrorReportingDao.class))
         .build();
@@ -31,6 +33,7 @@ public class ErrorReportModule {
 
     var githubCreateIssueResponse =
         githubApiClient.newIssue(
+            targetRepo,
             CreateIssueRequest.builder()
                 .title(errorReportRequest.getTitle())
                 .body(errorReportRequest.getBody())
