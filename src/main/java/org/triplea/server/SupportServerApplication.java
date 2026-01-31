@@ -7,13 +7,12 @@ import io.dropwizard.core.setup.Bootstrap;
 import io.dropwizard.core.setup.Environment;
 import io.dropwizard.jdbi3.JdbiFactory;
 import io.dropwizard.jdbi3.bundles.JdbiExceptionsBundle;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.jdbi.v3.core.Jdbi;
 import org.triplea.maps.MapsController;
 import org.triplea.maps.indexing.MapsIndexingObjectFactory;
 import org.triplea.server.error.reporting.ErrorReportController;
-
-import java.util.List;
 
 /**
  * Main entry-point for launching drop wizard HTTP server. This class is responsible for configuring

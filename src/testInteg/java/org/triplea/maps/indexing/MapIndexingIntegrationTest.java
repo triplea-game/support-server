@@ -14,8 +14,7 @@ public class MapIndexingIntegrationTest {
     SupportServerConfig supportServerConfig = new SupportServerConfig();
     supportServerConfig.setGithubMapsOrgName("triplea-maps");
 
-    final MapIndexer mapIndexerRunner =
-        MapIndexer.build(supportServerConfig.githubClientMaps());
+    final MapIndexer mapIndexerRunner = MapIndexer.build(supportServerConfig.githubClientMaps());
 
     final MapIndex result =
         mapIndexerRunner.apply(

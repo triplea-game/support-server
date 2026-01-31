@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Collection;
 import java.util.List;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,7 +23,6 @@ import ru.lanwen.wiremock.ext.WiremockUriResolver;
 
 @ExtendWith({WiremockResolver.class, WiremockUriResolver.class})
 class GithubClientTest {
-
 
   @Test
   void repoListing(@WiremockResolver.Wiremock final WireMockServer server) {

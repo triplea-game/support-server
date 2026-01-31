@@ -1,6 +1,7 @@
 package org.triplea.http.client.github;
 
-import com.google.common.annotations.VisibleForTesting;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import com.google.common.base.Strings;
 import feign.FeignException;
 import feign.Param;
@@ -11,25 +12,24 @@ import java.time.Instant;
 import java.util.*;
 import javax.annotation.Nonnull;
 import lombok.Builder;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.triplea.http.client.HttpClient;
-import static org.slf4j.LoggerFactory.getLogger;
 
 /** Can be used to interact with github's webservice API. */
-public class GithubClient  {
+public class GithubClient {
 
   private static final Logger log = getLogger(GithubClient.class);
 
   /**
-   * Inner implementation for the HTTP client, Feign interface,
-   * we can instantiate this with Feign.
+   * Inner implementation for the HTTP client, Feign interface, we can instantiate this with Feign.
    */
   @SuppressWarnings("InterfaceNeverImplemented")
   interface GithubApiFeignClient {
     @RequestLine("POST /repos/{org}/{repo}/issues")
     CreateIssueResponse newIssue(
-        @Param("org") String org, @Param("repo") String repo, CreateIssueRequest createIssueRequest);
+        @Param("org") String org,
+        @Param("repo") String repo,
+        CreateIssueRequest createIssueRequest);
 
     @RequestLine("GET /orgs/{org}/repos")
     List<MapRepoListing> listRepos(
@@ -43,7 +43,7 @@ public class GithubClient  {
     LatestReleaseResponse getLatestRelease(@Param("org") String org, @Param("repo") String repo);
   }
 
-  private final static String GITHUB_HOST= "api.github.com";
+  private static final String GITHUB_HOST = "api.github.com";
 
   private final GithubApiFeignClient githubApiFeignClient;
   private final String org;
@@ -102,7 +102,6 @@ public class GithubClient  {
     return githubApiFeignClient.getBranchInfo(org, repoName, branchName).getLastCommitDate();
   }
 
-
   /**
    * Invokes github web-API to create a github issue with the provided parameter data.
    *
@@ -124,7 +123,6 @@ public class GithubClient  {
    *
    * @param branch Which branch to be queried.
    * @return Payload response object representing the response from Github's web API.
-   *
    */
   public BranchInfoResponse fetchBranchInfo(String repo, String branch) {
     return githubApiFeignClient.getBranchInfo(org, repo, branch);
