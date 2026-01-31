@@ -11,13 +11,15 @@ import java.time.Instant;
 import java.util.*;
 import javax.annotation.Nonnull;
 import lombok.Builder;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
 import org.triplea.http.client.HttpClient;
+import static org.slf4j.LoggerFactory.getLogger;
 
-//@Slf4j
 /** Can be used to interact with github's webservice API. */
 public class GithubClient  {
+
+  private static final Logger log = getLogger(GithubClient.class);
 
   /**
    * Inner implementation for the HTTP client, Feign interface,

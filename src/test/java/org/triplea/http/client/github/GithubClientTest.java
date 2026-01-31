@@ -25,6 +25,7 @@ import ru.lanwen.wiremock.ext.WiremockUriResolver;
 @ExtendWith({WiremockResolver.class, WiremockUriResolver.class})
 class GithubClientTest {
 
+
   @Test
   void repoListing(@WiremockResolver.Wiremock final WireMockServer server) {
     stubRepoListingResponse(

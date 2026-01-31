@@ -27,6 +27,14 @@ public class SupportServerConfig extends Configuration {
 
   @Getter(onMethod_ = {@JsonProperty})
   @Setter(onMethod_ = {@JsonProperty})
+  private String errorReportingRepo;
+
+  @Getter(onMethod_ = {@JsonProperty})
+  @Setter(onMethod_ = {@JsonProperty})
+  private String tripleaOrgName;
+
+  @Getter(onMethod_ = {@JsonProperty})
+  @Setter(onMethod_ = {@JsonProperty})
   private boolean mapIndexingEnabled;
 
   @Getter(onMethod_ = {@JsonProperty})
@@ -41,11 +49,17 @@ public class SupportServerConfig extends Configuration {
   @Setter(onMethod_ = {@JsonProperty})
   private boolean logSqlStatements;
 
-  public GithubClient createGithubApiClient() {
+  public GithubClient githubClientMaps() {
     return GithubClient.builder()
-        .uri()
-        .uri(( githubMapsOrgName))
         .authToken(githubApiToken)
+        .org(githubMapsOrgName)
+        .build();
+  }
+
+  public GithubClient githubClientErrorReporting() {
+    return GithubClient.builder()
+        .authToken(githubApiToken)
+        .org(tripleaOrgName)
         .build();
   }
 }

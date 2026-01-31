@@ -11,6 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.jdbi.v3.core.Jdbi;
 import org.triplea.maps.MapsController;
 import org.triplea.maps.indexing.MapsIndexingObjectFactory;
+import org.triplea.server.error.reporting.ErrorReportController;
+
+import java.util.List;
 
 /**
  * Main entry-point for launching drop wizard HTTP server. This class is responsible for configuring
@@ -60,6 +63,12 @@ public class SupportServerApplication extends Application<SupportServerConfig> {
     } else {
       log.info("Map indexing is disabled");
     }
-    environment.jersey().register(MapsController.build(jdbi));
+    List.of(
+            MapsController.build(jdbi),
+            ErrorReportController.build(
+                configuration.githubClientErrorReporting(),
+                configuration.getErrorReportingRepo(),
+                jdbi))
+        .forEach(controller -> environment.jersey().register(controller));
   }
 }
