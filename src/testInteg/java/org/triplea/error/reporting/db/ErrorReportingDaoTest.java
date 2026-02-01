@@ -10,20 +10,24 @@ import com.github.npathai.hamcrestopt.OptionalMatchers;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
+import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.triplea.maps.IntegTestExtension;
 import org.triplea.server.error.reporting.upload.ErrorReportingDao;
 import org.triplea.server.error.reporting.upload.InsertHistoryRecordParams;
 
-@RequiredArgsConstructor
-@ExtendWith(ErrorReportingModuleDatabaseTestSupport.class)
+@ExtendWith(IntegTestExtension.class)
 @ExtendWith(DBUnitExtension.class)
 final class ErrorReportingDaoTest {
   private final ErrorReportingDao errorReportingDao;
+
+  ErrorReportingDaoTest(Jdbi jdbi) {
+    errorReportingDao = jdbi.onDemand(ErrorReportingDao.class);
+  }
 
   /** Simple check that if we insert a record we'll get a new record in the expected dataset. */
   @DataSet(value = "error_reporting/empty_error_report_history.yml", useSequenceFiltering = false)

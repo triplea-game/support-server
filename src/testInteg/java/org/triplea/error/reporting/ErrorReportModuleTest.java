@@ -1,8 +1,9 @@
-package org.triplea.modules.error.reporting;
+package org.triplea.error.reporting;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -19,7 +20,7 @@ import org.triplea.http.client.error.report.ErrorReportRequest;
 import org.triplea.http.client.error.report.ErrorReportResponse;
 import org.triplea.http.client.github.CreateIssueRequest;
 import org.triplea.http.client.github.CreateIssueResponse;
-import org.triplea.http.client.github.GithubApiClient;
+import org.triplea.http.client.github.GithubClient;
 import org.triplea.server.error.reporting.upload.CreateIssueParams;
 import org.triplea.server.error.reporting.upload.ErrorReportModule;
 import org.triplea.server.error.reporting.upload.ErrorReportingDao;
@@ -40,7 +41,7 @@ class ErrorReportModuleTest {
           .errorReportRequest(ERROR_REPORT_REQUEST)
           .build();
 
-  @Mock private GithubApiClient githubApiClient;
+  @Mock private GithubClient githubApiClient;
   @Mock private ErrorReportingDao errorReportingDao;
 
   private ErrorReportModule errorReportModule;
@@ -49,12 +50,12 @@ class ErrorReportModuleTest {
   void setup() {
     errorReportModule =
         ErrorReportModule.builder()
-            .targetRepo()
+            .targetRepo("repo")
             .githubApiClient(githubApiClient)
             .errorReportingDao(errorReportingDao)
             .build();
 
-    when(githubApiClient.newIssue(any())).thenReturn(new CreateIssueResponse(GITHUB_ISSUE_URL));
+    when(githubApiClient.newIssue(eq("repo"), any())).thenReturn(new CreateIssueResponse(GITHUB_ISSUE_URL));
   }
 
   @Test
@@ -74,6 +75,7 @@ class ErrorReportModuleTest {
 
     verify(githubApiClient)
         .newIssue(
+            "repo",
             CreateIssueRequest.builder()
                 .body("body")
                 .title("title")
@@ -98,6 +100,7 @@ class ErrorReportModuleTest {
 
     verify(githubApiClient)
         .newIssue(
+            "repo",
             CreateIssueRequest.builder()
                 .body("body")
                 .title("title")

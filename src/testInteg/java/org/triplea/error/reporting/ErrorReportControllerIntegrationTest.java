@@ -1,4 +1,4 @@
-package org.triplea.modules.error.reporting;
+package org.triplea.error.reporting;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -7,28 +7,22 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import java.net.URI;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.glassfish.jersey.server.Uri;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.triplea.http.client.LobbyHttpClientConfig;
 import org.triplea.http.client.error.report.CanUploadRequest;
 import org.triplea.http.client.error.report.ErrorReportClient;
 import org.triplea.http.client.error.report.ErrorReportRequest;
 import org.triplea.http.client.error.report.ErrorReportResponse;
+import org.triplea.maps.IntegTestExtension;
 
-@Slf4j
+@ExtendWith(IntegTestExtension.class)
 class ErrorReportControllerIntegrationTest {
   private final ErrorReportClient client;
 
-  ErrorReportControllerIntegrationTest() {
-    log.info("System props: " + System.getProperties());
-    log.info("Env vars: " + System.getenv());
-
-    String host = Optional.ofNullable(System.getenv("LOBBY_HOST")).orElse("localhost");
-    String port = Optional.ofNullable(System.getenv("LOBBY_TCP_8080")).orElse("8080");
-    log.info("Using host: {}:{}", host, port);
-    final URI localhost = URI.create(String.format("http://%s:%s", host, port));
-    LobbyHttpClientConfig.setConfig(
-        LobbyHttpClientConfig.builder().clientVersion("2.7").systemId("system").build());
-    client = ErrorReportClient.newClient(localhost);
+  ErrorReportControllerIntegrationTest(URI serverUri) {
+    client = ErrorReportClient.newClient(serverUri);
   }
 
   @Test

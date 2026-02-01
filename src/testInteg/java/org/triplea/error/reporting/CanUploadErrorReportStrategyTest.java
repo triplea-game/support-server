@@ -1,4 +1,4 @@
-package org.triplea.modules.error.reporting;
+package org.triplea.error.reporting;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;

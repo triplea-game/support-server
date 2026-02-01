@@ -37,7 +37,7 @@ class GithubClientTest {
     stubRepoListingResponse(3, server, "[]");
 
     final Collection<MapRepoListing> repos =
-        new GithubClient(URI.create(server.baseUrl()), "", "exmaple-org").listRepositories();
+        new GithubClient(URI.create(server.baseUrl()), "", "example-org").listRepositories();
 
     assertThat(repos, hasSize(3));
 

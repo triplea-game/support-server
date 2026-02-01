@@ -50,7 +50,8 @@ public class SupportServerConfig extends Configuration {
   private boolean logSqlStatements;
 
   public GithubClient githubClientMaps() {
-    return GithubClient.builder().authToken(githubApiToken).org(githubMapsOrgName).build();
+    return GithubClient.builder()
+        .authToken(githubApiToken).org(githubMapsOrgName).build();
   }
 
   public GithubClient githubClientErrorReporting() {
