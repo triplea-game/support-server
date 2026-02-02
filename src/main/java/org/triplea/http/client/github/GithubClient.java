@@ -43,7 +43,7 @@ public class GithubClient {
     LatestReleaseResponse getLatestRelease(@Param("org") String org, @Param("repo") String repo);
   }
 
-  private static final String GITHUB_HOST = "api.github.com";
+  private static final String GITHUB_HOST = "https://api.github.com";
 
   private final GithubApiFeignClient githubApiFeignClient;
   private final String org;

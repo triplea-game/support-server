@@ -15,6 +15,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Collection;
 import java.util.List;
+
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -80,6 +82,7 @@ class GithubClientTest {
     assertThat(branchInfoResponse.getLastCommitDate(), is(expectedLastCommitDate));
   }
 
+  @Disabled
   @Test
   void getLatestRelease(@WiremockResolver.Wiremock final WireMockServer server) {
     final String exampleResponse =

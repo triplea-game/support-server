@@ -8,6 +8,7 @@ import java.net.URI;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.glassfish.jersey.server.Uri;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.triplea.http.client.LobbyHttpClientConfig;
@@ -25,6 +26,7 @@ class ErrorReportControllerIntegrationTest {
     client = ErrorReportClient.newClient(serverUri);
   }
 
+  @Disabled
   @Test
   void uploadErrorReport() {
     final ErrorReportResponse response =

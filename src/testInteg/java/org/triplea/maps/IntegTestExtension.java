@@ -16,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
+import org.triplea.http.client.LobbyHttpClientConfig;
 
 /**
  *
@@ -54,6 +55,9 @@ public class IntegTestExtension
     GlobalConfig.instance().getDbUnitConfig().user("support_user");
     GlobalConfig.instance().getDbUnitConfig().password("support_user");
     GlobalConfig.instance().getDbUnitConfig().driver("org.postgresql.Driver");
+
+    LobbyHttpClientConfig.setConfig(
+        LobbyHttpClientConfig.builder().clientVersion("2.7").systemId("system").build());
   }
 
   @Override
