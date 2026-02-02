@@ -1,6 +1,7 @@
 githubApiToken: ${GITHUB_API_TOKEN:-}
 githubMapsOrgName: triplea-maps
-
+tripleaOrgName: triplea-game
+errorReportingRepo: triplea
 
 # If map indexing is enabled, it will begin shortly after server startup.
 # If disabled no map indexing will occur.
