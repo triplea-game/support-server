@@ -5,13 +5,9 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 
 import java.net.URI;
-import java.util.Optional;
-import lombok.extern.slf4j.Slf4j;
-import org.glassfish.jersey.server.Uri;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.triplea.http.client.LobbyHttpClientConfig;
 import org.triplea.http.client.error.report.CanUploadRequest;
 import org.triplea.http.client.error.report.ErrorReportClient;
 import org.triplea.http.client.error.report.ErrorReportRequest;

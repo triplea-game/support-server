@@ -55,7 +55,8 @@ class ErrorReportModuleTest {
             .errorReportingDao(errorReportingDao)
             .build();
 
-    when(githubApiClient.newIssue(eq("repo"), any())).thenReturn(new CreateIssueResponse(GITHUB_ISSUE_URL));
+    when(githubApiClient.newIssue(eq("repo"), any()))
+        .thenReturn(new CreateIssueResponse(GITHUB_ISSUE_URL));
   }
 
   @Test
