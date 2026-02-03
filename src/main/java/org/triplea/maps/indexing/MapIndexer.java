@@ -11,7 +11,10 @@ import lombok.Builder;
 import lombok.Getter;
 import org.triplea.http.client.github.GithubClient;
 import org.triplea.http.client.github.MapRepoListing;
-import org.triplea.maps.indexing.tasks.*;
+import org.triplea.maps.indexing.tasks.CommitDateFetcher;
+import org.triplea.maps.indexing.tasks.DownloadSizeFetcher;
+import org.triplea.maps.indexing.tasks.MapDescriptionReader;
+import org.triplea.maps.indexing.tasks.MapNameReader;
 
 /** MapIndexer physically fetches the data required to index a map. */
 @Builder
