@@ -2,7 +2,8 @@ package org.triplea.http.client.github;
 
 import com.google.gson.annotations.SerializedName;
 import java.net.URI;
-import lombok.*;
+import lombok.Builder;
+import lombok.Value;
 
 /** Response object from Github listing the details of an organization's repositories. */
 @Value

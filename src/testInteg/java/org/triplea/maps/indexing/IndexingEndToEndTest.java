@@ -27,7 +27,7 @@ public class IndexingEndToEndTest {
    */
   @Test
   void verifyIndexing() {
-    var githubClient = GithubClient.build("", "triplea-maps");
+    var githubClient = new GithubClient("", "triplea-maps");
     MapIndexDao dao = new MapIndexDao(jdbi);
     MapIndexingTaskRunner taskRunner =
         new MapIndexingTaskRunner(dao, githubClient, MapIndexer.build(githubClient), 0);

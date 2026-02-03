@@ -22,8 +22,8 @@ public class MapsIndexingObjectFactory {
         .period(Duration.ofMinutes(configuration.getMapIndexingPeriodMinutes()))
         .task(
             MapIndexingTaskRunner.builder()
-                .githubClient(configuration.createGithubApiClient())
-                .mapIndexer(MapIndexer.build(configuration.createGithubApiClient()))
+                .githubClient(configuration.githubClientMaps())
+                .mapIndexer(MapIndexer.build(configuration.githubClientMaps()))
                 .mapIndexDao(new MapIndexDao(jdbi))
                 .indexingTaskDelaySeconds(configuration.getIndexingTaskDelaySeconds())
                 .build())
