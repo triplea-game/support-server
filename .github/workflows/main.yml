@@ -23,7 +23,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-      - uses: webfactory/ssh-agent@v0.9.1
+      - uses: webfactory/ssh-agent@v0.10.0
         with:
           ssh-private-key: ${{ secrets.DEPLOY_SUPPORT_SERVER_USER_PRIVATE_SSH_KEY }}
       - name: Login to GitHub Container Registry
