@@ -85,12 +85,12 @@ tasks.clean {
 
 tasks {
     withType<Test> {
-        useJUnitPlatform()
-        testLogging {
-            events("standardOut", "standardError", "skipped", "failed")
+            useJUnitPlatform()
+            testLogging {
+                events("standardOut", "standardError", "skipped", "failed")
+            }
+            jvmArgs("-XX:+EnableDynamicAgentLoading", "-Duser.timezone=UTC")
         }
-        jvmArgs("-XX:+EnableDynamicAgentLoading")
-    }
 }
 
 spotless {

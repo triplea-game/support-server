@@ -1,0 +1,257 @@
+map_index:
+- id: 1000
+  map_name: 1914-cow-empires
+  repo_url: https://github.com/triplea-maps/1914-cow-empires
+  default_branch: master
+  description: '<br>Version 1.0, last update 2014.12.07 for engine 1.8.0.3
+
+    <br>Game done by RogerCooper
+
+    <br>Suggestions to RogerCoop@aol.com
+
+    <br>
+
+    <br>a.) Content:
+
+    <br>1 Game
+
+    <br>1914-COW-Empires
+
+    <br>
+
+    <br>b.) Rough overview:
+
+    <br>A WW1 scenario using the Napoleonic Empires map and military/economic data from the Correlates of War database.
+
+    <br>
+
+    <br>c.) General tips:
+
+    <br>Read game notes before playing.
+
+    <br>
+
+    '
+  download_url: https://github.com/triplea-maps/1914-cow-empires/archive/refs/heads/master.zip
+  preview_image_url: https://github.com/triplea-maps/1914-cow-empires/blob/master/preview.png?raw=true
+  download_size_bytes: 4287712
+  last_commit_date: '2021-09-16 05:43:46.0'
+- id: 1001
+  map_name: 1939ARevised
+  repo_url: https://github.com/triplea-maps/1939ARevised
+  default_branch: master
+  description: 'No description available for: https://github.com/triplea-maps/1939ARevised. Contact the map author and request they add a ''description.html'' file'
+  download_url: https://github.com/triplea-maps/1939ARevised/archive/refs/heads/master.zip
+  preview_image_url: https://github.com/triplea-maps/1939ARevised/blob/master/preview.png?raw=true
+  download_size_bytes: 1301896
+  last_commit_date: '2022-11-27 15:00:22.0'
+- id: 1002
+  map_name: 1939_Pact_of_Steel_Big_World
+  repo_url: https://github.com/triplea-maps/1939_Pact_of_Steel_Big_World
+  default_branch: master
+  description: 1939 on the Big World Map with 7 powers
+  download_url: https://github.com/triplea-maps/1939_Pact_of_Steel_Big_World/archive/refs/heads/master.zip
+  preview_image_url: https://github.com/triplea-maps/1939_Pact_of_Steel_Big_World/blob/master/preview.png?raw=true
+  download_size_bytes: 803364
+  last_commit_date: '2022-09-04 18:12:31.0'
+- id: 1003
+  map_name: '1941'
+  repo_url: https://github.com/triplea-maps/1941
+  default_branch: master
+  description: 'No description available for: https://github.com/triplea-maps/1941. Contact the map author and request they add a ''description.html'' file'
+  download_url: https://github.com/triplea-maps/1941/archive/refs/heads/master.zip
+  preview_image_url: https://github.com/triplea-maps/1941/blob/master/preview.png?raw=true
+  download_size_bytes: 8553163
+  last_commit_date: '2021-09-16 05:43:38.0'
+- id: 1004
+  map_name: 1941_global_command_decision
+  repo_url: https://github.com/triplea-maps/1941_global_command_decision
+  default_branch: master
+  description: "<br>\n<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>1941 GLOBAL COMMAND DECISION</b>\n<br>by Black Elk (graphics/testing) & TheDog (code/testing)\n<br>\n<br><b>Introduction</b>\n<br>It is late 1941; Germany has launched a massive invasion against the USSR and Japan is ready to strike at the USA in the Pacific.\n<br>\n<br><b>FEATURES</b>\n<br>• Massive map 16816x8085px=136Mpx, one of the biggest TripleA maps.  Unit size 54px high, this is with 4K screens in mind.\n<br>• Nearly 800 land & sea locations, with terrain effects, Desert, Forest, Marsh, Tundra, Urban, impassable mountains, canals\n<br>\n<br>• Stacking limit is enforced to help the AI.  Only 10 Air & 10 Sea units are allowed per Sea Zone/Territory.  Only 20 Land per Territory.\n<br>• AI friendly, no Objectives, or Politics/Technology phases, both are scripted.  79 territories marked to guide the AI for better play.\n<br>\n<br>• Sea Zones are worth 1-2pu/turn and for Britain and Japan are vital for their survival\n<br>• All land territories bordering Sea Zones can be blockaded.  There are no convoy centres/route/zones.\n<br>\n<br>• Four Lend-Lease-Depots, 3 in USSR Archangelsk, Persian Corridor to Baku, Vladivostok  and Burma Road to Yunnan China\n<br>• Four types of HQ Commands, Air, Army, Fleet and Submarine, nations can have between none and five types of a HQ.  \n<br>&nbsp;&nbsp;&nbsp;&nbsp;These represent Rommel, Montgomery, Patton, Cunningham, Donitz, Nimitz, US 8th Air Force HQs etc. and their staff.\n<br>• Four different type of “Factory”\n<br>\n<br>• As a minimum requires TripleA 2.7.14848+\n<br>\n<br>For the latest download and discussion, copy and paste the link below\n<br>\n<br><a href=\"https://forums.triplea-game.org/topic/3326/1941-global-command-decision\">https://forums.triplea-game.org/topic/3326/1941-global-command-decision</a>\n<br>\n<br>"
+  download_url: https://github.com/triplea-maps/1941_global_command_decision/archive/refs/heads/master.zip
+  preview_image_url: https://github.com/triplea-maps/1941_global_command_decision/blob/master/preview.png?raw=true
+  download_size_bytes: 94976745
+  last_commit_date: '2026-03-14 08:07:45.0'
+- id: 1005
+  map_name: 2013Conflict
+  repo_url: https://github.com/triplea-maps/2013Conflict
+  default_branch: master
+  description: Hypothetical World War 3 in 2013.
+  download_url: https://github.com/triplea-maps/2013Conflict/archive/refs/heads/master.zip
+  preview_image_url: https://github.com/triplea-maps/2013Conflict/blob/master/preview.png?raw=true
+  download_size_bytes: 9717791
+  last_commit_date: '2023-07-15 13:09:14.0'
+- id: 1006
+  map_name: '2020'
+  repo_url: https://github.com/triplea-maps/2020
+  default_branch: master
+  description: 'No description available for: https://github.com/triplea-maps/2020. Contact the map author and request they add a ''description.html'' file'
+  download_url: https://github.com/triplea-maps/2020/archive/refs/heads/master.zip
+  preview_image_url: https://github.com/triplea-maps/2020/blob/master/preview.png?raw=true
+  download_size_bytes: 2670316
+  last_commit_date: '2021-10-20 23:11:09.0'
+- id: 1007
+  map_name: 270BC_Tertiered
+  repo_url: https://github.com/triplea-maps/270BC_Variants
+  default_branch: master
+  description: 'No description available for: https://github.com/triplea-maps/270BC_Variants. Contact the map author and request they add a ''description.html'' file'
+  download_url: https://github.com/triplea-maps/270BC_Variants/archive/refs/heads/master.zip
+  preview_image_url: https://github.com/triplea-maps/270BC_Variants/blob/master/preview.png?raw=true
+  download_size_bytes: 8052661
+  last_commit_date: '2022-02-16 23:07:11.0'
+- id: 1008
+  map_name: 270bc
+  repo_url: https://github.com/triplea-maps/270bc
+  default_branch: master
+  description: '<br>By Doctor Che
+
+    <br>Updated by Redrum
+
+    <br>
+
+    <br>Ancient Era Map of the Mediterranean
+
+    <br>
+
+    <br>Make yourself an empire around the Mediterranean Sea (the known world),
+
+    <br>in the era when Hellenes, Romans, and Phoenicians ruled. Choose from a arsenal of
+
+    <br>legionaires, hoplites, onagers, cataphracts, triremes, war elephants, and many more.
+
+    <br>Territory names are based on cities at the time give or take 500 years.
+
+    <br>
+
+    '
+  download_url: https://github.com/triplea-maps/270bc/archive/refs/heads/master.zip
+  preview_image_url: https://github.com/triplea-maps/270bc/blob/master/preview.png?raw=true
+  download_size_bytes: 8087243
+  last_commit_date: '2021-09-16 05:43:45.0'
+- id: 1009
+  map_name: 270bc_wars
+  repo_url: https://github.com/triplea-maps/270bc_wars
+  default_branch: master
+  description: '<br>By Cernel.
+
+    <br>Original 270BC map and game by Doctor Che.
+
+    <br>Original 270BC game modified by Veqryn, Cernel, redrum.
+
+    <br>Original 270BC map details and decorations, "TripleA Ancient" image, units images, territory names images, territory values images, dice images by Hepps.
+
+    <br>
+
+    <br>Mistress of Italy, Rome, looking over the sea, discovers herself engaged in the inexorable struggle for survival against the might of Carthage, encroaching on Africa and Spain, and the islands nearby, as far as the columns of Hercules, the end of the World.
+
+    <br>In Greece, the royal hegemony of Macedonia is bitterly challenged by a warring coalition of free cities and leagues, from Sicily, in the west, to Asia, in the east.
+
+    <br>Across what remains of what was taken by Alexander, what had begun as a spate of civil conflicts conflated into a dynastic strife between the new realms of Egypt and Syria.
+
+    <br>Beyond the Hellenistic world, the ascendancy of Parthia looms on the horizon, eager to champion the resurgence of Persian supremacy to her former greatness.
+
+    <br>Meanwhile, hailing from unknown lands, the tribes of Numidia are swarming out of the wilds of Libya, their savage want for slaves and violent desire for booty, unquenchable.
+
+    <br>''Tis a clash of civilizations: for either side, the other side is to be eliminated.
+
+    <br>
+
+    <br>Special thanks to Navalland, guerrilla_J and Aposteles for play-testing.
+
+    '
+  download_url: https://github.com/triplea-maps/270bc_wars/archive/refs/heads/master.zip
+  preview_image_url: https://github.com/triplea-maps/270bc_wars/blob/master/preview.png?raw=true
+  download_size_bytes: 24085728
+  last_commit_date: '2021-09-16 05:43:38.0'
+- id: 1010
+  map_name: 300BC
+  repo_url: https://github.com/triplea-maps/300BC
+  default_branch: master
+  description: The Mediterranean in 300BC.
+  download_url: https://github.com/triplea-maps/300BC/archive/refs/heads/master.zip
+  preview_image_url: https://github.com/triplea-maps/300BC/blob/master/preview.png?raw=true
+  download_size_bytes: 1903629
+  last_commit_date: '2023-01-07 15:37:35.0'
+- id: 1011
+  map_name: 41_Oztea
+  repo_url: https://github.com/triplea-maps/41_Oztea_Variants
+  default_branch: master
+  description: 'No description available for: https://github.com/triplea-maps/41_Oztea_Variants. Contact the map author and request they add a ''description.html'' file'
+  download_url: https://github.com/triplea-maps/41_Oztea_Variants/archive/refs/heads/master.zip
+  preview_image_url: https://github.com/triplea-maps/41_Oztea_Variants/blob/master/preview.png?raw=true
+  download_size_bytes: 26833930
+  last_commit_date: '2021-07-18 02:20:28.0'
+- id: 1012
+  map_name: 6Kingdoms
+  repo_url: https://github.com/triplea-maps/6Kingdoms
+  default_branch: master
+  description: A war between two alliances of fantasy kingdoms.
+  download_url: https://github.com/triplea-maps/6Kingdoms/archive/refs/heads/master.zip
+  preview_image_url: https://github.com/triplea-maps/6Kingdoms/blob/master/preview.png?raw=true
+  download_size_bytes: 2541514
+  last_commit_date: '2023-12-06 22:09:36.0'
+- id: 1013
+  map_name: AA50-41-Maintenance
+  repo_url: https://github.com/triplea-maps/AA50-41-Maintenance
+  default_branch: master
+  description: World War 2 Version 3 with Maintenance costs.
+  download_url: https://github.com/triplea-maps/AA50-41-Maintenance/archive/refs/heads/master.zip
+  preview_image_url: https://github.com/triplea-maps/AA50-41-Maintenance/blob/master/preview.png?raw=true
+  download_size_bytes: 9270272
+  last_commit_date: '2024-02-04 15:07:17.0'
+- id: 1014
+  map_name: AA50-BuildCaps
+  repo_url: https://github.com/triplea-maps/AA50-BuildCaps
+  default_branch: master
+  description: AA50/World World V3/Anniversary edition with production capped at what came in the box.
+  download_url: https://github.com/triplea-maps/AA50-BuildCaps/archive/refs/heads/master.zip
+  preview_image_url: https://github.com/triplea-maps/AA50-BuildCaps/blob/master/preview.png?raw=true
+  download_size_bytes: 9458131
+  last_commit_date: '2023-11-07 01:22:11.0'
+- id: 1015
+  map_name: AA50-Europe
+  repo_url: https://github.com/triplea-maps/AA50-Europe
+  default_branch: master
+  description: World Word 2 in Europe on the AA50 map
+  download_url: https://github.com/triplea-maps/AA50-Europe/archive/refs/heads/master.zip
+  preview_image_url: https://github.com/triplea-maps/AA50-Europe/blob/master/preview.png?raw=true
+  download_size_bytes: 9611525
+  last_commit_date: '2025-05-15 22:05:44.0'
+- id: 1016
+  map_name: AA50-realistic
+  repo_url: https://github.com/triplea-maps/AA50-realistic
+  default_branch: master
+  description: World War II v3, 1942 with an modified setup.
+  download_url: https://github.com/triplea-maps/AA50-realistic/archive/refs/heads/master.zip
+  preview_image_url: https://github.com/triplea-maps/AA50-realistic/blob/master/preview.png?raw=true
+  download_size_bytes: 10492327
+  last_commit_date: '2024-07-04 15:01:42.0'
+- id: 1017
+  map_name: AAC-BuildCaps
+  repo_url: https://github.com/triplea-maps/AAC-BuildCaps
+  default_branch: master
+  description: 'No description available for: https://github.com/triplea-maps/AAC-BuildCaps. Contact the map author and request they add a ''description.html'' file'
+  download_url: https://github.com/triplea-maps/AAC-BuildCaps/archive/refs/heads/master.zip
+  preview_image_url: https://github.com/triplea-maps/AAC-BuildCaps/blob/master/preview.png?raw=true
+  download_size_bytes: 8788099
+  last_commit_date: '2022-01-19 00:42:14.0'
+- id: 1018
+  map_name: AAR-BuildCaps
+  repo_url: https://github.com/triplea-maps/AAR-BuildCaps
+  default_branch: master
+  description: 'World War II Revised with caps on how many units of each type that can be built.
+
+    '
+  download_url: https://github.com/triplea-maps/AAR-BuildCaps/archive/refs/heads/master.zip
+  preview_image_url: https://github.com/triplea-maps/AAR-BuildCaps/blob/master/preview.png?raw=true
+  download_size_bytes: 3026055
+  last_commit_date: '2024-12-29 20:46:17.0'
+- id: 1019
+  map_name: AAZ
+  repo_url: https://github.com/triplea-maps/AAZ
+  default_branch: master
+  description: "<b>Axis & Allies & Zombies</b>\n\t\t\t\t\t<br>\n\t\t\t\t\t<br>1. No strategic bombing.\n\t\t\t\t\t<br>2. No AA Guns / Mechanized Infantry / Cruisers.\n\t\t\t\t\t<br>3. No shore bombardment.\n\t\t\t\t\t<br>4. Cannot build new factories.\n\t\t\t\t\t<br>5. Recruitment centers are like factories but only build infantry\n\t\t\t\t\t<br>6  For balance, 3 Zombies start in Germany\n\t\t\t\t\t<br><b>Victory Condition:</b>\n\t\t\t\t\t<br> Take 1 enemy capital and hold all your own\n\t\t\t\t\t<br> Zombies win if their income reaches 25\n            <br>Set Game/User Notifications/Show Trigger/Condition Change Roll Failure to off\n\t\t\t\t\t\t<br>Based upon Axis & Allies & Zombies\n\t\t\t\t\t\t<br>Player nations are not allowed to invade neutrals, but can move in once zombies have taken over.\n\t\t\t\t\t\t<br>Note that in this weIrd alternate history scenario, the Zombies are restless dead (Draugr) and not contagious as in most modern zombie fiction. They are capable of using weaponry, but too impaired to handle sophisticated weaponry or coordinate their actions.\n\t\t\t\t\t\t<br>The dead were awakened uncontrallably by Nazi occultists\n\t\t\t\t\t\t<br>The big change from the original game is that Zombies are not spawned by killing infantry, as there was no way to handle that in TripleA. Instead every area has 1% chance per turn of spawning a horde of 10. In addition each area has a 10% chance each turn of spawning 1.\n\t\t\t\t\t<br> Created for TripleA by Roger Cooper"
+  download_url: https://github.com/triplea-maps/AAZ/archive/refs/heads/master.zip
+  preview_image_url: https://github.com/triplea-maps/AAZ/blob/master/preview.png?raw=true
+  download_size_bytes: 1908091
+  last_commit_date: '2024-07-08 02:34:19.0'
