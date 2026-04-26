@@ -38,7 +38,7 @@ class GithubClientTest {
     stubRepoListingResponse(3, server, "[]");
 
     final Collection<MapRepoListing> repos =
-        new GithubClient(URI.create(server.baseUrl()), "", "example-org").listRepositories();
+        GithubClient.build(URI.create(server.baseUrl()), "", "example-org").listRepositories();
 
     assertThat(repos, hasSize(3));
 
@@ -73,7 +73,7 @@ class GithubClientTest {
             .willReturn(aResponse().withStatus(200).withBody(exampleResponse)));
 
     final BranchInfoResponse branchInfoResponse =
-        new GithubClient(URI.create(server.baseUrl()), "test-token", "example-org")
+        GithubClient.build(URI.create(server.baseUrl()), "test-token", "example-org")
             .fetchBranchInfo("map-repo", "main");
 
     final Instant expectedLastCommitDate =
@@ -92,7 +92,7 @@ class GithubClientTest {
             .willReturn(aResponse().withStatus(200).withBody(exampleResponse)));
 
     final String latestVersion =
-        new GithubClient(URI.create(server.baseUrl()), "example-org", "test-token")
+        GithubClient.build(URI.create(server.baseUrl()), "example-org", "test-token")
             .fetchLatestVersion("map-repo")
             .orElseThrow();
 
