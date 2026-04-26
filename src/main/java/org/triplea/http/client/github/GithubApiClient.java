@@ -31,9 +31,8 @@ class GithubApiClient implements GithubClient {
 
   /**
    * @param baseUri The base URI for the Github webservice API.
-   * @param authToken Auth token sent to Github for webservice calls. Can be empty, but if
-   *     specified must be valid (no auth token still works, but rate limits will be more
-   *     restrictive).
+   * @param authToken Auth token sent to Github for webservice calls. Can be empty, but if specified
+   *     must be valid (no auth token still works, but rate limits will be more restrictive).
    * @param org Name of the Github org to be queried.
    */
   GithubApiClient(@Nonnull URI baseUri, String authToken, @Nonnull String org) {
