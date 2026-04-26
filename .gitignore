@@ -1,4 +1,5 @@
 .classpath
+.docs/
 .gradle
 .idea/*
 !.idea/runConfigurations
