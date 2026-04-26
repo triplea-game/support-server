@@ -102,7 +102,7 @@ spotless {
 }
 
 val dropWizardVersion = "4.0.7"
-val feignVersion = "13.6"
+val gsonVersion = "2.12.1"
 val jaxbVersion = "4.0.5"
 val junitVersion = "5.13.4"
 val mockitoVersion = "5.19.0"
@@ -111,14 +111,13 @@ val tripleaVersion = "2.7.15281"
 dependencies {
     implementation("at.favre.lib:bcrypt:0.10.2")
     implementation("be.tomcools:dropwizard-websocket-jsr356-bundle:4.0.0")
+    implementation("com.google.code.gson:gson:$gsonVersion")
     implementation("com.sun.mail:jakarta.mail:2.0.2")
     implementation("com.sun.xml.bind:jaxb-core:$jaxbVersion")
     implementation("com.sun.xml.bind:jaxb-impl:$jaxbVersion")
     implementation("io.dropwizard:dropwizard-auth:$dropWizardVersion")
     implementation("io.dropwizard:dropwizard-core:$dropWizardVersion")
     implementation("io.dropwizard:dropwizard-jdbi3:$dropWizardVersion")
-    implementation("io.github.openfeign:feign-core:$feignVersion")
-    implementation("io.github.openfeign:feign-gson:$feignVersion")
     implementation("javax.activation:activation:1.1.1")
     implementation("javax.servlet:servlet-api:2.5")
     implementation("javax.xml.bind:jaxb-api:2.3.1")
@@ -128,7 +127,6 @@ dependencies {
     implementation("org.jdbi:jdbi3-sqlobject:3.49.5")
     implementation("org.snakeyaml:snakeyaml-engine:2.10")
     implementation("triplea:domain-data:$tripleaVersion")
-    implementation("triplea:feign-common:$tripleaVersion")
     implementation("triplea:java-extras:$tripleaVersion")
     implementation("triplea:lobby-client:$tripleaVersion")
     implementation("triplea:websocket-client:$tripleaVersion")
