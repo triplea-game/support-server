@@ -7,6 +7,10 @@ SSH_USER ?= $${USER}
 
 all: format check
 
+setup: ## Installs pre-commit as a pre-push git hook (requires pre-commit to be installed)
+	uv tool install pre-commit
+	pre-commit install --hook-type pre-push
+
 help: ## Show this help text
 	grep -h -E '^[a-z]+.*:' $(MAKEFILE_LIST) | \
 		awk -F ":|#+" '{printf "\033[31m%s $(nc) \n   %s $(nc)\n    \033[3;37mDepends On: $(nc) [ %s ]\n", $$1, $$3, $$2}'
