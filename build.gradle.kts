@@ -102,6 +102,7 @@ spotless {
 }
 
 val dropWizardVersion = "4.0.7"
+val feignVersion = "13.6"
 val gsonVersion = "2.12.1"
 val jaxbVersion = "4.0.5"
 val junitVersion = "5.13.4"
@@ -131,6 +132,10 @@ dependencies {
     implementation("triplea:lobby-client:$tripleaVersion")
     implementation("triplea:websocket-client:$tripleaVersion")
     runtimeOnly("org.postgresql:postgresql:42.7.7")
+
+    testImplementation("io.github.openfeign:feign-core:$feignVersion")
+    testImplementation("io.github.openfeign:feign-gson:$feignVersion")
+    testImplementation("triplea:feign-common:$tripleaVersion")
 
     testImplementation("com.github.database-rider:rider-junit5:1.44.0")
     testImplementation("com.github.npathai:hamcrest-optional:2.0.0")
