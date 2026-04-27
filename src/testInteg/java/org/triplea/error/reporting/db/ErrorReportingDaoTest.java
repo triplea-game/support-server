@@ -16,11 +16,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.triplea.maps.IntegTestExtension;
+import org.triplea.maps.DbOnlyExtension;
 import org.triplea.server.error.reporting.upload.ErrorReportingDao;
 import org.triplea.server.error.reporting.upload.InsertHistoryRecordParams;
 
-@ExtendWith(IntegTestExtension.class)
+@ExtendWith(DbOnlyExtension.class)
 @ExtendWith(DBUnitExtension.class)
 final class ErrorReportingDaoTest {
   private final ErrorReportingDao errorReportingDao;

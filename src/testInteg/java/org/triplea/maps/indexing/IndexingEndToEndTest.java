@@ -8,9 +8,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.triplea.http.client.github.GithubClient;
 import org.triplea.http.client.github.MapRepoListing;
-import org.triplea.maps.IntegTestExtension;
+import org.triplea.maps.DbOnlyExtension;
 
-@ExtendWith(IntegTestExtension.class)
+@ExtendWith(DbOnlyExtension.class)
 @AllArgsConstructor
 public class IndexingEndToEndTest {
   final Jdbi jdbi;

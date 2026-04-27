@@ -14,7 +14,7 @@ import org.triplea.java.timer.Timers;
  * stopped. Typically used for things like periodic indexing jobs.
  */
 @Slf4j
-public class ScheduledTask implements Managed {
+public class ScheduledTask implements TaskLifecycle, Managed {
 
   private final String taskName;
   private final ScheduledTimer taskTimer;

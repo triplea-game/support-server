@@ -24,7 +24,7 @@ repositories {
 
 tasks.jar {
     manifest {
-        attributes["Main-Class"] = "org.triplea.server.SupportServerApplication"
+        attributes["Main-Class"] = "org.triplea.server.dropwizard.SupportServerApplication"
     }
 }
 

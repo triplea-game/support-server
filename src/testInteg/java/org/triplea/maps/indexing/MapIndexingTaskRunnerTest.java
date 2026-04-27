@@ -11,11 +11,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.triplea.http.client.github.GithubClient;
 import org.triplea.http.client.github.MapRepoListing;
-import org.triplea.maps.IntegTestExtension;
+import org.triplea.maps.DbOnlyExtension;
 import org.triplea.maps.TestData;
 
 @AllArgsConstructor
-@ExtendWith(IntegTestExtension.class)
+@ExtendWith(DbOnlyExtension.class)
 class MapIndexingTaskRunnerTest {
   final Jdbi jdbi;
 

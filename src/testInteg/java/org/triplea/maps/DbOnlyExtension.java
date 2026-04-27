@@ -1,0 +1,73 @@
+package org.triplea.maps;
+
+import com.github.database.rider.core.configuration.GlobalConfig;
+import com.github.database.rider.junit5.DBUnitExtension;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.sqlobject.SqlObjectPlugin;
+import org.junit.jupiter.api.extension.BeforeAllCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.ParameterContext;
+import org.junit.jupiter.api.extension.ParameterResolutionException;
+import org.junit.jupiter.api.extension.ParameterResolver;
+
+/**
+ * JUnit 5 extension for tests that need only a live database (no server process). Provides {@link
+ * Jdbi} parameter injection and runs the db-cleanup script before each test.
+ *
+ * <p>Use {@link IntegTestExtension} instead when the test also needs the server URI.
+ */
+@ExtendWith(DBUnitExtension.class)
+public class DbOnlyExtension implements BeforeAllCallback, BeforeEachCallback, ParameterResolver {
+
+  private static Jdbi jdbi;
+
+  static String getDatabaseUrl() {
+    var host = System.getProperty("database_1.host");
+    var port = System.getProperty("database_1.tcp.5432");
+    return String.format("jdbc:postgresql://%s:%s/support_db", host, port);
+  }
+
+  @Override
+  public void beforeAll(final ExtensionContext context) {
+    if (jdbi == null) {
+      jdbi = Jdbi.create(getDatabaseUrl(), "support_user", "support_user");
+      jdbi.installPlugin(new SqlObjectPlugin());
+    }
+    GlobalConfig.instance().getDbUnitConfig().url(getDatabaseUrl());
+    GlobalConfig.instance().getDbUnitConfig().user("support_user");
+    GlobalConfig.instance().getDbUnitConfig().password("support_user");
+    GlobalConfig.instance().getDbUnitConfig().driver("org.postgresql.Driver");
+  }
+
+  @Override
+  public void beforeEach(final ExtensionContext context) throws Exception {
+    final URL cleanupFileUrl = getClass().getClassLoader().getResource("db-cleanup.sql");
+    if (cleanupFileUrl != null) {
+      final String cleanupSql = Files.readString(Path.of(cleanupFileUrl.toURI()));
+      jdbi.withHandle(handle -> handle.execute(cleanupSql));
+    }
+  }
+
+  @Override
+  public boolean supportsParameter(
+      final ParameterContext parameterContext, final ExtensionContext extensionContext)
+      throws ParameterResolutionException {
+    return parameterContext.getParameter().getType().equals(Jdbi.class);
+  }
+
+  @Override
+  public Object resolveParameter(
+      final ParameterContext parameterContext, final ExtensionContext extensionContext)
+      throws ParameterResolutionException {
+    if (parameterContext.getParameter().getType().equals(Jdbi.class)) {
+      return jdbi;
+    }
+    throw new IllegalStateException(
+        "Unsupported parameter type: " + parameterContext.getParameter().getType());
+  }
+}

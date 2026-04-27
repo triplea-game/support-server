@@ -13,11 +13,11 @@ import java.util.List;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.triplea.maps.IntegTestExtension;
+import org.triplea.maps.DbOnlyExtension;
 import org.triplea.maps.TestData;
 
 @DataSet(value = "map_index.yml", useSequenceFiltering = false)
-@ExtendWith(IntegTestExtension.class)
+@ExtendWith(DbOnlyExtension.class)
 @ExtendWith(DBUnitExtension.class)
 class MapIndexDaoTest {
 
