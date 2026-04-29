@@ -3,10 +3,8 @@ package org.triplea.maps.indexing;
 import com.google.common.annotations.VisibleForTesting;
 import java.net.URI;
 import java.time.Instant;
-import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.Deque;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
@@ -61,16 +59,20 @@ class MapIndexingTaskRunner implements Runnable {
     // create a stack of maps that we might need to index, pull one off at a time and do the
     // indexing.
     // Sleep between iterations to avoid rate limits.
-    final Deque<MapRepoListing> reposToIndex = new ArrayDeque<>(mapUris);
     int mapsIndexed = 0;
-    while (!reposToIndex.isEmpty()) {
-      var listing = reposToIndex.pop();
-      mapsIndexed++;
-      IndexingResult result = index(listing);
+    int errors = 0;
+    for (var listing : mapUris) {
       log.info("Indexing map: {}", listing.getUri());
-      mapIndexDao.recordIndexingStatus(listing, result);
       try {
-        Thread.sleep(indexingTaskDelaySeconds * 1000L);
+        IndexingResult result = index(listing);
+        mapIndexDao.recordIndexingStatus(listing, result);
+        mapsIndexed++;
+      } catch (Exception e) {
+        log.error("Error indexing map: " + listing.getUri(), e);
+        errors++;
+      }
+      try {
+        Thread.sleep(GithubClient.GITHUB_MIN_REQUEST_INTERVAL_MS);
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
         throw new RuntimeException("System aborted, process terminated while sleeping");
@@ -78,11 +80,16 @@ class MapIndexingTaskRunner implements Runnable {
     }
 
     log.info(
-        "Map indexing finished in {} ms, repos found: {}, repos with map.yml: {}, maps deleted: {}",
+        "Map indexing finished in {} ms,"
+            + " repos found: {},"
+            + " repos with map.yml: {},"
+            + " maps deleted: {},"
+            + " errors encountered: {}",
         (System.currentTimeMillis() - startTimeEpochMillis),
         totalNumberMaps,
         mapsIndexed,
-        mapsDeleted);
+        mapsDeleted,
+        errors);
   }
 
   // TODO: test me

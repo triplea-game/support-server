@@ -26,6 +26,13 @@ import ru.lanwen.wiremock.ext.WiremockUriResolver;
 class GithubClientTest {
 
   @Test
+  @DisplayName("Request rate constant should throttle to stay within the GitHub rate limit")
+  void githubMaxRequestRate_isExpectedThrottleDelay() {
+    // 3_600_000 ms per hour / 5000 requests per hour = 720 ms per request
+    assertThat(GithubClient.GITHUB_MIN_REQUEST_INTERVAL, is(720));
+  }
+
+  @Test
   void repoListing(@WiremockResolver.Wiremock final WireMockServer server) {
     stubRepoListingResponse(
         1,
