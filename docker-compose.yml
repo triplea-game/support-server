@@ -1,46 +1,38 @@
-# Launches a maps server with database
+# Launches a Postgres database and runs Flyway migrations.
+# Used by integration tests (testInteg source set) and for local development.
 
 services:
   database:
-    image: postgres:17
+    image: postgres:18
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
+      PGUSER: postgres
     volumes:
       - ./database/init/01-init-database.sql:/docker-entrypoint-initdb.d/01-init-database.sql
     ports:
-      - "${DATABASE_PORT}:5432"
+      - "${DATABASE_PORT:-5432}:5432"
     healthcheck:
       test: pg_isready -U support_user -d support_db
       interval: 3s
       retries: 10
       timeout: 3s
-  flyway:
-    build:
-      context: database/
-      dockerfile: flyway.Dockerfile
-    command: >
-      -locations=filesystem:/flyway/sql
-      -connectRetries=6
-      -connectRetriesInterval=5
-      -user=support_user
-      -password=support_user
-      -url=jdbc:postgresql://database:5432/support_db
-      -ignoreMigrationPatterns="repeatable:missing"
-      migrate
-    depends_on:
-      database:
-        condition: service_healthy
-  server:
+  support_server:
     build:
       dockerfile: Dockerfile
     environment:
-      - DATABASE_USER=support_user
-      - DATABASE_PASSWORD=support_user
-      - DB_URL=database:5432/support_db
+        - DATABASE_USER=support_user
+        - DATABASE_PASSWORD=support_user
+        - DB_URL=database:5432/support_db
     ports:
-      - "${SERVER_PORT}:8080"
+      - "${SERVER_PORT}:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/q/health"]
+      interval: 5s
+      retries: 10
+      timeout: 3s
+      start_period: 30s
     depends_on:
-      flyway:
-         condition: service_completed_successfully
+      database:
+        condition: service_healthy

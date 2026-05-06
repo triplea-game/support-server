@@ -2,19 +2,18 @@ package org.triplea.maps.indexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
+import org.triplea.http.client.github.GithubClient;
 import org.triplea.http.client.github.MapRepoListing;
-import org.triplea.server.SupportServerConfig;
 
 /** Validate we can scrape a real map on github and scrape correct data. */
+@QuarkusTest
 public class MapIndexingIntegrationTest {
 
   @Test
   void runIndexingOnTestMap() {
-    SupportServerConfig supportServerConfig = new SupportServerConfig();
-    supportServerConfig.setGithubMapsOrgName("triplea-maps");
-
-    final MapIndexer mapIndexerRunner = MapIndexer.build(supportServerConfig.githubClientMaps());
+    final MapIndexer mapIndexerRunner = MapIndexer.build(GithubClient.build("", "triplea-maps"));
 
     final MapIndex result =
         mapIndexerRunner.apply(

@@ -1,9 +1,8 @@
 plugins {
     id("java")
     id("io.freefair.lombok") version "8.14.2"
-    id("com.diffplug.spotless") version "8.2.1"
-    id("com.avast.gradle.docker-compose") version "0.17.12"
-    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("com.diffplug.spotless") version "7.2.1"
+    id("io.quarkus") version "3.34.6"
 }
 
 java {
@@ -16,24 +15,10 @@ repositories {
     maven {
         url = uri("https://maven.pkg.github.com/triplea-game/triplea")
         credentials {
-            username = System.getenv("GITHUB_ACTOR") ?: project.findProperty("triplea.github.username") as String?
-            password = System.getenv("GH_TOKEN") ?: project.findProperty("triplea.github.access.token") as String?
+            username = System.getenv("GITHUB_ACTOR") ?: project.findProperty("triplea_github_username") as String?
+            password = System.getenv("GH_TOKEN") ?: project.findProperty("triplea_github_access_token") as String?
         }
     }
-}
-
-tasks.jar {
-    manifest {
-        attributes["Main-Class"] = "org.triplea.server.SupportServerApplication"
-    }
-}
-
-tasks.shadowJar {
-    archiveClassifier.set("")
-    // mergeServiceFiles is needed by dropwizard
-    // Without this configuration parsing breaks and is unable to find connector type "http" for
-    // the following YAML snippet:  server: {applicationConnectors: [{type: http, port: 8080}]
-    mergeServiceFiles()
 }
 
 /* "testInteg" runs tests that require a database or a server to be running */
@@ -52,86 +37,76 @@ val testIntegTask = tasks.register<Test>("testInteg") {
     group = "verification"
     testClassesDirs = sourceSets["testInteg"].output.classesDirs
     classpath = sourceSets["testInteg"].runtimeClasspath
+    // Required for Quarkus @QuarkusTest to use the JBoss log manager
+    systemProperty("java.util.logging.manager", "org.jboss.logmanager.LogManager")
 }
 
 tasks.check {
     dependsOn(testIntegTask)
 }
 
-
-///* docker compose used to set up integ tests, starts a server and database */
-// See: https://github.com/avast/gradle-docker-compose-plugin
-dockerCompose {
-    captureContainersOutput = true
-    isRequiredBy(testIntegTask)
-    setProjectName("support-server")
-    // suppress unset variable warning, assign variables to empty string (which will result in random port numbers)
-    environment = mapOf("DATABASE_PORT" to "", "SERVER_PORT" to "")
-}
-
-tasks.composeBuild {
-    dependsOn(tasks.shadowJar)
-}
-
-tasks.register<Exec>("dockerComposeClean") {
-    group = "docker"
-    description = "Docker compose stop and removes volumes"
-    commandLine("docker", "compose", "down", "--volumes")
-}
-
 tasks.clean {
-    dependsOn(tasks.findByName("dockerComposeClean"))
+    // Clean Quarkus build artifacts
+    delete("build/quarkus-app")
 }
 
 tasks {
     withType<Test> {
-            useJUnitPlatform()
-            testLogging {
-                events("standardOut", "standardError", "skipped", "failed")
-            }
-            jvmArgs("-XX:+EnableDynamicAgentLoading", "-Duser.timezone=UTC")
+        useJUnitPlatform()
+        testLogging {
+            events("standardOut", "standardError", "skipped", "failed")
         }
+        jvmArgs("-XX:+EnableDynamicAgentLoading", "-Duser.timezone=UTC")
+    }
 }
 
 spotless {
     java {
         googleJavaFormat()
         removeUnusedImports()
-        expandWildcardImports()
     }
 }
 
-val dropWizardVersion = "4.0.7"
+val quarkusPlatformVersion = "3.34.6"
 val feignVersion = "13.6"
 val gsonVersion = "2.12.1"
-val jaxbVersion = "4.0.5"
 val junitVersion = "5.13.4"
 val mockitoVersion = "5.19.0"
 val tripleaVersion = "2.7.15281"
 
 dependencies {
-    implementation("at.favre.lib:bcrypt:0.10.2")
-    implementation("be.tomcools:dropwizard-websocket-jsr356-bundle:4.0.0")
-    implementation("com.google.code.gson:gson:$gsonVersion")
-    implementation("com.sun.mail:jakarta.mail:2.0.2")
-    implementation("com.sun.xml.bind:jaxb-core:$jaxbVersion")
-    implementation("com.sun.xml.bind:jaxb-impl:$jaxbVersion")
-    implementation("io.dropwizard:dropwizard-auth:$dropWizardVersion")
-    implementation("io.dropwizard:dropwizard-core:$dropWizardVersion")
-    implementation("io.dropwizard:dropwizard-jdbi3:$dropWizardVersion")
-    implementation("javax.activation:activation:1.1.1")
-    implementation("javax.servlet:servlet-api:2.5")
-    implementation("javax.xml.bind:jaxb-api:2.3.1")
-    implementation("org.apache.httpcomponents:httpclient:4.5.14")
-    implementation("org.java-websocket:Java-WebSocket:1.6.0")
+    implementation(enforcedPlatform("io.quarkus.platform:quarkus-bom:$quarkusPlatformVersion"))
+
+    // Quarkus extensions
+    implementation("io.quarkus:quarkus-resteasy-jackson")   // JAX-RS (Classic) + Jackson
+    implementation("io.quarkus:quarkus-agroal")             // JDBC connection pool
+    implementation("io.quarkus:quarkus-jdbc-postgresql")    // PostgreSQL + Dev Services
+    implementation("io.quarkus:quarkus-flyway")             // DB migrations on startup
+    implementation("io.quarkus:quarkus-scheduler")          // @Scheduled background tasks
+    implementation("org.flywaydb:flyway-database-postgresql")
+    // JDBI — framework-agnostic, wires against any DataSource
     implementation("org.jdbi:jdbi3-core:3.49.5")
     implementation("org.jdbi:jdbi3-sqlobject:3.49.5")
+
+    // Gson — used by GithubApiClient
+    implementation("com.google.code.gson:gson:$gsonVersion")
+
+    // SnakeYAML Engine — used by MapNameReader to parse map.yml files
     implementation("org.snakeyaml:snakeyaml-engine:2.10")
+
+    // Annotations previously pulled in transitively by DropWizard
+    implementation("com.google.guava:guava:33.4.8-jre")           // @VisibleForTesting
+    implementation("com.google.code.findbugs:jsr305:3.0.2")      // @Nonnull
+
+    // TripleA shared libraries
     implementation("triplea:domain-data:$tripleaVersion")
     implementation("triplea:java-extras:$tripleaVersion")
     implementation("triplea:lobby-client:$tripleaVersion")
     implementation("triplea:websocket-client:$tripleaVersion")
-    runtimeOnly("org.postgresql:postgresql:42.7.7")
+
+    // Test dependencies
+    testImplementation(enforcedPlatform("io.quarkus.platform:quarkus-bom:$quarkusPlatformVersion"))
+    testImplementation("io.quarkus:quarkus-junit5")           // @QuarkusTest + Dev Services
 
     testImplementation("io.github.openfeign:feign-core:$feignVersion")
     testImplementation("io.github.openfeign:feign-gson:$feignVersion")
@@ -139,8 +114,6 @@ dependencies {
 
     testImplementation("com.github.database-rider:rider-junit5:1.44.0")
     testImplementation("com.github.npathai:hamcrest-optional:2.0.0")
-    testImplementation("com.sun.mail:jakarta.mail:2.0.2")
-    testImplementation("io.dropwizard:dropwizard-testing:$dropWizardVersion")
     testImplementation("org.awaitility:awaitility:4.3.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-params:$junitVersion")

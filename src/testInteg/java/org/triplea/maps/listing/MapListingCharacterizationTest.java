@@ -4,8 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.github.database.rider.core.api.dataset.DataSet;
 import com.github.database.rider.junit5.DBUnitExtension;
+import io.quarkus.test.junit.QuarkusTest;
 import java.net.URI;
 import java.util.List;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.triplea.http.client.ClientIdentifiers;
@@ -23,16 +26,20 @@ import org.triplea.maps.IntegTestExtension;
  * the endpoint again, pick the first 20 maps, and update both the YAML and the expected list below.
  */
 @DataSet(value = "map_index_prod_sample.yml", useSequenceFiltering = false)
+@QuarkusTest
 @ExtendWith(IntegTestExtension.class)
 @ExtendWith(DBUnitExtension.class)
 class MapListingCharacterizationTest {
+  @ConfigProperty(name = "quarkus.http.test-port", defaultValue = "8081")
+  int testPort;
 
-  private final MapsClient mapsClient;
+  private MapsClient mapsClient;
 
-  MapListingCharacterizationTest(final URI serverUri) {
+  @BeforeEach
+  void setUp() {
     mapsClient =
         MapsClient.newClient(
-            serverUri,
+            URI.create("http://localhost:" + testPort),
             ClientIdentifiers.builder()
                 .applicationVersion("test")
                 .systemId("test")

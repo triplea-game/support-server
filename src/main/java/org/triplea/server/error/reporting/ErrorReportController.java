@@ -1,5 +1,8 @@
 package org.triplea.server.error.reporting;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
@@ -7,9 +10,9 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
+import java.util.Optional;
 import java.util.function.Function;
-import javax.annotation.Nonnull;
-import lombok.Builder;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jdbi.v3.core.Jdbi;
 import org.triplea.http.client.ClientIdentifiers;
 import org.triplea.http.client.error.report.CanUploadErrorReportResponse;
@@ -27,17 +30,28 @@ import org.triplea.server.error.reporting.upload.ErrorReportModule;
 @Path("/")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-@Builder
+@ApplicationScoped
 public class ErrorReportController {
-  @Nonnull private final ErrorReportModule errorReportIngestion;
-  @Nonnull private final Function<CanUploadRequest, CanUploadErrorReportResponse> canReportModule;
 
-  /** Factory method. */
-  public static ErrorReportController build(GithubClient githubApiClient, String repo, Jdbi jdbi) {
-    return ErrorReportController.builder()
-        .errorReportIngestion(ErrorReportModule.build(githubApiClient, repo, jdbi))
-        .canReportModule(CanUploadErrorReportStrategy.build(jdbi))
-        .build();
+  @Inject Jdbi jdbi;
+
+  @ConfigProperty(name = "app.github-api-token")
+  Optional<String> githubApiToken;
+
+  @ConfigProperty(name = "app.triplea-org-name", defaultValue = "triplea-game")
+  String tripleaOrgName;
+
+  @ConfigProperty(name = "app.error-reporting-repo", defaultValue = "triplea")
+  String errorReportingRepo;
+
+  private ErrorReportModule errorReportIngestion;
+  private Function<CanUploadRequest, CanUploadErrorReportResponse> canReportModule;
+
+  @PostConstruct
+  void init() {
+    var githubClient = GithubClient.build(githubApiToken.orElse(""), tripleaOrgName);
+    errorReportIngestion = ErrorReportModule.build(githubClient, errorReportingRepo, jdbi);
+    canReportModule = CanUploadErrorReportStrategy.build(jdbi);
   }
 
   @POST
@@ -48,7 +62,6 @@ public class ErrorReportController {
         || canUploadRequest.getGameVersion() == null) {
       throw new IllegalArgumentException("Missing request attributes title or game version");
     }
-
     return canReportModule.apply(canUploadRequest);
   }
 
