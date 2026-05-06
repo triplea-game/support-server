@@ -3,12 +3,12 @@
 ## Tech Overview
 
 - Java 21
-- DropWizard (http server)
+- Quarkus (http server)
 - Junit5 (unit tests)
 - assertj (unit tests)
 - JDBI (no ORM, JDBI instead)
 - Postgres (database layer)
-- Docker & Docker Compose 
+- Docker & Docker Compose
 - gradle (build tool)
 - Makefile (developer build commands)
 
@@ -24,10 +24,22 @@ Warning: First make sure that the local triplea project can build cleanly.
 
 ### Integration Tests
 
-These are tests that run against a live database & server running on locally.
-The server & database are set up with docker-compose.
-First we build a shadow jar, then we use a gradle plugin to launch docker-compose
-which stands up database, runs migration (with flyway), and launches the server.
+These are tests that run against a live database. They use `@QuarkusTest`, which starts the
+Quarkus application in-process - no separately managed server is needed.
+
+Before running integration tests, start Postgres and run Flyway migrations:
+
+```
+docker compose up database flyway
+```
+
+Then run the tests with:
+
+```
+./gradlew check
+```
+
+The `make verify` command does both steps in sequence.
 
 
 ## Deployment
@@ -88,4 +100,3 @@ and can be returned as part of the 'list-maps' payload to clients.
 - `MapIndexer`: fetches all the data of a given map, creates a `MapIndexingResult`
 - `MapIndexingResult`: represents all desired data of a parsed map, eg: map name, download size, description
 - `MapIndexDao`: upserts `MapIndexingResult` into database
-

@@ -4,22 +4,33 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 
+import io.quarkus.test.junit.QuarkusTest;
 import java.net.URI;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.triplea.http.client.LobbyHttpClientConfig;
 import org.triplea.http.client.error.report.CanUploadRequest;
 import org.triplea.http.client.error.report.ErrorReportClient;
 import org.triplea.http.client.error.report.ErrorReportRequest;
 import org.triplea.http.client.error.report.ErrorReportResponse;
 import org.triplea.maps.IntegTestExtension;
 
+@QuarkusTest
 @ExtendWith(IntegTestExtension.class)
 class ErrorReportControllerIntegrationTest {
-  private final ErrorReportClient client;
+  private ErrorReportClient client;
 
-  ErrorReportControllerIntegrationTest(URI serverUri) {
-    client = ErrorReportClient.newClient(serverUri);
+  @ConfigProperty(name = "quarkus.http.test-port", defaultValue = "8081")
+  int testPort;
+
+  @BeforeEach
+  void setUp() {
+    LobbyHttpClientConfig.setConfig(
+        LobbyHttpClientConfig.builder().systemId("test-system-id").clientVersion("test").build());
+    client = ErrorReportClient.newClient(URI.create("http://localhost:" + testPort));
   }
 
   @Disabled

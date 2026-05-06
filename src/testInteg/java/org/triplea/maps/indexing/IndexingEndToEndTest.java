@@ -2,15 +2,17 @@ package org.triplea.maps.indexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.quarkus.test.junit.QuarkusTest;
 import lombok.AllArgsConstructor;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.triplea.http.client.github.GithubClient;
 import org.triplea.http.client.github.MapRepoListing;
-import org.triplea.maps.IntegTestExtension;
+import org.triplea.maps.DbOnlyExtension;
 
-@ExtendWith(IntegTestExtension.class)
+@QuarkusTest
+@ExtendWith(DbOnlyExtension.class)
 @AllArgsConstructor
 public class IndexingEndToEndTest {
   final Jdbi jdbi;

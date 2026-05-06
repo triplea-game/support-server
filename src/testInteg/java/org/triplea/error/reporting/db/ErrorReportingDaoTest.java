@@ -1,4 +1,4 @@
-package org.triplea.modules.error.reporting.db;
+package org.triplea.error.reporting.db;
 
 import static com.github.npathai.hamcrestopt.OptionalMatchers.isPresentAndIs;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -7,6 +7,7 @@ import com.github.database.rider.core.api.dataset.DataSet;
 import com.github.database.rider.core.api.dataset.ExpectedDataSet;
 import com.github.database.rider.junit5.DBUnitExtension;
 import com.github.npathai.hamcrestopt.OptionalMatchers;
+import io.quarkus.test.junit.QuarkusTest;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -16,17 +17,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.triplea.maps.IntegTestExtension;
+import org.triplea.maps.DbOnlyExtension;
 import org.triplea.server.error.reporting.upload.ErrorReportingDao;
 import org.triplea.server.error.reporting.upload.InsertHistoryRecordParams;
 
-@ExtendWith(IntegTestExtension.class)
+@QuarkusTest
+@ExtendWith(DbOnlyExtension.class)
 @ExtendWith(DBUnitExtension.class)
 final class ErrorReportingDaoTest {
   private final ErrorReportingDao errorReportingDao;
 
   ErrorReportingDaoTest(Jdbi jdbi) {
-    errorReportingDao = jdbi.onDemand(ErrorReportingDao.class);
+    errorReportingDao = new ErrorReportingDao(jdbi);
   }
 
   /** Simple check that if we insert a record we'll get a new record in the expected dataset. */

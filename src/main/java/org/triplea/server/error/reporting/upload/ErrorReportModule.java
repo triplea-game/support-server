@@ -20,7 +20,7 @@ public class ErrorReportModule {
     return ErrorReportModule.builder()
         .targetRepo(repo)
         .githubApiClient(githubApiClient)
-        .errorReportingDao(jdbi.onDemand(ErrorReportingDao.class))
+        .errorReportingDao(new ErrorReportingDao(jdbi))
         .build();
   }
 
