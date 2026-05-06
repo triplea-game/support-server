@@ -95,7 +95,7 @@ dependencies {
     implementation("org.snakeyaml:snakeyaml-engine:2.10")
 
     // Annotations previously pulled in transitively by DropWizard
-    implementation("com.google.guava:guava:33.4.8-jre")           // @VisibleForTesting
+    implementation("com.google.guava:guava:33.6.0-jre")           // @VisibleForTesting
     implementation("com.google.code.findbugs:jsr305:3.0.2")      // @Nonnull
 
     // TripleA shared libraries
