@@ -68,11 +68,10 @@ spotless {
 }
 
 val quarkusPlatformVersion = "3.34.6"
-val feignVersion = "13.6"
 val gsonVersion = "2.12.1"
 val junitVersion = "5.13.4"
 val mockitoVersion = "5.19.0"
-val tripleaVersion = "2.7.15281"
+val tripleaVersion = "2.7.15496"
 
 dependencies {
     implementation(enforcedPlatform("io.quarkus.platform:quarkus-bom:$quarkusPlatformVersion"))
@@ -99,18 +98,12 @@ dependencies {
     implementation("com.google.code.findbugs:jsr305:3.0.2")      // @Nonnull
 
     // TripleA shared libraries
-    implementation("triplea:domain-data:$tripleaVersion")
-    implementation("triplea:java-extras:$tripleaVersion")
-    implementation("triplea:lobby-client:$tripleaVersion")
-    implementation("triplea:websocket-client:$tripleaVersion")
+    implementation("triplea:lobby-client-data:${tripleaVersion}")
 
     // Test dependencies
     testImplementation(enforcedPlatform("io.quarkus.platform:quarkus-bom:$quarkusPlatformVersion"))
     testImplementation("io.quarkus:quarkus-junit5")           // @QuarkusTest + Dev Services
 
-    testImplementation("io.github.openfeign:feign-core:$feignVersion")
-    testImplementation("io.github.openfeign:feign-gson:$feignVersion")
-    testImplementation("triplea:feign-common:$tripleaVersion")
 
     testImplementation("com.github.database-rider:rider-junit5:1.44.0")
     testImplementation("com.github.npathai:hamcrest-optional:2.0.0")

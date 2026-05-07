@@ -4,6 +4,9 @@ import com.google.common.annotations.VisibleForTesting;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -12,8 +15,7 @@ import java.util.function.Function;
 import lombok.AccessLevel;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.triplea.io.ContentDownloader;
-import org.triplea.io.FileUtils;
+import org.triplea.io.utils.FileUtils;
 import org.triplea.java.function.ThrowingFunction;
 
 /**
@@ -24,11 +26,23 @@ import org.triplea.java.function.ThrowingFunction;
  */
 @Slf4j
 public class DownloadSizeFetcher implements Function<URI, Optional<Long>> {
+  private static final HttpClient HTTP_CLIENT =
+      HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NORMAL).build();
 
   @SuppressWarnings("resource")
   @Setter(value = AccessLevel.PACKAGE, onMethod_ = @VisibleForTesting)
   private ThrowingFunction<URI, InputStream, IOException> downloadFunction =
-      (uri -> new ContentDownloader(uri).getStream());
+      uri -> {
+        try {
+          HttpRequest request = HttpRequest.newBuilder(uri).GET().build();
+          HttpResponse<InputStream> response =
+              HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
+          return response.body();
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+          throw new IOException("Download interrupted", e);
+        }
+      };
 
   @Override
   public Optional<Long> apply(URI uri) {

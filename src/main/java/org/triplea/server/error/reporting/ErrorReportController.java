@@ -14,10 +14,10 @@ import java.util.Optional;
 import java.util.function.Function;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jdbi.v3.core.Jdbi;
-import org.triplea.http.client.ClientIdentifiers;
+import org.triplea.http.client.HttpHeaders;
+import org.triplea.http.client.ServerPaths;
 import org.triplea.http.client.error.report.CanUploadErrorReportResponse;
 import org.triplea.http.client.error.report.CanUploadRequest;
-import org.triplea.http.client.error.report.ErrorReportClient;
 import org.triplea.http.client.error.report.ErrorReportRequest;
 import org.triplea.http.client.error.report.ErrorReportResponse;
 import org.triplea.http.client.github.GithubClient;
@@ -55,7 +55,7 @@ public class ErrorReportController {
   }
 
   @POST
-  @Path(ErrorReportClient.CAN_UPLOAD_ERROR_REPORT_PATH)
+  @Path(ServerPaths.CAN_UPLOAD_ERROR_REPORT_PATH)
   public CanUploadErrorReportResponse canUploadErrorReport(CanUploadRequest canUploadRequest) {
     if (canUploadRequest == null
         || canUploadRequest.getErrorTitle() == null
@@ -70,7 +70,7 @@ public class ErrorReportController {
    * user to in turn create a GitHub issue using the data from the error report.
    */
   @POST
-  @Path(ErrorReportClient.ERROR_REPORT_PATH)
+  @Path(ServerPaths.ERROR_REPORT_PATH)
   public ErrorReportResponse uploadErrorReport(
       @Context HttpServletRequest request, ErrorReportRequest errorReport) {
 
@@ -84,7 +84,7 @@ public class ErrorReportController {
     return errorReportIngestion.createErrorReport(
         CreateIssueParams.builder()
             .ip(IpAddressExtractor.extractIpAddress(request))
-            .systemId(request.getHeader(ClientIdentifiers.VERSION_HEADER))
+            .systemId(request.getHeader(HttpHeaders.VERSION_HEADER))
             .errorReportRequest(errorReport)
             .build());
   }

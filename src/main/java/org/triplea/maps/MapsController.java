@@ -11,8 +11,9 @@ import jakarta.ws.rs.core.MediaType;
 import java.util.List;
 import java.util.function.Supplier;
 import org.jdbi.v3.core.Jdbi;
-import org.triplea.http.client.maps.listing.MapDownloadItem;
-import org.triplea.http.client.maps.listing.MapsClient;
+import org.triplea.http.client.ServerPaths;
+import org.triplea.http.client.lobby.maps.listing.MapDownloadItem;
+import org.triplea.http.client.lobby.maps.listing.MapListingResponse;
 import org.triplea.maps.listing.MapsListingModule;
 
 @Path("/")
@@ -35,8 +36,8 @@ public class MapsController {
    * maps listing', the intended audience is any game user searching for available to download maps.
    */
   @GET
-  @Path(MapsClient.MAPS_LISTING_PATH)
-  public List<MapDownloadItem> fetchAvailableMaps() {
-    return downloadListingSupplier.get();
+  @Path(ServerPaths.MAPS_LISTING_PATH)
+  public MapListingResponse fetchAvailableMaps() {
+    return MapListingResponse.builder().maps(downloadListingSupplier.get()).build();
   }
 }

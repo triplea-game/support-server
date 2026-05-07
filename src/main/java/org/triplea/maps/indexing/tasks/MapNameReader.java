@@ -1,7 +1,11 @@
 package org.triplea.maps.indexing.tasks;
 
 import com.google.common.annotations.VisibleForTesting;
+import java.io.IOException;
 import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -10,17 +14,31 @@ import lombok.Builder;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.triplea.http.client.github.MapRepoListing;
-import org.triplea.io.ContentDownloader;
 import org.triplea.yaml.YamlReader;
 
 @Slf4j
 @Builder
 public class MapNameReader implements Function<MapRepoListing, Optional<String>> {
-  /* Function to download content as a string and log an info message if not found. */
+  private static final HttpClient HTTP_CLIENT =
+      HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NORMAL).build();
+
+  /* Function to download content as a string, returns null if the download fails or returns a non-200 status. */
   @Setter(value = AccessLevel.PACKAGE, onMethod_ = @VisibleForTesting)
   @Builder.Default
   private Function<URI, String> downloadFunction =
-      uri -> ContentDownloader.downloadAsString(uri).orElse(null);
+      uri -> {
+        try {
+          HttpRequest request = HttpRequest.newBuilder(uri).GET().build();
+          HttpResponse<String> response =
+              HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+          return response.statusCode() == 200 ? response.body() : null;
+        } catch (IOException e) {
+          return null;
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+          return null;
+        }
+      };
 
   public static URI computeMapYamlLocation(MapRepoListing mapRepoListing) {
     return URI.create(mapRepoListing.getUri().toString() + "/blob/master/map.yml?raw=true");

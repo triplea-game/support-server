@@ -4,16 +4,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.github.database.rider.core.api.dataset.DataSet;
 import com.github.database.rider.junit5.DBUnitExtension;
+import com.google.gson.Gson;
 import io.quarkus.test.junit.QuarkusTest;
+import java.io.IOException;
 import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.List;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.triplea.http.client.ClientIdentifiers;
-import org.triplea.http.client.maps.listing.MapDownloadItem;
-import org.triplea.http.client.maps.listing.MapsClient;
+import org.triplea.http.client.HttpHeaders;
+import org.triplea.http.client.ServerPaths;
+import org.triplea.http.client.lobby.maps.listing.MapDownloadItem;
+import org.triplea.http.client.lobby.maps.listing.MapListingResponse;
 import org.triplea.maps.IntegTestExtension;
 
 /**
@@ -30,26 +36,31 @@ import org.triplea.maps.IntegTestExtension;
 @ExtendWith(IntegTestExtension.class)
 @ExtendWith(DBUnitExtension.class)
 class MapListingCharacterizationTest {
+  private static final Gson GSON = new Gson();
+
   @ConfigProperty(name = "quarkus.http.test-port", defaultValue = "8081")
   int testPort;
 
-  private MapsClient mapsClient;
+  private HttpClient httpClient;
 
   @BeforeEach
   void setUp() {
-    mapsClient =
-        MapsClient.newClient(
-            URI.create("http://localhost:" + testPort),
-            ClientIdentifiers.builder()
-                .applicationVersion("test")
-                .systemId("test")
-                .apiKey("")
-                .build());
+    httpClient = HttpClient.newHttpClient();
   }
 
   @Test
-  void mapsListingMatchesProdSample() {
-    final List<MapDownloadItem> results = mapsClient.fetchMapListing();
+  void mapsListingMatchesProdSample() throws IOException, InterruptedException {
+    var httpRequest =
+        HttpRequest.newBuilder()
+            .uri(URI.create("http://localhost:" + testPort + ServerPaths.MAPS_LISTING_PATH))
+            .header(HttpHeaders.SYSTEM_ID_HEADER, "test")
+            .header(HttpHeaders.VERSION_HEADER, "test")
+            .GET()
+            .build();
+
+    var response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+    final List<MapDownloadItem> results =
+        GSON.fromJson(response.body(), MapListingResponse.class).getMaps();
 
     assertThat(results)
         .hasSize(20)
