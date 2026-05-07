@@ -14,7 +14,7 @@ import lombok.Builder;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.triplea.http.client.github.MapRepoListing;
-import org.triplea.yaml.YamlReader;
+import org.triplea.utils.YamlReader;
 
 @Slf4j
 @Builder

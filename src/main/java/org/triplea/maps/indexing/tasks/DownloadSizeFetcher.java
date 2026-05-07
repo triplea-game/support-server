@@ -15,8 +15,8 @@ import java.util.function.Function;
 import lombok.AccessLevel;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.triplea.io.utils.FileUtils;
-import org.triplea.java.function.ThrowingFunction;
+import org.triplea.utils.FileUtils;
+import org.triplea.utils.ThrowingFunction;
 
 /**
  * Given a map repo, determines the map download size.

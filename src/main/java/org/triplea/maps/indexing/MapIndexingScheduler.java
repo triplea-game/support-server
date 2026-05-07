@@ -24,9 +24,6 @@ public class MapIndexingScheduler {
   @ConfigProperty(name = "app.map-indexing-period-minutes", defaultValue = "300")
   int periodMinutes;
 
-  @ConfigProperty(name = "app.indexing-task-delay-seconds", defaultValue = "120")
-  int taskDelaySeconds;
-
   @ConfigProperty(name = "app.github-api-token")
   Optional<String> githubApiToken;
 
@@ -45,7 +42,6 @@ public class MapIndexingScheduler {
             .githubClient(githubClient)
             .mapIndexer(MapIndexer.build(githubClient))
             .mapIndexDao(new MapIndexDao(jdbi))
-            .indexingTaskDelaySeconds(taskDelaySeconds)
             .build();
   }
 

@@ -1,4 +1,4 @@
-package org.triplea.io.utils;
+package org.triplea.utils;
 
 import java.io.IOException;
 import java.nio.file.Files;

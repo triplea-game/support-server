@@ -1,4 +1,4 @@
-package org.triplea.server;
+package org.triplea.utils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.experimental.UtilityClass;

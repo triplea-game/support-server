@@ -1,4 +1,4 @@
-package org.triplea.java.function;
+package org.triplea.utils;
 
 /**
  * A function that accepts one argument, produces a result, and may throw a checked exception.

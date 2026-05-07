@@ -1,4 +1,4 @@
-package org.triplea.server.error.reporting;
+package org.triplea.error.reporting;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -14,6 +14,9 @@ import java.util.Optional;
 import java.util.function.Function;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jdbi.v3.core.Jdbi;
+import org.triplea.error.reporting.upload.CanUploadErrorReportStrategy;
+import org.triplea.error.reporting.upload.CreateIssueParams;
+import org.triplea.error.reporting.upload.ErrorReportModule;
 import org.triplea.http.client.HttpHeaders;
 import org.triplea.http.client.ServerPaths;
 import org.triplea.http.client.error.report.CanUploadErrorReportResponse;
@@ -21,10 +24,7 @@ import org.triplea.http.client.error.report.CanUploadRequest;
 import org.triplea.http.client.error.report.ErrorReportRequest;
 import org.triplea.http.client.error.report.ErrorReportResponse;
 import org.triplea.http.client.github.GithubClient;
-import org.triplea.server.IpAddressExtractor;
-import org.triplea.server.error.reporting.upload.CanUploadErrorReportStrategy;
-import org.triplea.server.error.reporting.upload.CreateIssueParams;
-import org.triplea.server.error.reporting.upload.ErrorReportModule;
+import org.triplea.utils.IpAddressExtractor;
 
 /** Http controller that binds the error upload endpoint with the error report upload handler. */
 @Path("/")

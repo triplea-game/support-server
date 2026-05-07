@@ -32,7 +32,7 @@ public class IndexingEndToEndTest {
     var githubClient = GithubClient.build("", "triplea-maps");
     MapIndexDao dao = new MapIndexDao(jdbi);
     MapIndexingTaskRunner taskRunner =
-        new MapIndexingTaskRunner(dao, githubClient, MapIndexer.build(githubClient), 0);
+        new MapIndexingTaskRunner(dao, githubClient, MapIndexer.build(githubClient));
 
     assertThat(testMapExistsInDatabase()).isFalse();
 

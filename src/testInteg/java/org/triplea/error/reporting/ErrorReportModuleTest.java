@@ -16,15 +16,15 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.triplea.error.reporting.upload.CreateIssueParams;
+import org.triplea.error.reporting.upload.ErrorReportModule;
+import org.triplea.error.reporting.upload.ErrorReportingDao;
+import org.triplea.error.reporting.upload.InsertHistoryRecordParams;
 import org.triplea.http.client.error.report.ErrorReportRequest;
 import org.triplea.http.client.error.report.ErrorReportResponse;
 import org.triplea.http.client.github.CreateIssueRequest;
 import org.triplea.http.client.github.CreateIssueResponse;
 import org.triplea.http.client.github.GithubClient;
-import org.triplea.server.error.reporting.upload.CreateIssueParams;
-import org.triplea.server.error.reporting.upload.ErrorReportModule;
-import org.triplea.server.error.reporting.upload.ErrorReportingDao;
-import org.triplea.server.error.reporting.upload.InsertHistoryRecordParams;
 
 @ExtendWith(MockitoExtension.class)
 class ErrorReportModuleTest {

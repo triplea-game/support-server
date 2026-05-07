@@ -1,4 +1,4 @@
-package org.triplea.yaml;
+package org.triplea.utils;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

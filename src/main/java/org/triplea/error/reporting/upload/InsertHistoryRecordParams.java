@@ -1,4 +1,4 @@
-package org.triplea.server.error.reporting.upload;
+package org.triplea.error.reporting.upload;
 
 import lombok.Builder;
 import lombok.Value;

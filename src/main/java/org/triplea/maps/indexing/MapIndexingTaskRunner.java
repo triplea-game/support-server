@@ -32,7 +32,6 @@ class MapIndexingTaskRunner implements Runnable {
   @Nonnull private final MapIndexDao mapIndexDao;
   @Nonnull private final GithubClient githubClient;
   @Nonnull private final MapIndexer mapIndexer;
-  @Nonnull private final Integer indexingTaskDelaySeconds;
 
   @Override
   public void run() {
@@ -92,7 +91,6 @@ class MapIndexingTaskRunner implements Runnable {
         errors);
   }
 
-  // TODO: test me
   @VisibleForTesting
   IndexingResult index(MapRepoListing listing) {
     Instant latestCommitInDatabase =
