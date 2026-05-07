@@ -57,11 +57,9 @@ build:
 	./gradlew quarkusBuild
 
 docker-build: build ## Creates 'docker container' build artifacts
-	docker build database -f database/flyway.Dockerfile --tag ghcr.io/triplea-game/support-server/flyway:latest
 	docker build . --tag ghcr.io/triplea-game/support-server/server:latest
 
 docker-push: docker-build ## Pushes 'docker container' build artifacts to github docker container registry
-	docker push ghcr.io/triplea-game/support-server/flyway:latest
 	docker push ghcr.io/triplea-game/support-server/server:latest
 
 # TODO: the ansible related stuff needs cleanup
