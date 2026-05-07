@@ -1,9 +1,9 @@
 package org.triplea.services.error.reporting;
 
+import io.vertx.ext.web.RoutingContext;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -72,7 +72,7 @@ public class ErrorReportController {
   @POST
   @Path(ServerPaths.ERROR_REPORT_PATH)
   public ErrorReportResponse uploadErrorReport(
-      @Context HttpServletRequest request, ErrorReportRequest errorReport) {
+      @Context RoutingContext routingContext, ErrorReportRequest errorReport) {
 
     if (errorReport == null
         || errorReport.getBody() == null
@@ -83,8 +83,8 @@ public class ErrorReportController {
 
     return errorReportIngestion.createErrorReport(
         CreateIssueParams.builder()
-            .ip(IpAddressExtractor.extractIpAddress(request))
-            .systemId(request.getHeader(HttpHeaders.VERSION_HEADER))
+            .ip(IpAddressExtractor.extractIpAddress(routingContext))
+            .systemId(routingContext.request().getHeader(HttpHeaders.VERSION_HEADER))
             .errorReportRequest(errorReport)
             .build());
   }

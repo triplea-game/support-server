@@ -1,22 +1,23 @@
 package org.triplea.utils;
 
-import jakarta.servlet.http.HttpServletRequest;
+import io.vertx.ext.web.RoutingContext;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class IpAddressExtractor {
 
   /**
-   * Extracts the IP address of the remote address making an HttpServletRequest.
+   * Extracts the IP address of the remote address from the routing context.
    *
-   * <p>httpServletRequest.getRemoteAddr() can return a value surrounded by square brackets. This
-   * method will return that remote addr with square brackets stripped.
+   * <p>IPv6 addresses may be surrounded by square brackets; this method strips them.
    *
-   * @return valid IP address of the remote machine making
+   * @return IP address of the remote machine making the request
    */
-  public String extractIpAddress(HttpServletRequest httpServletRequest) {
-    return httpServletRequest
-        .getRemoteAddr() //
+  public String extractIpAddress(RoutingContext routingContext) {
+    return routingContext
+        .request()
+        .remoteAddress()
+        .host()
         .replaceAll("\\[", "")
         .replaceAll("\\]", "");
   }
