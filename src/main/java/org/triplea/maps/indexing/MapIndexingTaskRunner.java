@@ -15,10 +15,6 @@ import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.triplea.http.client.github.GithubClient;
 import org.triplea.http.client.github.MapRepoListing;
-import org.triplea.java.Interruptibles;
-
-// import org.triplea.http.client.github.GithubApiClient;
-// import org.triplea.http.client.github.MapRepoListing;
 
 /**
  * Task that runs a map indexing pass on all maps. The indexing will update database to reflect the
@@ -73,7 +69,12 @@ class MapIndexingTaskRunner implements Runnable {
       IndexingResult result = index(listing);
       log.info("Indexing map: {}", listing.getUri());
       mapIndexDao.recordIndexingStatus(listing, result);
-      Interruptibles.sleep(indexingTaskDelaySeconds * 1000L);
+      try {
+        Thread.sleep(indexingTaskDelaySeconds * 1000L);
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        throw new RuntimeException("System aborted, process terminated while sleeping");
+      }
     }
 
     log.info(

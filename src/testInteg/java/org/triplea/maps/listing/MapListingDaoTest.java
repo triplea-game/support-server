@@ -11,7 +11,7 @@ import java.util.List;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.triplea.http.client.maps.listing.MapTag;
+import org.triplea.http.client.lobby.maps.listing.MapTag;
 import org.triplea.maps.DbOnlyExtension;
 
 @DataSet(value = "map_index.yml,map_tag_value.yml", useSequenceFiltering = false)

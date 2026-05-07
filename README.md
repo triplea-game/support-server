@@ -1,5 +1,13 @@
 # Support Server
 
+
+Create file (or append to):  `~/.gradle/gradle.properties`, the following:
+
+```
+triplea_github_username=CHANGE_ME
+triplea_github_access.token=CHANGE_ME
+```
+
 ## Tech Overview
 
 - Java 21

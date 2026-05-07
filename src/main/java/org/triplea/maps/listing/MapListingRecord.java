@@ -8,8 +8,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.jdbi.v3.core.mapper.reflect.JdbiConstructor;
-import org.triplea.http.client.maps.listing.MapDownloadItem;
-import org.triplea.http.client.maps.listing.MapTag;
+import org.triplea.http.client.lobby.maps.listing.MapDownloadItem;
+import org.triplea.http.client.lobby.maps.listing.MapTag;
 
 @Setter
 @Getter

@@ -5,8 +5,8 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
-import org.triplea.http.client.maps.listing.MapDownloadItem;
-import org.triplea.http.client.maps.listing.MapTag;
+import org.triplea.http.client.lobby.maps.listing.MapDownloadItem;
+import org.triplea.http.client.lobby.maps.listing.MapTag;
 
 @AllArgsConstructor
 public class MapListingDao {

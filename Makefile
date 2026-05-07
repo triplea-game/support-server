@@ -1,6 +1,6 @@
 MAKEFLAGS += --always-make --warn-undefined-variables
-SHELL=/bin/bash -u
-
+SHELL=/bin/bash
+.SHELLFLAGS = -eu -c
 red=\033[31m
 nc=\033[0m
 SSH_USER ?= $${USER}
@@ -11,9 +11,16 @@ help: ## Show this help text
 
 all: format check
 
+gradleProperties=$$HOME/.gradle/gradle.properties
+
 setup: ## Installs pre-commit as a pre-push git hook (requires pre-commit to be installed)
+	set -e
 	uv tool install pre-commit
 	pre-commit install --hook-type pre-push
+	test -f $(gradleProperties) || touch $(gradleProperties)
+	# Check that required gradle properties are set
+	grep -q "triplea_github_username" $(gradleProperties)
+	grep -q "triplea_github_access_token" $(gradleProperties)
 
 print-versions: ## Prints versions of system dependencies (EG: java, docker)
 	@echo -e "\n$(red)### Versions used by Gradle ###$(nc)"
