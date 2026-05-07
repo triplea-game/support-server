@@ -70,7 +70,7 @@ spotless {
 val quarkusPlatformVersion = "3.34.6"
 val gsonVersion = "2.12.1"
 val junitVersion = "5.13.4"
-val mockitoVersion = "5.19.0"
+val mockitoVersion = "5.23.0"
 val tripleaVersion = "2.7.15496"
 
 dependencies {
