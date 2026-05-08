@@ -21,6 +21,11 @@ setup: ## Installs pre-commit as a pre-push git hook (requires pre-commit to be 
 	# Check that required gradle properties are set
 	grep -q "triplea_github_username" $(gradleProperties)
 	grep -q "triplea_github_access_token" $(gradleProperties)
+	@if ! grep -qs '^testcontainers.reuse.enable=true' $${HOME}/.testcontainers.properties; then \
+		echo 'testcontainers.reuse.enable=true' >> $${HOME}/.testcontainers.properties; \
+		echo "Enabled testcontainers reuse in ~/.testcontainers.properties"; \
+	fi
+
 
 print-versions: ## Prints versions of system dependencies (EG: java, docker)
 	@echo -e "\n$(red)### Versions used by Gradle ###$(nc)"
