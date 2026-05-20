@@ -89,7 +89,7 @@ spotless {
 
 val quarkusPlatformVersion = "3.35.2"
 val gsonVersion = "2.12.1"
-val junitVersion = "6.0.3"
+val junitVersion = "6.1.0"
 val mockitoVersion = "5.23.0"
 val tripleaVersion = "2.7.15496"
 
