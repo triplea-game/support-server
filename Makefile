@@ -46,7 +46,7 @@ database-up: ## Launches database
 	docker compose build flyway
 	DATABASE_PORT=5432 docker compose up database flyway
 
-up: ## Build & run server in dev mode (Quarkus Dev Services starts Postgres automatically)
+run up: ## Build & run server in dev mode (Quarkus Dev Services starts Postgres automatically)
 	./gradlew quarkusDev
 
 psql: ## Connects to locally running docker database
