@@ -1,4 +1,4 @@
-- hosts: tag_supoprt
+- hosts: tag_support
   tasks:
     - name: Deploy latest Support Server
       command: sudo -u support /opt/support/deploy-support.sh
