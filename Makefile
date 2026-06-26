@@ -67,24 +67,9 @@ docker-build: build ## Creates 'docker container' build artifacts
 docker-push: docker-build ## Pushes 'docker container' build artifacts to github docker container registry
 	docker push ghcr.io/triplea-game/support-server/server:latest
 
-# TODO: the ansible related stuff needs cleanup
-vaultPassword=@echo "${TRIPLEA_ANSIBLE_VAULT_PASSWORD}" > deploy/vault-password; trap 'rm -f "deploy/vault-password"' EXIT
-runAnsible=$(vaultPassword); ANSIBLE_CONFIG="deploy/ansible.cfg" ansible-playbook --vault-password-file deploy/vault-password -e ansible_user=$(SSH_USER)
-testInventory=--inventory deploy/ansible/inventory/test.inventory
-prodInventory=--inventory deploy/ansible/inventory/prod.inventory
-playbook=deploy/ansible/deploy-playbook.yml
-
-ansible-galaxy-install:
-	ansible-galaxy collection install -r deploy/ansible/requirements.yml --force
-
-diff-test: ansible-galaxy-install
-	$(runAnsible) --check --diff $(testInventory) $(playbook)
-
-deploy-test: ansible-galaxy-install
-	$(runAnsible) $(testInventory) $(playbook)
-
-diff-prod: ansible-galaxy-install
-	$(runAnsible) --check --diff $(prodInventory) $(playbook)
-
-deploy-prod: ansible-galaxy-install
-	$(runAnsible) $(prodInventory) $(playbook)
+deploy: ## Triggers prod to pull latest docker and restart services
+	ANSIBLE_CONFIG="deploy/ansible.cfg" \
+	  ansible-playbook \
+	    -e ansible_user=$(SSH_USER) \
+	    --inventory deploy/ansible/inventory.linode.yml \
+	    deploy/ansible/playbook.yml
