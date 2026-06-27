@@ -45,7 +45,11 @@ clean: ## Removes build artifacts and stops docker containers and removes docker
 database-up: ## Launches database
 	DATABASE_PORT=5432 docker compose up database
 
-run up: ## Build & run server in dev mode (Quarkus Dev Services starts Postgres automatically)
+dev: ## Run with fake auth — no proxy, no GitHub, zero setup (newcomer default). DEV_FAKE_AUTH=anon to test anonymous.
+	DEV_FAKE_AUTH=$${DEV_FAKE_AUTH:-member} ./gradlew quarkusDev
+
+run up: ## Run behind the real oauth2-proxy/nginx auth overlay (browse http://localhost:8000). Needs .env.auth — see docs/auth.md.
+	docker compose -f docker-compose.auth.yml up -d
 	./gradlew quarkusDev
 
 psql: ## Connects to locally running docker database

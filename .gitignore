@@ -9,6 +9,8 @@
 .vscode/
 **/vault-password
 **/vault_password
+# Local auth-proxy secrets (GitHub OAuth client id/secret, oauth2-proxy cookie secret)
+.env.auth
 *.iml
 *.backup
 *.swp
