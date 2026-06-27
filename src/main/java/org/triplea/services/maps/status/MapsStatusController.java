@@ -16,10 +16,11 @@ import org.triplea.http.client.lobby.maps.listing.MapDownloadItem;
 import org.triplea.services.maps.listing.MapsListingModule;
 
 /**
- * Renders the maps admin page, map admin page can be used to manage maps, namely to add/remove
- * attributes. Auth is intended to be handled by NGINX.
+ * Renders the public map status page: a read-only listing of all indexed maps and their current
+ * attributes. Public path (no auth required); write controls will later be shown conditionally for
+ * authenticated team members.
  */
-@Path("/support/admin/map/listing")
+@Path("/support/maps/status")
 @ApplicationScoped
 public class MapsStatusController {
 
@@ -34,12 +35,12 @@ public class MapsStatusController {
 
   @CheckedTemplate
   public static class Templates {
-    public static native TemplateInstance adminPage(List<MapsStatusView> maps);
+    public static native TemplateInstance statusPage(List<MapsStatusView> maps);
   }
 
   @GET
   @Produces(MediaType.TEXT_HTML)
-  public TemplateInstance adminPage() {
-    return Templates.adminPage(mapListingSupplier.get().stream().map(MapsStatusView::of).toList());
+  public TemplateInstance statusPage() {
+    return Templates.statusPage(mapListingSupplier.get().stream().map(MapsStatusView::of).toList());
   }
 }
