@@ -17,15 +17,19 @@ import jakarta.ws.rs.core.Response;
 import java.net.URI;
 import java.util.List;
 import org.jdbi.v3.core.Jdbi;
+import org.triplea.services.auth.RequiresMember;
 
 /**
  * Renders and edits the attribute catalog (the dimensions like "difficulty" and the allowed values
  * within each dimension). Mutations are HTML form posts that 303-redirect back to the GET page so
- * the browser history remains a series of GETs (post-redirect-get). Intended to be placed behind an
- * NGINX reverse proxy with basic auth; this controller does no authentication.
+ * the browser history remains a series of GETs (post-redirect-get).
+ *
+ * <p>Fully gated: {@link RequiresMember} on the class makes the GET render and every POST
+ * members-only, enforced server-side by {@code MemberAuthFilter}.
  */
 @Path("/support/admin/map/attributes")
 @ApplicationScoped
+@RequiresMember
 public class MapAttributesController {
 
   private static final URI SELF = URI.create("/support/admin/map/attributes");
