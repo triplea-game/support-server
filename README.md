@@ -10,7 +10,7 @@ triplea_github_access.token=CHANGE_ME
 
 ## Tech Overview
 
-- Java 21
+- Java 25
 - Quarkus (http server)
 - Junit5 (unit tests)
 - assertj (unit tests)

@@ -1,7 +1,7 @@
 Use `make check` to validate the project
 
 ## Tech Stack
-- Java 21, Quarkus (HTTP server), JDBI (no ORM), Postgres, Lombok
+- Java 25, Quarkus (HTTP server), JDBI (no ORM), Postgres, Lombok
 - Quarkus fast-jar (`build/quarkus-app/`) as deployment artifact
 - Docker + docker-compose for local dev and integration tests
 

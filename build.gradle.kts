@@ -6,8 +6,13 @@ plugins {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+lombok {
+    version = "1.18.42"
 }
 
 tasks.withType<JavaCompile>().configureEach {
