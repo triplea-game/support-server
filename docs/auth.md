@@ -79,6 +79,39 @@ proxy headers under `make run`.
 **401 for any non-member** (anonymous *or* authenticated-non-member) — a single contract that the
 future HTMX work can map to a login redirect.
 
+### CSRF protection
+
+The identity cookie (oauth2-proxy's session) makes mutations forgeable: a malicious page could auto-
+submit a form to a mutating endpoint and the browser would attach the victim's session cookie. Every
+mutating browser form is therefore CSRF-protected with a **double-submit cookie**:
+
+| Type | Role |
+|---|---|
+| `@CsrfProtected` | `@NameBinding`; apply to a JAX-RS class/method whose unsafe requests need a token. |
+| `CsrfTokenProvider` | Request-scoped. Resolves the token once: the existing `csrf_token` cookie, or a freshly generated value. Exposes `token()` for templates and `isGenerated()`. |
+| `CsrfCookieResponseFilter` | Emits the `Set-Cookie` when a fresh token was minted (typically the GET that renders a form). |
+| `CsrfRequestFilter` | On POST/PUT/PATCH/DELETE, requires the `_csrf` form field to equal (constant-time) the `csrf_token` cookie, else **403**. Safe methods are not checked. |
+
+The token is rendered into every form as a hidden `_csrf` field *and* set as the `csrf_token`
+cookie. A forged cross-site POST can send the cookie (attached automatically) but cannot read it to
+forge a matching field, so the two won't agree → 403. `CsrfRequestFilter` runs *after*
+`MemberAuthFilter` (higher priority value), so a non-member to a gated form still gets the
+authorization 401 rather than a 403.
+
+The CSRF cookie is `HttpOnly` (no JS reads it — the field is server-rendered), `SameSite=Strict`,
+and `Secure` in prod (`app.auth.csrf-cookie-secure`, `true` under `%prod`, `false` for local http).
+
+> **SameSite decision.** The oauth2-proxy *session* cookie stays `SameSite=Lax`, **not** `Strict`:
+> Strict would drop the cookie on the top-level redirect back from GitHub during the OAuth callback,
+> breaking login. Lax alone is only a partial CSRF mitigation (it still allows top-level GET-initiated
+> navigations), so the app-level double-submit token above is the actual defense, not the cookie's
+> SameSite attribute. The CSRF cookie *itself* is `Strict` because it is never involved in any
+> cross-site redirect — it is only ever echoed on our own same-site form posts.
+
+Currently only `MapAttributesController` carries `@CsrfProtected` (it owns the only browser forms;
+the game-client APIs are JSON, not cookie-authenticated). The status-page write controls, when
+built, inherit the same machinery by adding `@CsrfProtected` and rendering `_csrf` into their forms.
+
 ### Route posture
 
 | Route | Controller | Posture |
@@ -148,6 +181,27 @@ Browse **nginx at <http://localhost:8000>** (not Quarkus at :8080). Prerequisite
 > but get 401 from the app's `isMember` check. Align them by setting `app.auth.member-group` (env
 > `APP_AUTH_MEMBER_GROUP`) to whatever oauth2-proxy actually emits.
 
+### Verifying header sanitization
+
+Header sanitization (nginx always overwriting `X-Auth-*`) is the security crux, and it lives in the
+proxy, not the app — so it can't be a `@QuarkusTest`. `auth/verify-header-sanitization.sh` checks it
+end-to-end against the running overlay:
+
+```bash
+make run                  # in one terminal: proxy + quarkusDev
+make verify-auth-headers  # in another: brings the proxy up (idempotent) and runs the check
+```
+
+It proves the property by contrast: the app directly (`:8080`) *trusts* a spoofed `X-Auth-Email`
+(expected — that confirms the header is wired through and that the proxy is the thing protecting it),
+while the same spoofed header through nginx (`:8000`) is stripped so the app renders the anonymous
+view. It also asserts a spoofed header on `/support/admin` does not yield a 200 (login redirect
+instead).
+
+> The app still runs on the host via `quarkusDev`, so this isn't yet fully self-contained. The
+> intended direction is to containerize the app and drive the whole stack from docker compose, making
+> this a CI-runnable integration test rather than a manual-stack check.
+
 ---
 
 ## Production deploy
@@ -162,8 +216,9 @@ not here. It mirrors `auth/nginx.conf`'s optional-auth + hard-gate + header-sani
 
 | File | Purpose |
 |---|---|
-| `src/main/java/org/triplea/services/auth/` | Identity, providers, resolver, `@RequiresMember`, filter. |
-| `src/main/resources/application.properties` | Header names, member group, `DEV_FAKE_AUTH` wiring. |
+| `src/main/java/org/triplea/services/auth/` | Identity, providers, resolver, `@RequiresMember`, filter; `@CsrfProtected` + the CSRF provider/filters. |
+| `src/main/resources/application.properties` | Header names, member group, `DEV_FAKE_AUTH` wiring, `app.auth.csrf-cookie-secure`. |
 | `src/main/resources/templates/MapsStatusController/statusPage.html` | Conditional render + logout link. |
 | `docker-compose.auth.yml`, `auth/nginx.conf`, `.env.auth.example` | Local real-proxy overlay. |
+| `auth/verify-header-sanitization.sh` | End-to-end header-sanitization check (`make verify-auth-headers`). |
 | `src/testInteg/java/org/triplea/services/maps/**/Map*AuthIntegrationTest.java` | The three auth states. |

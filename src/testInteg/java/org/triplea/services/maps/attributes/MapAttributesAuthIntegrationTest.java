@@ -16,7 +16,8 @@ import org.triplea.IntegTestExtension;
 
 /**
  * Authorization integration tests for the fully-gated attribute catalog: anonymous is rejected on
- * the GET render and on every one of the 8 mutation endpoints; a member is allowed through.
+ * the GET render and on every one of the 8 mutation endpoints; a member is allowed through, but
+ * only once they supply a valid double-submit CSRF token (a member POST without one is 403).
  *
  * <p>Under {@code @QuarkusTest} the app runs in TEST launch mode with {@code DEV_FAKE_AUTH} unset,
  * so identity is derived from the {@code X-Auth-*} headers (the post-nginx state): anonymous = no
@@ -75,11 +76,32 @@ class MapAttributesAuthIntegrationTest {
   }
 
   @Test
-  void memberMutationIsAllowedThroughTheFilter() throws Exception {
-    // createAttribute needs no pre-existing row; 303 means it passed the filter and
-    // post-redirect-got.
+  void memberMutationWithoutCsrfTokenIsRejected() throws Exception {
+    // Passes the membership filter (member headers) but carries no CSRF token -> 403.
     int status = send(post(new Mutation("/attribute", "name=auth-test"), true)).statusCode();
+    assertThat(status).isEqualTo(403);
+  }
+
+  @Test
+  void memberMutationWithValidCsrfTokenSucceeds() throws Exception {
+    // Full double-submit flow: GET the page to obtain the csrf_token cookie, then POST it back as
+    // both the cookie and the _csrf form field. 303 means it passed the membership + CSRF filters
+    // and post-redirect-got. createAttribute needs no pre-existing row.
+    String token = csrfTokenFromGet();
+    int status =
+        send(postWithCsrf(new Mutation("/attribute", "name=auth-test"), token)).statusCode();
     assertThat(status).isEqualTo(303);
+  }
+
+  /** Issues a member GET and pulls the {@code csrf_token} value out of its {@code Set-Cookie}. */
+  private String csrfTokenFromGet() throws Exception {
+    HttpResponse<String> response = send(get(true));
+    assertThat(response.statusCode()).isEqualTo(200);
+    return response.headers().allValues("set-cookie").stream()
+        .filter(c -> c.startsWith("csrf_token="))
+        .map(c -> c.substring("csrf_token=".length(), c.indexOf(';')))
+        .findFirst()
+        .orElseThrow(() -> new AssertionError("GET did not issue a csrf_token cookie"));
   }
 
   private HttpRequest get(boolean member) {
@@ -96,6 +118,18 @@ class MapAttributesAuthIntegrationTest {
       builder.POST(HttpRequest.BodyPublishers.noBody());
     }
     return withAuth(builder, member).build();
+  }
+
+  /** A member POST carrying the CSRF token in both the cookie and the {@code _csrf} form field. */
+  private HttpRequest postWithCsrf(Mutation mutation, String token) {
+    String body = "_csrf=" + token + (mutation.formBody() == null ? "" : "&" + mutation.formBody());
+    var builder =
+        HttpRequest.newBuilder()
+            .uri(URI.create(baseUrl + BASE + mutation.path()))
+            .header("Content-Type", "application/x-www-form-urlencoded")
+            .header("Cookie", "csrf_token=" + token)
+            .POST(HttpRequest.BodyPublishers.ofString(body));
+    return withAuth(builder, true).build();
   }
 
   private static HttpRequest.Builder withAuth(HttpRequest.Builder builder, boolean member) {

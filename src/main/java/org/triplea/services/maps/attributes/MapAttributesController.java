@@ -17,6 +17,8 @@ import jakarta.ws.rs.core.Response;
 import java.net.URI;
 import java.util.List;
 import org.jdbi.v3.core.Jdbi;
+import org.triplea.services.auth.CsrfProtected;
+import org.triplea.services.auth.CsrfTokenProvider;
 import org.triplea.services.auth.RequiresMember;
 
 /**
@@ -25,16 +27,20 @@ import org.triplea.services.auth.RequiresMember;
  * the browser history remains a series of GETs (post-redirect-get).
  *
  * <p>Fully gated: {@link RequiresMember} on the class makes the GET render and every POST
- * members-only, enforced server-side by {@code MemberAuthFilter}.
+ * members-only, enforced server-side by {@code MemberAuthFilter}. {@link CsrfProtected}
+ * additionally requires a valid double-submit token on every mutation, since the cookie session
+ * makes raw posts forgeable.
  */
 @Path("/support/admin/map/attributes")
 @ApplicationScoped
 @RequiresMember
+@CsrfProtected
 public class MapAttributesController {
 
   private static final URI SELF = URI.create("/support/admin/map/attributes");
 
   @Inject Jdbi jdbi;
+  @Inject CsrfTokenProvider csrfTokenProvider;
 
   private MapAttributeDao dao;
 
@@ -45,13 +51,14 @@ public class MapAttributesController {
 
   @CheckedTemplate
   public static class Templates {
-    public static native TemplateInstance catalogPage(List<AttributeWithValues> attributes);
+    public static native TemplateInstance catalogPage(
+        List<AttributeWithValues> attributes, String csrfToken);
   }
 
   @GET
   @Produces(MediaType.TEXT_HTML)
   public TemplateInstance catalogPage() {
-    return Templates.catalogPage(dao.listAttributes());
+    return Templates.catalogPage(dao.listAttributes(), csrfTokenProvider.token());
   }
 
   @POST

@@ -52,6 +52,10 @@ run up: ## Run behind the real oauth2-proxy/nginx auth overlay (browse http://lo
 	docker compose -f docker-compose.auth.yml up -d
 	./gradlew quarkusDev
 
+verify-auth-headers: ## Verify nginx strips spoofed inbound X-Auth-* headers (security check). Brings the proxy up; needs the app running (make run).
+	docker compose -f docker-compose.auth.yml up -d
+	./auth/verify-header-sanitization.sh
+
 psql: ## Connects to locally running docker database
 	docker exec -u postgres -it support-server-database-1 psql support_db
 

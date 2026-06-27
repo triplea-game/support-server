@@ -31,6 +31,7 @@
   {#for attr in attributes}
     <section class="attribute">
       <form method="post" class="inline attribute-header">
+        <input type="hidden" name="_csrf" value="{csrfToken}">
         <input type="text" name="name" value="{attr.name}" required>
         <button formaction="/support/admin/map/attributes/attribute/{attr.id}/rename">Rename</button>
         <button formaction="/support/admin/map/attributes/attribute/{attr.id}/move"
@@ -50,6 +51,7 @@
         {/if}
         {#for v in attr.values}
           <form method="post" class="inline value-row">
+            <input type="hidden" name="_csrf" value="{csrfToken}">
             <input type="text" name="value" value="{v.value}" required>
             <button formaction="/support/admin/map/attributes/value/{v.id}/rename">Rename</button>
             <button formaction="/support/admin/map/attributes/value/{v.id}/move"
@@ -67,6 +69,7 @@
         <form method="post"
               action="/support/admin/map/attributes/attribute/{attr.id}/value"
               class="inline add-row">
+          <input type="hidden" name="_csrf" value="{csrfToken}">
           <input type="text" name="value" placeholder="New value" required>
           <button>Add value</button>
         </form>
@@ -76,6 +79,7 @@
 
   <section class="add-attribute">
     <form method="post" action="/support/admin/map/attributes/attribute" class="inline">
+      <input type="hidden" name="_csrf" value="{csrfToken}">
       <label>New attribute:</label>
       <input type="text" name="name" placeholder="e.g. difficulty" required>
       <button>Add attribute</button>
