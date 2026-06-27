@@ -14,17 +14,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.triplea.http.client.github.GithubClient;
 import org.triplea.http.client.github.MapRepoListing;
 
-/**
- * Task that runs a map indexing pass on all maps. The indexing will update database to reflect the
- * latest checked in across all map repositories.
- *
- * <ul>
- *   <li>Queries Github for list of map repos
- *   <li>Checks each map repo for a 'map.yml' and reads the map name and version
- *   <li>Deletes from database maps that have been removed
- *   <li>Upserts latest map info into database
- * </ul>
- */
+/// Task that runs a map indexing pass on all maps. The indexing will update database to reflect the
+/// latest checked in across all map repositories.
+///
+/// - Queries Github for list of map repos
+/// - Checks each map repo for a 'map.yml' and reads the map name and version
+/// - Deletes from database maps that have been removed
+/// - Upserts latest map info into database
 @Builder
 @Slf4j
 class MapIndexingTaskRunner implements Runnable {

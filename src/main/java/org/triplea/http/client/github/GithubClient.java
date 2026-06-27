@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import org.slf4j.Logger;
 
-/** Can be used to interact with GitHub's webservice API. */
+/// Can be used to interact with GitHub's webservice API.
 public class GithubClient {
 
   private static final Logger log = getLogger(GithubClient.class);
@@ -60,14 +60,12 @@ public class GithubClient {
     return new GithubClient(baseUri, authToken, org);
   }
 
-  /**
-   * Returns a listing of the repositories within a github organization. This call handles paging,
-   * it returns a complete list and may perform multiple calls to Github.
-   *
-   * <p>Example equivalent cUrl call:
-   *
-   * <p>curl https://api.github.com/orgs/triplea-maps/repos
-   */
+  /// Returns a listing of the repositories within a github organization. This call handles paging,
+  /// it returns a complete list and may perform multiple calls to Github.
+  ///
+  /// Example equivalent cUrl call:
+  ///
+  /// curl https://api.github.com/orgs/triplea-maps/repos
   public Collection<MapRepoListing> listRepositories() {
     final Collection<MapRepoListing> allRepos = new HashSet<>();
     int pageNumber = 1;

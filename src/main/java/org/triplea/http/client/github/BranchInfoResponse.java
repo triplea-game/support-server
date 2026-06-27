@@ -5,17 +5,15 @@ import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
 
-/**
- * Represents the data returned by github API for their 'branches' endpoint. This class Presents a
- * simplified interface for what is otherwise a JSON response.
- */
+/// Represents the data returned by github API for their 'branches' endpoint. This class Presents a
+/// simplified interface for what is otherwise a JSON response.
 @ToString
 @AllArgsConstructor
 public class BranchInfoResponse {
   @SerializedName("commit")
   private final LastCommit lastCommit;
 
-  /** Returns the date of the last commit. */
+  /// Returns the date of the last commit.
   public Instant getLastCommitDate() {
     return Instant.parse(lastCommit.commit.commitDetails.date);
   }

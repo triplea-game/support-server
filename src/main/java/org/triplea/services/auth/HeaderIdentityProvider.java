@@ -6,14 +6,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
-/**
- * Production identity source: derives identity from the {@code X-Auth-*} headers injected by the
- * oauth2-proxy / nginx reverse proxy. Absent the email header, the request is {@link
- * Identity#ANONYMOUS}.
- *
- * <p>This is the only identity path in a real deployment. nginx always overwrites the {@code
- * X-Auth-*} headers from the auth subrequest, so a client cannot spoof identity by sending its own.
- */
+/// Production identity source: derives identity from the `X-Auth-*` headers injected by the
+/// oauth2-proxy / nginx reverse proxy. Absent the email header, the request is
+/// [Identity#ANONYMOUS].
+///
+/// This is the only identity path in a real deployment. nginx always overwrites the `X-Auth-*`
+/// headers from the auth subrequest, so a client cannot spoof identity by sending its own.
 @ApplicationScoped
 public class HeaderIdentityProvider implements IdentityProvider {
 

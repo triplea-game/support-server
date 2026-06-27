@@ -11,14 +11,12 @@ import org.snakeyaml.engine.v2.api.Load;
 import org.snakeyaml.engine.v2.api.LoadSettings;
 import org.snakeyaml.engine.v2.exceptions.YamlEngineException;
 
-/** Methods useful for reading YAML data from a String or InputStream. */
+/// Methods useful for reading YAML data from a String or InputStream.
 @UtilityClass
 public class YamlReader {
-  /**
-   * Reads from input a YAML data structure. YAML is assumed to be a List at the top level.
-   *
-   * @throws InvalidYamlFormatException Thrown if the YAML is badly formatted.
-   */
+  /// Reads from input a YAML data structure. YAML is assumed to be a List at the top level.
+  ///
+  /// @throws InvalidYamlFormatException Thrown if the YAML is badly formatted.
   @SuppressWarnings("unchecked")
   public static List<Map<String, Object>> readList(final String input) {
     try {
@@ -28,11 +26,9 @@ public class YamlReader {
     }
   }
 
-  /**
-   * Reads from input a YAML data structure. YAML is assumed to be a List at the top level.
-   *
-   * @throws InvalidYamlFormatException Thrown if the YAML is badly formatted.
-   */
+  /// Reads from input a YAML data structure. YAML is assumed to be a List at the top level.
+  ///
+  /// @throws InvalidYamlFormatException Thrown if the YAML is badly formatted.
   @SuppressWarnings("unchecked")
   public static List<Map<String, Object>> readList(final InputStream input) {
     try {
@@ -42,11 +38,9 @@ public class YamlReader {
     }
   }
 
-  /**
-   * Reads from input a YAML data structure. YAML is assumed to be map at the top level.
-   *
-   * @throws InvalidYamlFormatException Thrown if the YAML is badly formatted.
-   */
+  /// Reads from input a YAML data structure. YAML is assumed to be map at the top level.
+  ///
+  /// @throws InvalidYamlFormatException Thrown if the YAML is badly formatted.
   @SuppressWarnings("unchecked")
   public static Map<String, Object> readMap(final String input) {
     try {
@@ -56,11 +50,9 @@ public class YamlReader {
     }
   }
 
-  /**
-   * Reads from input a YAML data structure. YAML is assumed to be map at the top level.
-   *
-   * @throws InvalidYamlFormatException Thrown if the YAML is badly formatted.
-   */
+  /// Reads from input a YAML data structure. YAML is assumed to be map at the top level.
+  ///
+  /// @throws InvalidYamlFormatException Thrown if the YAML is badly formatted.
   @SuppressWarnings("unchecked")
   public static Map<String, Object> readMap(final InputStream input) {
     try {

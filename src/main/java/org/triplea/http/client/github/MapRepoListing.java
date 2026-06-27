@@ -5,7 +5,7 @@ import java.net.URI;
 import lombok.Builder;
 import lombok.Value;
 
-/** Response object from Github listing the details of an organization's repositories. */
+/// Response object from Github listing the details of an organization's repositories.
 @Value
 @Builder
 public class MapRepoListing {

@@ -6,12 +6,12 @@ import lombok.RequiredArgsConstructor;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 
-/** DAO class for error reporting functionality. */
+/// DAO class for error reporting functionality.
 @RequiredArgsConstructor
 public class ErrorReportingDao {
   private final Jdbi jdbi;
 
-  /** Inserts a new record indicating a user has submitted an error report at a given date. */
+  /// Inserts a new record indicating a user has submitted an error report at a given date.
   public void insertHistoryRecord(InsertHistoryRecordParams insertHistoryRecordParams) {
     jdbi.withHandle(
         handle ->
@@ -31,12 +31,10 @@ public class ErrorReportingDao {
                 .execute());
   }
 
-  /**
-   * Method to clean up old records from the error report history table. This is to avoid the table
-   * from growing very large.
-   *
-   * @param purgeSinceDate Any records older than this date will be removed.
-   */
+  /// Method to clean up old records from the error report history table. This is to avoid the table
+  /// from growing very large.
+  ///
+  /// @param purgeSinceDate Any records older than this date will be removed.
   public void purgeOld(@Bind("purgeSinceDate") Instant purgeSinceDate) {
     jdbi.withHandle(
         handle ->

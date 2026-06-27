@@ -18,12 +18,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.triplea.utils.FileUtils;
 import org.triplea.utils.ThrowingFunction;
 
-/**
- * Given a map repo, determines the map download size.
- *
- * <p>Implementation note: download size is determined by downloading the entire file at the given
- * URI to a temp file and then returning the size of that temp file. The temp file is then deleted.
- */
+/// Given a map repo, determines the map download size.
+///
+/// Implementation note: download size is determined by downloading the entire file at the given
+/// URI to a temp file and then returning the size of that temp file. The temp file is then deleted.
 @Slf4j
 public class DownloadSizeFetcher implements Function<URI, Optional<Long>> {
   private static final HttpClient HTTP_CLIENT =

@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-/** Represents request data to create a github issue. */
+/// Represents request data to create a github issue.
 @ToString
 @EqualsAndHashCode
 @Builder

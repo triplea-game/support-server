@@ -5,14 +5,12 @@ import java.util.Optional;
 import java.util.Set;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
-/**
- * Local-development identity source: synthesizes an identity from the {@code DEV_FAKE_AUTH} value
- * ({@code member} | {@code anon}), ignoring all request headers. This lets a newcomer exercise both
- * the member and anonymous postures with zero proxy/GitHub setup.
- *
- * <p>It is selected only outside a packaged production build — see {@link IdentityProducer#select};
- * it can never activate in prod even if {@code DEV_FAKE_AUTH} is present in the environment.
- */
+/// Local-development identity source: synthesizes an identity from the `DEV_FAKE_AUTH` value
+/// (`member` | `anon`), ignoring all request headers. This lets a newcomer exercise both
+/// the member and anonymous postures with zero proxy/GitHub setup.
+///
+/// It is selected only outside a packaged production build — see [IdentityProducer#select];
+/// it can never activate in prod even if `DEV_FAKE_AUTH` is present in the environment.
 @ApplicationScoped
 public class DevFakeIdentityProvider implements IdentityProvider {
 

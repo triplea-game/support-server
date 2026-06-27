@@ -13,15 +13,13 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class TestDataFileReader {
 
-  /**
-   * Reads file contents, file is expected to be located at either the project root or in
-   * "src/test/resources".
-   *
-   * @param filePath Path to the file relative to 'src/test/resources' or relative to the project
-   *     root.
-   * @return Contents of the file read.
-   * @throws TestDataFileNotFound Thrown if file does not exist.
-   */
+  /// Reads file contents, file is expected to be located at either the project root or in
+  /// "src/test/resources".
+  ///
+  /// @param filePath Path to the file relative to 'src/test/resources' or relative to the project
+  ///     root.
+  /// @return Contents of the file read.
+  /// @throws TestDataFileNotFound Thrown if file does not exist.
   public static String readContents(final String filePath) {
     return readFromProjectRoot(filePath)
         // current context can be from a sub-project, or can be from the top-most level of the

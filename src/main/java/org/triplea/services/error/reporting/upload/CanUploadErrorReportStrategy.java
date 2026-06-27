@@ -7,10 +7,8 @@ import org.jdbi.v3.core.Jdbi;
 import org.triplea.http.client.error.report.CanUploadErrorReportResponse;
 import org.triplea.http.client.error.report.CanUploadRequest;
 
-/**
- * Answers the question if a user can upload an error report. If the given title and version already
- * exist, then a user cannot upload a (duplicate) error report.
- */
+/// Answers the question if a user can upload an error report. If the given title and version
+/// already exist, then a user cannot upload a (duplicate) error report.
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class CanUploadErrorReportStrategy
     implements Function<CanUploadRequest, CanUploadErrorReportResponse> {

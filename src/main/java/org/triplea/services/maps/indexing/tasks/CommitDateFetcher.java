@@ -9,10 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.triplea.http.client.github.GithubClient;
 import org.triplea.http.client.github.MapRepoListing;
 
-/**
- * Given a map repo listing, does an API call to github to return the last commit date for that
- * repo. Returns an empty if there are any errors fetching last commit date.
- */
+/// Given a map repo listing, does an API call to github to return the last commit date for that
+/// repo. Returns an empty if there are any errors fetching last commit date.
 @Builder
 @Slf4j
 public class CommitDateFetcher implements Function<MapRepoListing, Optional<Instant>> {

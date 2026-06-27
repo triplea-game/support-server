@@ -9,11 +9,9 @@ import java.util.Optional;
 import java.util.function.Function;
 import org.triplea.http.client.github.MapRepoListing;
 
-/**
- * A function where if given a map repo listing will find the 'description.html' file in that repo
- * and returns its contents. If the contents are too long or the file is missing then will return a
- * 'description-missing' error message with details on how to fix it.
- */
+/// A function where if given a map repo listing will find the 'description.html' file in that repo
+/// and returns its contents. If the contents are too long or the file is missing then will return a
+/// 'description-missing' error message with details on how to fix it.
 public class MapDescriptionReader implements Function<MapRepoListing, String> {
   private static final int DESCRIPTION_COLUMN_DATABASE_MAX_LENGTH = 3000;
   private static final HttpClient HTTP_CLIENT =

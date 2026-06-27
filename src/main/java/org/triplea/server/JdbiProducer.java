@@ -7,7 +7,7 @@ import jakarta.inject.Inject;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 
-/** CDI producer that exposes a singleton {@link Jdbi} instance backed by the Quarkus datasource. */
+/// CDI producer that exposes a singleton [Jdbi] instance backed by the Quarkus datasource.
 @ApplicationScoped
 public class JdbiProducer {
 

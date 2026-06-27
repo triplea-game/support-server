@@ -16,7 +16,7 @@ import org.triplea.services.maps.indexing.tasks.DownloadSizeFetcher;
 import org.triplea.services.maps.indexing.tasks.MapDescriptionReader;
 import org.triplea.services.maps.indexing.tasks.MapNameReader;
 
-/** MapIndexer physically fetches the data required to index a map. */
+/// MapIndexer physically fetches the data required to index a map.
 @Builder
 class MapIndexer {
   @Nonnull private final Function<MapRepoListing, Optional<Instant>> lastCommitDateFetcher;

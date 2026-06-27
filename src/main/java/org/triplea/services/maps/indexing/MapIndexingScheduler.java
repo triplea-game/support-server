@@ -10,10 +10,8 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jdbi.v3.core.Jdbi;
 import org.triplea.http.client.github.GithubClient;
 
-/**
- * Quarkus-managed bean that runs the map indexing task on a configurable schedule. Replaces the
- * DropWizard {@code ScheduledTask} + {@code MapsIndexingObjectFactory} wiring.
- */
+/// Quarkus-managed bean that runs the map indexing task on a configurable schedule. Replaces the
+/// DropWizard `ScheduledTask` + `MapsIndexingObjectFactory` wiring.
 @ApplicationScoped
 @Slf4j
 public class MapIndexingScheduler {

@@ -13,14 +13,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.triplea.IntegTestExtension;
 
-/**
- * Conditional-render integration tests for the public map status page. The GET is public (200 for
- * everyone); what differs is the auth-aware scaffolding: a member sees the logout link and the
- * member-only region, an anonymous caller sees neither.
- *
- * <p>Identity is derived from the {@code X-Auth-*} headers (the post-nginx state in TEST launch
- * mode, {@code DEV_FAKE_AUTH} unset): anonymous = no headers, member = email + the member group.
- */
+/// Conditional-render integration tests for the public map status page. The GET is public (200 for
+/// everyone); what differs is the auth-aware scaffolding: a member sees the logout link and the
+/// member-only region, an anonymous caller sees neither.
+///
+/// Identity is derived from the `X-Auth-*` headers (the post-nginx state in TEST launch
+/// mode, `DEV_FAKE_AUTH` unset): anonymous = no headers, member = email + the member group.
 @QuarkusTest
 @ExtendWith(IntegTestExtension.class)
 class MapsStatusAuthIntegrationTest {

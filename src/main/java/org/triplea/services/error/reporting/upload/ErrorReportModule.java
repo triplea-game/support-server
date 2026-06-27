@@ -9,7 +9,7 @@ import org.triplea.http.client.error.report.ErrorReportResponse;
 import org.triplea.http.client.github.CreateIssueRequest;
 import org.triplea.http.client.github.GithubClient;
 
-/** Performs the steps for uploading an error report from the point of view of the server. */
+/// Performs the steps for uploading an error report from the point of view of the server.
 @Builder
 public class ErrorReportModule {
   @Nonnull private final GithubClient githubApiClient;
@@ -24,10 +24,8 @@ public class ErrorReportModule {
         .build();
   }
 
-  /**
-   * Creates an error report (a github issue), records in database the created issue, and purges
-   * very old error reports from database.
-   */
+  /// Creates an error report (a github issue), records in database the created issue, and purges
+  /// very old error reports from database.
   public ErrorReportResponse createErrorReport(CreateIssueParams createIssueParams) {
     var errorReportRequest = createIssueParams.getErrorReportRequest();
 

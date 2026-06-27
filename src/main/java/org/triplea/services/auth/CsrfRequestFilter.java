@@ -16,18 +16,16 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Set;
 
-/**
- * Validates the double-submit CSRF token on every <em>unsafe</em> request to a {@link
- * CsrfProtected} resource: the {@code _csrf} form field must be present and equal (constant-time)
- * to the {@code csrf_token} cookie. Mismatch or absence aborts with <b>403</b>.
- *
- * <p>Safe methods (GET/HEAD/OPTIONS) are not checked — they don't mutate, and the GET render is
- * what issues the cookie + field in the first place.
- *
- * <p>Runs <em>after</em> {@link MemberAuthFilter} (higher priority value) so an anonymous caller to
- * a member-gated form gets the authorization 401 rather than a 403 — a non-member has no business
- * reaching the CSRF check.
- */
+/// Validates the double-submit CSRF token on every *unsafe* request to a [CsrfProtected]
+/// resource: the `_csrf` form field must be present and equal (constant-time)
+/// to the `csrf_token` cookie. Mismatch or absence aborts with **403**.
+///
+/// Safe methods (GET/HEAD/OPTIONS) are not checked — they don't mutate, and the GET render is
+/// what issues the cookie + field in the first place.
+///
+/// Runs *after* [MemberAuthFilter] (higher priority value) so an anonymous caller to
+/// a member-gated form gets the authorization 401 rather than a 403 — a non-member has no business
+/// reaching the CSRF check.
 @Provider
 @CsrfProtected
 @Priority(Priorities.AUTHORIZATION + 100)
@@ -61,10 +59,8 @@ public class CsrfRequestFilter implements ContainerRequestFilter {
     return cookie == null ? null : cookie.getValue();
   }
 
-  /**
-   * Reads the {@code _csrf} field from a form-urlencoded body, then restores the entity stream so
-   * the resource method's {@code @FormParam}s still bind. Non-form bodies have no token.
-   */
+  /// Reads the `_csrf` field from a form-urlencoded body, then restores the entity stream so
+  /// the resource method's `@FormParam`s still bind. Non-form bodies have no token.
   private static String readFormToken(ContainerRequestContext requestContext) throws IOException {
     MediaType mediaType = requestContext.getMediaType();
     if (mediaType == null || !mediaType.isCompatible(MediaType.APPLICATION_FORM_URLENCODED_TYPE)) {

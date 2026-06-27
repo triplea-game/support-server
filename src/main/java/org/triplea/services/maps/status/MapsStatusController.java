@@ -17,16 +17,14 @@ import org.triplea.services.auth.Identity;
 import org.triplea.services.auth.RequestIdentity;
 import org.triplea.services.maps.listing.MapsListingModule;
 
-/**
- * Renders the public map status page: a listing of all indexed maps and their current attributes.
- * The GET is public (no auth required) and stays unannotated.
- *
- * <p>The resolved {@link Identity} is passed to the template so it can conditionally render
- * write-enabled controls for team members ({@code identity.member}) and a logout link for any
- * authenticated caller ({@code !identity.anonymous}). The write controls themselves — and the
- * member-only POST endpoints they target (which would carry {@code @RequiresMember}) — are a
- * separate story; this only wires the identity through so those controls have what they need.
- */
+/// Renders the public map status page: a listing of all indexed maps and their current attributes.
+/// The GET is public (no auth required) and stays unannotated.
+///
+/// The resolved [Identity] is passed to the template so it can conditionally render
+/// write-enabled controls for team members (`identity.member`) and a logout link for any
+/// authenticated caller (`!identity.anonymous`). The write controls themselves — and the
+/// member-only POST endpoints they target (which would carry `@RequiresMember`) — are a
+/// separate story; this only wires the identity through so those controls have what they need.
 @Path("/support/maps/status")
 @ApplicationScoped
 public class MapsStatusController {

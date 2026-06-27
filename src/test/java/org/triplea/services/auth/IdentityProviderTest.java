@@ -8,17 +8,15 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.triplea.services.auth.IdentityProvider.HeaderLookup;
 
-/**
- * Pure unit tests for the two identity sources — header parsing for prod and {@code DEV_FAKE_AUTH}
- * synthesis for dev. No Quarkus container; config fields are set directly.
- */
+/// Pure unit tests for the two identity sources — header parsing for prod and `DEV_FAKE_AUTH`
+/// synthesis for dev. No Quarkus container; config fields are set directly.
 class IdentityProviderTest {
 
   private static final String MEMBER_GROUP = "triplea-game:maintainers";
   private static final String EMAIL_HEADER = "X-Auth-Email";
   private static final String GROUPS_HEADER = "X-Auth-Groups";
 
-  /** Header lookup backed by a fixed map; absent keys return null. */
+  /// Header lookup backed by a fixed map; absent keys return null.
   private static HeaderLookup headers(Map<String, String> values) {
     return values::get;
   }
@@ -101,7 +99,7 @@ class IdentityProviderTest {
       return provider;
     }
 
-    /** Dev provider ignores headers entirely. */
+    /// Dev provider ignores headers entirely.
     private static final HeaderLookup IGNORED = name -> "should-be-ignored";
 
     @Test

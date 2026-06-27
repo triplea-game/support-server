@@ -26,7 +26,7 @@ import org.triplea.services.error.reporting.upload.CreateIssueParams;
 import org.triplea.services.error.reporting.upload.ErrorReportModule;
 import org.triplea.utils.IpAddressExtractor;
 
-/** Http controller that binds the error upload endpoint with the error report upload handler. */
+/// Http controller that binds the error upload endpoint with the error report upload handler.
 @Path("/")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -65,10 +65,8 @@ public class ErrorReportController {
     return canReportModule.apply(canUploadRequest);
   }
 
-  /**
-   * Endpoint where users can submit an error report, the server will use an API token of a generic
-   * user to in turn create a GitHub issue using the data from the error report.
-   */
+  /// Endpoint where users can submit an error report, the server will use an API token of a generic
+  /// user to in turn create a GitHub issue using the data from the error report.
   @POST
   @Path(ServerPaths.ERROR_REPORT_PATH)
   public ErrorReportResponse uploadErrorReport(

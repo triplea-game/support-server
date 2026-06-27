@@ -16,10 +16,8 @@ import org.junit.jupiter.api.Test;
 
 class DownloadSizeFetcherTest {
 
-  /**
-   * In this test we stub the downloaded content to be a fixed size string. We then verify the
-   * reported download size matches teh byte length of the string.
-   */
+  /// In this test we stub the downloaded content to be a fixed size string. We then verify the
+  /// reported download size matches teh byte length of the string.
   @Test
   @DisplayName("Happy case, return content size downloaded")
   void returnContentSizeDownloaded() {

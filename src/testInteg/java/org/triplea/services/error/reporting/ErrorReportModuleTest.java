@@ -66,10 +66,8 @@ class ErrorReportModuleTest {
     assertThat(response.getGithubIssueLink(), is(GITHUB_ISSUE_URL));
   }
 
-  /**
-   * Given an input to create an error report, we validate the parameters we send to github to
-   * create an issue.
-   */
+  /// Given an input to create an error report, we validate the parameters we send to github to
+  /// create an issue.
   @Test
   void validateDataSentToGithub() {
     errorReportModule.createErrorReport(createIssueParams);
@@ -84,10 +82,8 @@ class ErrorReportModuleTest {
                 .build());
   }
 
-  /**
-   * Given a variety of 'inputVersion' representing game versions, we validate the data we send to
-   * github (notably checking the labels that we send).
-   */
+  /// Given a variety of 'inputVersion' representing game versions, we validate the data we send to
+  /// github (notably checking the labels that we send).
   @ParameterizedTest
   @MethodSource
   void validateLabelsDataSentToGithub(String inputVersion, String[] expectedLabels) {

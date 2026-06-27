@@ -23,10 +23,8 @@ public class IndexingEndToEndTest {
           .defaultBranch("master")
           .build();
 
-  /**
-   * In this test we will be scraping the 'test' repository from Github and will validate that data
-   * lands in database. Uses a real github client & real database.
-   */
+  /// In this test we will be scraping the 'test' repository from Github and will validate that data
+  /// lands in database. Uses a real github client & real database.
   @Test
   void verifyIndexing() {
     var githubClient = GithubClient.build("", "triplea-maps");

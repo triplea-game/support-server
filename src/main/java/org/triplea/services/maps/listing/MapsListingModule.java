@@ -15,7 +15,7 @@ public class MapsListingModule implements Supplier<List<MapDownloadItem>> {
     return new MapsListingModule(new MapListingDao(jdbi));
   }
 
-  /** Returns data for the full set of maps available to download. */
+  /// Returns data for the full set of maps available to download.
   @Override
   public List<MapDownloadItem> get() {
     return mapListingDao.fetchMapListings();

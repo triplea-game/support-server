@@ -15,14 +15,12 @@ import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
-/**
- * Sets up database access and shared test state for integration tests.
- *
- * <p>Resolves datasource coordinates from the CDI-managed {@link AgroalDataSource} bean so the
- * coordinates always match the actual datasource (including Dev Services / Testcontainers). Tests
- * that need the server URI should inject it via {@code @ConfigProperty(name =
- * "quarkus.http.test-port", defaultValue = "8081")}.
- */
+/// Sets up database access and shared test state for integration tests.
+///
+/// Resolves datasource coordinates from the CDI-managed [AgroalDataSource] bean so the
+/// coordinates always match the actual datasource (including Dev Services / Testcontainers). Tests
+/// that need the server URI should inject it via
+/// `@ConfigProperty(name = "quarkus.http.test-port", defaultValue = "8081")`.
 @ExtendWith(DBUnitExtension.class)
 public class IntegTestExtension implements BeforeEachCallback {
 

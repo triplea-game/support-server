@@ -6,14 +6,12 @@ import io.quarkus.runtime.LaunchMode;
 import org.junit.jupiter.api.Test;
 import org.triplea.services.auth.IdentityProvider.HeaderLookup;
 
-/**
- * Prod-safety: the worst-case failure is "everyone silently a member". A packaged production build
- * ({@link LaunchMode#NORMAL}) must resolve to the header provider — and therefore to anonymous when
- * no proxy headers are present — even when {@code DEV_FAKE_AUTH=member} is set in the environment.
- *
- * <p>This exercises the pure {@link RequestIdentity#select} gate directly so the guarantee is
- * verifiable without a packaged build (a {@code @QuarkusTest} runs in {@link LaunchMode#TEST}).
- */
+/// Prod-safety: the worst-case failure is "everyone silently a member". A packaged production build
+/// ([LaunchMode#NORMAL]) must resolve to the header provider — and therefore to anonymous when
+/// no proxy headers are present — even when `DEV_FAKE_AUTH=member` is set in the environment.
+///
+/// This exercises the pure [RequestIdentity#select] gate directly so the guarantee is
+/// verifiable without a packaged build (a `@QuarkusTest` runs in [LaunchMode#TEST]).
 class ProdSafetyTest {
 
   private final IdentityProvider headerProvider = new HeaderIdentityProvider();

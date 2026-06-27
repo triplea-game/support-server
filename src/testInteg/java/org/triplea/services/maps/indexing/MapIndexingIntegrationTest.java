@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.triplea.http.client.github.GithubClient;
 import org.triplea.http.client.github.MapRepoListing;
 
-/** Validate we can scrape a real map on github and scrape correct data. */
+/// Validate we can scrape a real map on github and scrape correct data.
 @QuarkusTest
 public class MapIndexingIntegrationTest {
 

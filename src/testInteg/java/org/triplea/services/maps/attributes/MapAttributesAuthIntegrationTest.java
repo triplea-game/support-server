@@ -14,15 +14,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.triplea.IntegTestExtension;
 
-/**
- * Authorization integration tests for the fully-gated attribute catalog: anonymous is rejected on
- * the GET render and on every one of the 8 mutation endpoints; a member is allowed through, but
- * only once they supply a valid double-submit CSRF token (a member POST without one is 403).
- *
- * <p>Under {@code @QuarkusTest} the app runs in TEST launch mode with {@code DEV_FAKE_AUTH} unset,
- * so identity is derived from the {@code X-Auth-*} headers (the post-nginx state): anonymous = no
- * headers, member = an email plus the member group.
- */
+/// Authorization integration tests for the fully-gated attribute catalog: anonymous is rejected on
+/// the GET render and on every one of the 8 mutation endpoints; a member is allowed through, but
+/// only once they supply a valid double-submit CSRF token (a member POST without one is 403).
+///
+/// Under `@QuarkusTest` the app runs in TEST launch mode with `DEV_FAKE_AUTH` unset,
+/// so identity is derived from the `X-Auth-*` headers (the post-nginx state): anonymous = no
+/// headers, member = an email plus the member group.
 @QuarkusTest
 @ExtendWith(IntegTestExtension.class)
 class MapAttributesAuthIntegrationTest {
@@ -42,7 +40,7 @@ class MapAttributesAuthIntegrationTest {
     baseUrl = "http://localhost:" + testPort;
   }
 
-  /** A gated mutation: path suffix under {@link #BASE} and its form body (null = no form body). */
+  /// A gated mutation: path suffix under [#BASE] and its form body (null = no form body).
   private record Mutation(String path, String formBody) {}
 
   private static List<Mutation> mutationEndpoints() {
@@ -93,7 +91,7 @@ class MapAttributesAuthIntegrationTest {
     assertThat(status).isEqualTo(303);
   }
 
-  /** Issues a member GET and pulls the {@code csrf_token} value out of its {@code Set-Cookie}. */
+  /// Issues a member GET and pulls the `csrf_token` value out of its `Set-Cookie`.
   private String csrfTokenFromGet() throws Exception {
     HttpResponse<String> response = send(get(true));
     assertThat(response.statusCode()).isEqualTo(200);
@@ -120,7 +118,7 @@ class MapAttributesAuthIntegrationTest {
     return withAuth(builder, member).build();
   }
 
-  /** A member POST carrying the CSRF token in both the cookie and the {@code _csrf} form field. */
+  /// A member POST carrying the CSRF token in both the cookie and the `_csrf` form field.
   private HttpRequest postWithCsrf(Mutation mutation, String token) {
     String body = "_csrf=" + token + (mutation.formBody() == null ? "" : "&" + mutation.formBody());
     var builder =

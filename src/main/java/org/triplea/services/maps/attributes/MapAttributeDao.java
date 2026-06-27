@@ -7,11 +7,9 @@ import lombok.AllArgsConstructor;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 
-/**
- * CRUD + reorder operations for the attribute catalog: {@code map_attribute} (the dimensions, e.g.
- * "difficulty") and {@code map_attribute_value} (the allowed values within a dimension, e.g.
- * "easy"). Reordering is a swap of {@code display_order} with the neighbor in the current ordering.
- */
+/// CRUD + reorder operations for the attribute catalog: `map_attribute` (the dimensions, e.g.
+/// "difficulty") and `map_attribute_value` (the allowed values within a dimension, e.g.
+/// "easy"). Reordering is a swap of `display_order` with the neighbor in the current ordering.
 @AllArgsConstructor
 public class MapAttributeDao {
 
@@ -176,11 +174,9 @@ public class MapAttributeDao {
 
   private record Binding(String name, Object value) {}
 
-  /**
-   * Swaps display_order between {@code id} and its neighbor in the current ordering. {@code
-   * scopeFilter} (if non-empty) restricts the neighbor search to a sub-collection (e.g. values
-   * belonging to the same attribute) and must end with {@code "and "}.
-   */
+  /// Swaps display_order between `id` and its neighbor in the current ordering. `scopeFilter`
+  /// (if non-empty) restricts the neighbor search to a sub-collection (e.g. values
+  /// belonging to the same attribute) and must end with `"and "`.
   private static void swapWithNeighbor(
       Handle handle,
       String table,

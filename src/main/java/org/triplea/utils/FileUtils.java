@@ -7,15 +7,13 @@ import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
-/** A collection of useful methods related to files. */
+/// A collection of useful methods related to files.
 @UtilityClass
 @Slf4j
 public final class FileUtils {
 
-  /**
-   * Utility to delete file specified by the given path. This method handles any needed logging if
-   * the delete fails.
-   */
+  /// Utility to delete file specified by the given path. This method handles any needed logging if
+  /// the delete fails.
   public static void delete(final Path pathToDelete) {
     try {
       Files.delete(pathToDelete);
@@ -24,10 +22,8 @@ public final class FileUtils {
     }
   }
 
-  /**
-   * Creates a temp file, logs and returns an empty optional if there is a problem creating the temp
-   * file.
-   */
+  /// Creates a temp file, logs and returns an empty optional if there is a problem creating the
+  /// temp file.
   public static Optional<Path> createTempFile() {
     try {
       return Optional.of(Files.createTempFile("triplea-temp-file", ".temp"));

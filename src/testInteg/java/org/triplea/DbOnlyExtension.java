@@ -13,24 +13,20 @@ import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
-/**
- * JUnit 5 extension for tests that need only a live database (no server process). Configures
- * DBUnit's {@link GlobalConfig} and runs the db-cleanup script before each test.
- *
- * <p>Reads datasource coordinates from the Quarkus {@link ConfigProvider} — available after
- * {@code @QuarkusTest}'s {@code QuarkusTestExtension.beforeAll()} has set up the test profile and
- * datasource system properties.
- *
- * <p>{@code Jdbi} constructor parameters in test classes are injected by Quarkus CDI (via {@code
- * QuarkusTestExtension}). Use {@link IntegTestExtension} instead when the test also needs the
- * server URI.
- */
+/// JUnit 5 extension for tests that need only a live database (no server process). Configures
+/// DBUnit's [GlobalConfig] and runs the db-cleanup script before each test.
+///
+/// Reads datasource coordinates from the Quarkus [ConfigProvider] — available after
+/// `@QuarkusTest`'s `QuarkusTestExtension.beforeAll()` has set up the test profile and
+/// datasource system properties.
+///
+/// `Jdbi` constructor parameters in test classes are injected by Quarkus CDI (via
+/// `QuarkusTestExtension`). Use [IntegTestExtension] instead when the test also needs the
+/// server URI.
 @ExtendWith(DBUnitExtension.class)
 public class DbOnlyExtension implements BeforeAllCallback, BeforeEachCallback {
 
-  /**
-   * Internal Jdbi used only for db-cleanup; test classes receive CDI-injected Jdbi from Quarkus.
-   */
+  /// Internal Jdbi used only for db-cleanup; test classes receive CDI-injected Jdbi from Quarkus.
   private static Jdbi jdbi;
 
   @Override

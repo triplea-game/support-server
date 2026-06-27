@@ -31,7 +31,7 @@ final class ErrorReportingDaoTest {
     errorReportingDao = new ErrorReportingDao(jdbi);
   }
 
-  /** Simple check that if we insert a record we'll get a new record in the expected dataset. */
+  /// Simple check that if we insert a record we'll get a new record in the expected dataset.
   @DataSet(value = "error_reporting/empty_error_report_history.yml", useSequenceFiltering = false)
   @ExpectedDataSet(value = "error_reporting/error_report_history_post_insert.yml")
   @Test
