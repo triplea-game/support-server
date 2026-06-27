@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Map Attributes Admin</title>
+  <style>
+    body { font-family: sans-serif; margin: 1em; max-width: 900px; }
+    h1 { margin-bottom: 0.2em; }
+    .nav { margin-bottom: 1em; }
+    .attribute { border: 1px solid #ccc; margin-bottom: 1em; }
+    .attribute-header { background: #f4f4f4; padding: 0.5em; }
+    .values { padding: 0.5em; }
+    .value-row { padding: 0.25em 0; }
+    .add-row { padding: 0.5em; border-top: 1px dashed #ccc; }
+    form.inline { display: flex; gap: 0.5em; align-items: center; margin: 0; }
+    form.inline input[type=text] { flex: 1; }
+    button { cursor: pointer; }
+    button.danger { color: #a00; }
+    .empty { color: #888; font-style: italic; padding: 0.5em; }
+    .add-attribute { margin-top: 1.5em; padding: 1em; border: 1px solid #ccc; background: #fafafa; }
+  </style>
+</head>
+<body>
+  <h1>Map Attributes</h1>
+  <div class="nav"><a href="/support/admin/map/listing">&larr; Maps listing</a></div>
+
+  {#if attributes.isEmpty}
+    <p class="empty">No attributes defined yet. Add one below.</p>
+  {/if}
+
+  {#for attr in attributes}
+    <section class="attribute">
+      <form method="post" class="inline attribute-header">
+        <input type="text" name="name" value="{attr.name}" required>
+        <button formaction="/support/admin/map/attributes/attribute/{attr.id}/rename">Rename</button>
+        <button formaction="/support/admin/map/attributes/attribute/{attr.id}/move"
+                name="direction" value="up" title="Move up">&uarr;</button>
+        <button formaction="/support/admin/map/attributes/attribute/{attr.id}/move"
+                name="direction" value="down" title="Move down">&darr;</button>
+        <button formaction="/support/admin/map/attributes/attribute/{attr.id}/delete"
+                class="danger"
+                onclick="return confirm('Delete this attribute? Its values and any map assignments using them will also be removed.');">
+          Delete
+        </button>
+      </form>
+
+      <div class="values">
+        {#if attr.values.isEmpty}
+          <div class="empty">No values yet.</div>
+        {/if}
+        {#for v in attr.values}
+          <form method="post" class="inline value-row">
+            <input type="text" name="value" value="{v.value}" required>
+            <button formaction="/support/admin/map/attributes/value/{v.id}/rename">Rename</button>
+            <button formaction="/support/admin/map/attributes/value/{v.id}/move"
+                    name="direction" value="up" title="Move up">&uarr;</button>
+            <button formaction="/support/admin/map/attributes/value/{v.id}/move"
+                    name="direction" value="down" title="Move down">&darr;</button>
+            <button formaction="/support/admin/map/attributes/value/{v.id}/delete"
+                    class="danger"
+                    onclick="return confirm('Delete this value? Any maps assigned to it will lose the assignment.');">
+              Delete
+            </button>
+          </form>
+        {/for}
+
+        <form method="post"
+              action="/support/admin/map/attributes/attribute/{attr.id}/value"
+              class="inline add-row">
+          <input type="text" name="value" placeholder="New value" required>
+          <button>Add value</button>
+        </form>
+      </div>
+    </section>
+  {/for}
+
+  <section class="add-attribute">
+    <form method="post" action="/support/admin/map/attributes/attribute" class="inline">
+      <label>New attribute:</label>
+      <input type="text" name="name" placeholder="e.g. difficulty" required>
+      <button>Add attribute</button>
+    </form>
+  </section>
+</body>
+</html>

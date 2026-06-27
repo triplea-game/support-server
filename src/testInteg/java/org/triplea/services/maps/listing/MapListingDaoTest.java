@@ -14,7 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.triplea.DbOnlyExtension;
 import org.triplea.http.client.lobby.maps.listing.MapTag;
 
-@DataSet(value = "map_index.yml,map_tag_value.yml", useSequenceFiltering = false)
+@DataSet(value = "map_index.yml,map_attributes.yml", useSequenceFiltering = false)
 @QuarkusTest
 @ExtendWith(DbOnlyExtension.class)
 @ExtendWith(DBUnitExtension.class)

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Maps Admin</title>
+  <style>
+    body { font-family: sans-serif; margin: 1em; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; vertical-align: top; }
+    th { background: #f4f4f4; }
+    img.thumb { max-width: 120px; max-height: 80px; }
+    ul.tags { margin: 0; padding-left: 1.2em; }
+  </style>
+</head>
+<body>
+  <h1>Maps Admin</h1>
+  <p>{maps.size} map{#if maps.size != 1}s{/if}</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Thumbnail</th>
+        <th>Name</th>
+        <th>Last Modified</th>
+        <th>Description</th>
+        <th>Tags</th>
+      </tr>
+    </thead>
+    <tbody>
+      {#for map in maps}
+        <tr>
+          <td><img class="thumb" src="{map.previewImageUrl}" alt="{map.mapName} preview"></td>
+          <td>{map.mapName}</td>
+          <td>{map.lastModified}</td>
+          <td>{map.description}</td>
+          <td>
+            {#if map.mapTags.isEmpty}
+              &mdash;
+            {#else}
+              <ul class="tags">
+                {#for tag in map.mapTags}
+                  <li>{tag.name}: {tag.value}</li>
+                {/for}
+              </ul>
+            {/if}
+          </td>
+        </tr>
+      {/for}
+    </tbody>
+  </table>
+</body>
+</html>

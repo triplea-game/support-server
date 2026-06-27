@@ -1,6 +1,6 @@
 package org.triplea.services.maps.listing;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.jdbi.v3.core.Jdbi;
@@ -26,31 +26,31 @@ public class MapListingDao {
                           m.preview_image_url,
                           m.description,
                           m.last_commit_date,
-                          t.value tag_value,
-                          mtc.name tag_category
+                          v.value attribute_value,
+                          a.name  attribute_name
                         from map_index m
-                        left join map_index_tag mit on mit.map_index_id = m.id
-                        left join map_tag t on t.id = mit.map_tag_id
-                        left join map_tag_category mtc on mtc.id = t.map_tag_category_id
-                        order by m.map_name
+                        left join map_index_attribute mia on mia.map_index_id = m.id
+                        left join map_attribute_value v on v.id = mia.map_attribute_value_id
+                        left join map_attribute a on a.id = mia.map_attribute_id
+                        order by m.last_commit_date desc, m.map_name, a.display_order, v.display_order
                         """)
                 .registerRowMapper(BeanMapper.factory(MapListingRecord.class))
                 .registerRowMapper(BeanMapper.factory(MapTag.class))
                 .reduceRows(
-                    new HashMap<Long, MapListingRecord>(),
+                    new LinkedHashMap<Long, MapListingRecord>(),
                     (accumulator, rowView) -> {
                       var listing =
                           accumulator.computeIfAbsent(
                               rowView.getColumn("id", Long.class),
                               id -> rowView.getRow(MapListingRecord.class));
 
-                      if (rowView.getColumn("tag_value", String.class) != null) {
+                      if (rowView.getColumn("attribute_value", String.class) != null) {
                         listing
                             .getTags()
                             .add(
                                 MapTag.builder()
-                                    .name(rowView.getColumn("tag_category", String.class))
-                                    .value(rowView.getColumn("tag_value", String.class))
+                                    .name(rowView.getColumn("attribute_name", String.class))
+                                    .value(rowView.getColumn("attribute_value", String.class))
                                     .build());
                       }
                       return accumulator;

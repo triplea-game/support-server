@@ -10,6 +10,12 @@ java {
     targetCompatibility = JavaVersion.VERSION_21
 }
 
+tasks.withType<JavaCompile>().configureEach {
+    // Retain method parameter names in compiled bytecode, which then
+    // become available via reflection.
+    options.compilerArgs.add("-parameters")
+}
+
 repositories {
     mavenCentral()
     maven {
@@ -98,6 +104,7 @@ dependencies {
 
     // Quarkus extensions
     implementation("io.quarkus:quarkus-resteasy-jackson")   // JAX-RS (Classic) + Jackson
+    implementation("io.quarkus:quarkus-resteasy-qute")      // Qute templating (mustache-like)
     implementation("io.quarkus:quarkus-agroal")             // JDBC connection pool
     implementation("io.quarkus:quarkus-jdbc-postgresql")    // PostgreSQL + Dev Services
     implementation("io.quarkus:quarkus-flyway")             // DB migrations on startup

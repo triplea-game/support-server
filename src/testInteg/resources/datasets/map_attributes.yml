@@ -1,0 +1,25 @@
+map_attribute:
+  - id: 3300
+    name: era
+    display_order: 1
+  - id: 8800
+    name: difficulty
+    display_order: 2
+
+map_attribute_value:
+  - id: 100
+    map_attribute_id: 3300
+    value: ancient
+    display_order: 1
+  - id: 200
+    map_attribute_id: 8800
+    value: easy
+    display_order: 1
+
+map_index_attribute:
+  - map_index_id: 10
+    map_attribute_id: 3300
+    map_attribute_value_id: 100
+  - map_index_id: 10
+    map_attribute_id: 8800
+    map_attribute_value_id: 200
