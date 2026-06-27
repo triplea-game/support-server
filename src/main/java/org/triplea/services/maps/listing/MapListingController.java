@@ -1,4 +1,4 @@
-package org.triplea.services.maps;
+package org.triplea.services.maps.listing;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -14,13 +14,12 @@ import org.jdbi.v3.core.Jdbi;
 import org.triplea.http.client.ServerPaths;
 import org.triplea.http.client.lobby.maps.listing.MapDownloadItem;
 import org.triplea.http.client.lobby.maps.listing.MapListingResponse;
-import org.triplea.services.maps.listing.MapsListingModule;
 
 @Path("/")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @ApplicationScoped
-public class MapsController {
+public class MapListingController {
 
   @Inject Jdbi jdbi;
 
