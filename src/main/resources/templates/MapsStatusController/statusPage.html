@@ -10,10 +10,35 @@
     th { background: #f4f4f4; }
     img.thumb { max-width: 120px; max-height: 80px; }
     ul.tags { margin: 0; padding-left: 1.2em; }
+    .authbar { display: flex; justify-content: flex-end; gap: 0.75em; align-items: center;
+               color: #555; font-size: 0.9em; margin-bottom: 0.5em; }
+    .member-tools { border: 1px dashed #ccc; background: #fafafa; padding: 0.5em 0.75em;
+                    margin-bottom: 1em; color: #555; }
   </style>
 </head>
 <body>
+  {!
+    Auth-aware scaffolding. `identity` is resolved server-side (RequestIdentity); the GET itself
+    stays public. `identity.member` gates write-enabled controls; `!identity.anonymous` gates the
+    logout link. The write controls and their member-only POST endpoints are a separate story.
+  !}
+  <div class="authbar">
+    {#if identity.anonymous}
+      <span class="anon">Read-only view</span>
+    {#else}
+      <span class="user">Signed in as {identity.email}</span>
+      <a href="/oauth2/sign_out">Logout</a>
+    {/if}
+  </div>
+
   <h1>Maps Status</h1>
+
+  {#if identity.member}
+    <div class="member-tools" data-member-tools>
+      Editing is enabled for your account. Write controls are not built yet.
+    </div>
+  {/if}
+
   <p>{maps.size} map{#if maps.size != 1}s{/if}</p>
   <table>
     <thead>

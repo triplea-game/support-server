@@ -13,18 +13,26 @@ import java.util.List;
 import java.util.function.Supplier;
 import org.jdbi.v3.core.Jdbi;
 import org.triplea.http.client.lobby.maps.listing.MapDownloadItem;
+import org.triplea.services.auth.Identity;
+import org.triplea.services.auth.RequestIdentity;
 import org.triplea.services.maps.listing.MapsListingModule;
 
 /**
- * Renders the public map status page: a read-only listing of all indexed maps and their current
- * attributes. Public path (no auth required); write controls will later be shown conditionally for
- * authenticated team members.
+ * Renders the public map status page: a listing of all indexed maps and their current attributes.
+ * The GET is public (no auth required) and stays unannotated.
+ *
+ * <p>The resolved {@link Identity} is passed to the template so it can conditionally render
+ * write-enabled controls for team members ({@code identity.member}) and a logout link for any
+ * authenticated caller ({@code !identity.anonymous}). The write controls themselves — and the
+ * member-only POST endpoints they target (which would carry {@code @RequiresMember}) — are a
+ * separate story; this only wires the identity through so those controls have what they need.
  */
 @Path("/support/maps/status")
 @ApplicationScoped
 public class MapsStatusController {
 
   @Inject Jdbi jdbi;
+  @Inject RequestIdentity requestIdentity;
 
   private Supplier<List<MapDownloadItem>> mapListingSupplier;
 
@@ -35,12 +43,13 @@ public class MapsStatusController {
 
   @CheckedTemplate
   public static class Templates {
-    public static native TemplateInstance statusPage(List<MapsStatusView> maps);
+    public static native TemplateInstance statusPage(List<MapsStatusView> maps, Identity identity);
   }
 
   @GET
   @Produces(MediaType.TEXT_HTML)
   public TemplateInstance statusPage() {
-    return Templates.statusPage(mapListingSupplier.get().stream().map(MapsStatusView::of).toList());
+    var maps = mapListingSupplier.get().stream().map(MapsStatusView::of).toList();
+    return Templates.statusPage(maps, requestIdentity.get());
   }
 }
