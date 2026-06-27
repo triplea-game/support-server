@@ -1,4 +1,4 @@
-package org.triplea.services.maps.admin;
+package org.triplea.services.maps.status;
 
 import io.quarkus.qute.CheckedTemplate;
 import io.quarkus.qute.TemplateInstance;
@@ -21,7 +21,7 @@ import org.triplea.services.maps.listing.MapsListingModule;
  */
 @Path("/support/admin/map/listing")
 @ApplicationScoped
-public class MapsAdminController {
+public class MapsStatusController {
 
   @Inject Jdbi jdbi;
 
@@ -34,12 +34,12 @@ public class MapsAdminController {
 
   @CheckedTemplate
   public static class Templates {
-    public static native TemplateInstance adminPage(List<AdminMapView> maps);
+    public static native TemplateInstance adminPage(List<MapsStatusView> maps);
   }
 
   @GET
   @Produces(MediaType.TEXT_HTML)
   public TemplateInstance adminPage() {
-    return Templates.adminPage(mapListingSupplier.get().stream().map(AdminMapView::of).toList());
+    return Templates.adminPage(mapListingSupplier.get().stream().map(MapsStatusView::of).toList());
   }
 }

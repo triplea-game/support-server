@@ -1,4 +1,4 @@
-package org.triplea.services.maps.admin;
+package org.triplea.services.maps.status;
 
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -7,7 +7,7 @@ import java.util.List;
 import org.triplea.http.client.lobby.maps.listing.MapDownloadItem;
 import org.triplea.http.client.lobby.maps.listing.MapTag;
 
-public record AdminMapView(
+public record MapsStatusView(
     String mapName,
     String description,
     String previewImageUrl,
@@ -17,8 +17,8 @@ public record AdminMapView(
   private static final DateTimeFormatter FORMATTER =
       DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm 'UTC'").withZone(ZoneOffset.UTC);
 
-  static AdminMapView of(MapDownloadItem item) {
-    return new AdminMapView(
+  static MapsStatusView of(MapDownloadItem item) {
+    return new MapsStatusView(
         item.getMapName(),
         item.getDescription(),
         item.getPreviewImageUrl(),
