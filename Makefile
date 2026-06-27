@@ -43,8 +43,7 @@ clean: ## Removes build artifacts and stops docker containers and removes docker
 	./gradlew clean
 
 database-up: ## Launches database
-	docker compose build flyway
-	DATABASE_PORT=5432 docker compose up database flyway
+	DATABASE_PORT=5432 docker compose up database
 
 run up: ## Build & run server in dev mode (Quarkus Dev Services starts Postgres automatically)
 	./gradlew quarkusDev
