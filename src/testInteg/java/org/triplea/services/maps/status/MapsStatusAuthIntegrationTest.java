@@ -26,6 +26,7 @@ class MapsStatusAuthIntegrationTest {
   private static final String PATH = "/support/maps/status";
   private static final String MEMBER_GROUP = "triplea-game:maintainers";
   private static final String LOGOUT_LINK = "/oauth2/sign_out";
+  private static final String LOGIN_LINK = "/oauth2/start";
   private static final String MEMBER_REGION = "data-member-tools";
 
   @ConfigProperty(name = "quarkus.http.test-port", defaultValue = "8081")
@@ -46,7 +47,7 @@ class MapsStatusAuthIntegrationTest {
 
     assertThat(response.statusCode()).isEqualTo(200);
     assertThat(response.body()).doesNotContain(LOGOUT_LINK).doesNotContain(MEMBER_REGION);
-    assertThat(response.body()).contains("Read-only view");
+    assertThat(response.body()).contains(LOGIN_LINK);
   }
 
   @Test

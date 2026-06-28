@@ -29,7 +29,7 @@ STATUS_PATH="/support/maps/status"
 ADMIN_PATH="/support/admin/map/attributes"
 
 SPOOFED_EMAIL="attacker@evil.example"
-SPOOFED_GROUPS="triplea-game:maintainers"
+SPOOFED_GROUPS="triplea-maps:MapAdmins"
 
 pass=0
 fail=0

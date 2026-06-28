@@ -25,8 +25,8 @@ services:
       OAUTH2_PROXY_SET_XAUTHREQUEST: "true"
       # read:org is required to read the user's team membership.
       OAUTH2_PROXY_SCOPE: user:email read:org
-      OAUTH2_PROXY_GITHUB_ORG: triplea-game
-      OAUTH2_PROXY_GITHUB_TEAM: maintainers
+      OAUTH2_PROXY_GITHUB_ORG: triplea-maps
+      OAUTH2_PROXY_GITHUB_TEAM: MapAdmins
       OAUTH2_PROXY_EMAIL_DOMAINS: "*"
       # http locally — must be true (secure cookies) once TLS terminates in front (prod).
       OAUTH2_PROXY_COOKIE_SECURE: "false"
