@@ -5,6 +5,12 @@ red=\033[31m
 nc=\033[0m
 SSH_USER ?= $${USER}
 
+# The GitHub <org>:<team-slug> whose members get write access. One source of truth for the auth
+# overlay: exported so both `docker compose` (oauth2-proxy gate) and `quarkusDev`
+# (app.auth.member-group) inherit it. Override from the shell to point at a different team.
+GITHUB_ADMIN_TEAM ?= triplea-maps:mapadmins
+export GITHUB_ADMIN_TEAM
+
 help: ## Show this help text
 	grep -h -E '^[a-z]+.*:' $(MAKEFILE_LIST) | \
 		awk -F ":|#+" '{printf "\033[31m%s $(nc) \n   %s $(nc)\n    \033[3;37mDepends On: $(nc) [ %s ]\n", $$1, $$3, $$2}'
@@ -51,6 +57,9 @@ dev: ## Run with fake auth — no proxy, no GitHub, zero setup (newcomer default
 run up: ## Run behind the real oauth2-proxy/nginx auth overlay (browse http://localhost:8000). Needs .env.auth — see docs/auth.md.
 	docker compose -f docker-compose.auth.yml up -d
 	./gradlew quarkusDev
+
+run-stop:
+	docker compose -f docker-compose.auth.yml down
 
 verify-auth-headers: ## Verify nginx strips spoofed inbound X-Auth-* headers (security check). Brings the proxy up; needs the app running (make run).
 	docker compose -f docker-compose.auth.yml up -d

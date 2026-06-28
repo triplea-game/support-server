@@ -24,13 +24,17 @@ import org.triplea.IntegTestExtension;
 class MapsStatusAuthIntegrationTest {
 
   private static final String PATH = "/support/maps/status";
-  private static final String MEMBER_GROUP = "triplea-game:maintainers";
   private static final String LOGOUT_LINK = "/oauth2/sign_out";
   private static final String LOGIN_LINK = "/oauth2/start";
   private static final String MEMBER_REGION = "data-member-tools";
 
   @ConfigProperty(name = "quarkus.http.test-port", defaultValue = "8081")
   int testPort;
+
+  // The exact group string a member carries is whatever the app is configured to match, so the test
+  // stays correct if app.auth.member-group (driven by GITHUB_ADMIN_TEAM) changes.
+  @ConfigProperty(name = "app.auth.member-group")
+  String memberGroup;
 
   private HttpClient httpClient;
   private String baseUrl;
@@ -61,7 +65,7 @@ class MapsStatusAuthIntegrationTest {
   private HttpResponse<String> get(boolean member) throws Exception {
     var builder = HttpRequest.newBuilder().uri(URI.create(baseUrl + PATH)).GET();
     if (member) {
-      builder.header("X-Auth-Email", "member@example.com").header("X-Auth-Groups", MEMBER_GROUP);
+      builder.header("X-Auth-Email", "member@example.com").header("X-Auth-Groups", memberGroup);
     }
     return httpClient.send(builder.build(), HttpResponse.BodyHandlers.ofString());
   }

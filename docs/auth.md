@@ -24,7 +24,8 @@ oauth2-proxy auth subrequest:
 Header names and the member group are configurable (`src/main/resources/application.properties`):
 
 ```properties
-app.auth.member-group=triplea-game:maintainers
+# Driven by the GITHUB_ADMIN_TEAM env var (see "make run" below); default is the real team.
+app.auth.member-group=${GITHUB_ADMIN_TEAM:triplea-maps:mapadmins}
 app.auth.email-header=X-Auth-Email
 app.auth.groups-header=X-Auth-Groups
 app.dev-fake-auth=${DEV_FAKE_AUTH:}
@@ -169,17 +170,19 @@ Browse **nginx at <http://localhost:8000>** (not Quarkus at :8080). Prerequisite
 `docker-compose.auth.yml` runs two host-network containers in front of the host's Quarkus process:
 
 - **oauth2-proxy** (`:4180`) — GitHub provider; `read:org` scope to read team membership;
-  restricted to org `triplea-game`, team `maintainers`; emits identity on the auth subrequest.
+  restricted to the team in `$GITHUB_ADMIN_TEAM` (`<org>:<team-slug>`, e.g. `triplea-maps:mapadmins`);
+  emits identity on the auth subrequest.
 - **nginx** (`:8000`, `auth/nginx.conf`) — terminates browser traffic and:
   - **optional-auth** on `/support/maps/status` (anonymous allowed; identity forwarded if present),
   - **hard-gate** on `/support/admin/` (unauthenticated → redirect to login),
   - **header sanitization** everywhere (always overwrites `X-Auth-*`).
 
-> **⚠ Verify the emitted group format on first login.** oauth2-proxy's `X-Auth-Request-Groups`
-> value for a GitHub team must match `app.auth.member-group` (`triplea-game:maintainers`). If it
-> emits a different form (e.g. just `maintainers`), a real member would pass nginx + oauth2-proxy
-> but get 401 from the app's `isMember` check. Align them by setting `app.auth.member-group` (env
-> `APP_AUTH_MEMBER_GROUP`) to whatever oauth2-proxy actually emits.
+> **One env var keeps the proxy gate and the app check aligned.** oauth2-proxy both *accepts*
+> (`OAUTH2_PROXY_GITHUB_TEAM`) and *emits* (`X-Auth-Request-Groups`) the same `<org>:<team-slug>`
+> form, so a single value — `GITHUB_ADMIN_TEAM` (default `triplea-maps:mapadmins`) — feeds both the
+> proxy and `app.auth.member-group`. The slug is GitHub's lowercased team slug (the team
+> *name* `MapAdmins` has slug `mapadmins`), not the display name. `make run` exports the var to both
+> the compose overlay and `quarkusDev`; override it in the shell to point at a different team.
 
 ### Verifying header sanitization
 

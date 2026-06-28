@@ -1,0 +1,28 @@
+{!
+  Shared site nav header. Auto-registered as a Qute user tag from `templates/tags/`,
+  invoked as `{#navHeader identity=... path="..." /}`.
+
+  Parameters:
+    - identity: the request's resolved Identity (anonymous / member / email). The GET pages
+        themselves stay public; `identity` only gates which auth control is shown.
+    - path: the current page's path, used as the post-login/logout redirect target (`rd=`),
+        so the caller lands back on the same page (-> oauth2-proxy via nginx).
+!}
+<style>
+  .site-header { display: flex; justify-content: space-between; align-items: center;
+                 border-bottom: 1px solid #ddd; padding-bottom: 0.5em; margin-bottom: 1em; }
+  .site-header .site-title { font-weight: bold; text-decoration: none; color: #333; }
+  .site-header .authbar { display: flex; gap: 0.75em; align-items: center;
+                          color: #555; font-size: 0.9em; }
+</style>
+<header class="site-header">
+  <a class="site-title" href="/support">TripleA Support</a>
+  <div class="authbar">
+    {#if identity.anonymous}
+      <a class="anon" href="/oauth2/start?rd={path}">admin login</a>
+    {#else}
+      <span class="user">Signed in as {identity.email}</span>
+      <a href="/oauth2/sign_out?rd={path}">Logout</a>
+    {/if}
+  </div>
+</header>

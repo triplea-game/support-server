@@ -25,8 +25,11 @@ services:
       OAUTH2_PROXY_SET_XAUTHREQUEST: "true"
       # read:org is required to read the user's team membership.
       OAUTH2_PROXY_SCOPE: user:email read:org
-      OAUTH2_PROXY_GITHUB_ORG: triplea-maps
-      OAUTH2_PROXY_GITHUB_TEAM: MapAdmins
+      # <org>:<team-slug> whose members get write access. Same env var the app reads for
+      # app.auth.member-group, so the proxy gate and the app check can never drift apart. Set by
+      # `make run`; the format and the emitted X-Auth-Groups string are identical (oauth2-proxy
+      # both accepts and emits <org>:<slug>).
+      OAUTH2_PROXY_GITHUB_TEAM: ${GITHUB_ADMIN_TEAM:?set GITHUB_ADMIN_TEAM (use make run)}
       OAUTH2_PROXY_EMAIL_DOMAINS: "*"
       # http locally — must be true (secure cookies) once TLS terminates in front (prod).
       OAUTH2_PROXY_COOKIE_SECURE: "false"

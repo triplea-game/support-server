@@ -10,7 +10,7 @@ import java.util.Set;
 /// identifying email is present.
 ///
 /// @param email the caller's email, or `null` when anonymous.
-/// @param groups the groups/teams the caller belongs to (e.g. `"triplea-game:maintainers"`).
+/// @param groups the groups/teams the caller belongs to (e.g. `"triplea-maps:mapadmins"`).
 /// @param memberGroup the group whose presence in [#groups] grants membership; `null`
 ///     for the anonymous null-object.
 public record Identity(String email, Set<String> groups, String memberGroup) {

@@ -22,7 +22,7 @@ public class DevFakeIdentityProvider implements IdentityProvider {
   @ConfigProperty(name = "app.dev-fake-auth")
   Optional<String> devFakeAuth;
 
-  @ConfigProperty(name = "app.auth.member-group", defaultValue = "triplea-game:maintainers")
+  @ConfigProperty(name = "app.auth.member-group")
   String memberGroup;
 
   @Override

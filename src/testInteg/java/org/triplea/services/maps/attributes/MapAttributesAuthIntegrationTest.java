@@ -26,10 +26,13 @@ import org.triplea.IntegTestExtension;
 class MapAttributesAuthIntegrationTest {
 
   private static final String BASE = "/support/admin/map/attributes";
-  private static final String MEMBER_GROUP = "triplea-game:maintainers";
 
   @ConfigProperty(name = "quarkus.http.test-port", defaultValue = "8081")
   int testPort;
+
+  // A member carries whatever group the app is configured to match (driven by GITHUB_ADMIN_TEAM).
+  @ConfigProperty(name = "app.auth.member-group")
+  String memberGroup;
 
   private HttpClient httpClient;
   private String baseUrl;
@@ -132,7 +135,7 @@ class MapAttributesAuthIntegrationTest {
 
   private static HttpRequest.Builder withAuth(HttpRequest.Builder builder, boolean member) {
     if (member) {
-      builder.header("X-Auth-Email", "member@example.com").header("X-Auth-Groups", MEMBER_GROUP);
+      builder.header("X-Auth-Email", "member@example.com").header("X-Auth-Groups", memberGroup);
     }
     return builder;
   }

@@ -33,7 +33,7 @@ class ProdSafetyTest {
     var provider = (HeaderIdentityProvider) selected;
     provider.emailHeader = "X-Auth-Email";
     provider.groupsHeader = "X-Auth-Groups";
-    provider.memberGroup = "triplea-game:maintainers";
+    provider.memberGroup = "triplea-maps:mapadmins";
 
     assertThat(provider.resolve(anonymousHeaders)).isEqualTo(Identity.ANONYMOUS);
   }

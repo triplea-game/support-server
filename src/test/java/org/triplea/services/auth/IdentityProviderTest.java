@@ -12,7 +12,7 @@ import org.triplea.services.auth.IdentityProvider.HeaderLookup;
 /// synthesis for dev. No Quarkus container; config fields are set directly.
 class IdentityProviderTest {
 
-  private static final String MEMBER_GROUP = "triplea-game:maintainers";
+  private static final String MEMBER_GROUP = "triplea-maps:mapadmins";
   private static final String EMAIL_HEADER = "X-Auth-Email";
   private static final String GROUPS_HEADER = "X-Auth-Groups";
 

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TripleA Support</title>
+  <style>
+    body { font-family: sans-serif; margin: 1em; max-width: 900px; }
+    ul.links { list-style: none; padding: 0; }
+    ul.links li { margin: 0.5em 0; }
+  </style>
+</head>
+<body>
+  {#navHeader identity=identity path="/support" /}
+
+  <h1>TripleA Support</h1>
+  <ul class="links">
+    <li><a href="/support/maps/status">Maps Status</a></li>
+    {#if identity.member}
+      <li><a href="/support/admin/map/attributes">Map Attributes (admin)</a></li>
+    {/if}
+  </ul>
+</body>
+</html>

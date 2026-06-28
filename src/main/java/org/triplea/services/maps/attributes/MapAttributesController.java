@@ -19,6 +19,8 @@ import java.util.List;
 import org.jdbi.v3.core.Jdbi;
 import org.triplea.services.auth.CsrfProtected;
 import org.triplea.services.auth.CsrfTokenProvider;
+import org.triplea.services.auth.Identity;
+import org.triplea.services.auth.RequestIdentity;
 import org.triplea.services.auth.RequiresMember;
 
 /// Renders and edits the attribute catalog (the dimensions like "difficulty" and the allowed values
@@ -33,6 +35,7 @@ public class MapAttributesController {
 
   @Inject Jdbi jdbi;
   @Inject CsrfTokenProvider csrfTokenProvider;
+  @Inject RequestIdentity requestIdentity;
 
   private MapAttributeDao dao;
 
@@ -44,13 +47,14 @@ public class MapAttributesController {
   @CheckedTemplate
   public static class Templates {
     public static native TemplateInstance catalogPage(
-        List<AttributeWithValues> attributes, String csrfToken);
+        List<AttributeWithValues> attributes, String csrfToken, Identity identity);
   }
 
   @GET
   @Produces(MediaType.TEXT_HTML)
   public TemplateInstance catalogPage() {
-    return Templates.catalogPage(dao.listAttributes(), csrfTokenProvider.token());
+    return Templates.catalogPage(
+        dao.listAttributes(), csrfTokenProvider.token(), requestIdentity.get());
   }
 
   @POST

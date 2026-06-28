@@ -21,7 +21,7 @@ public class HeaderIdentityProvider implements IdentityProvider {
   @ConfigProperty(name = "app.auth.groups-header", defaultValue = "X-Auth-Groups")
   String groupsHeader;
 
-  @ConfigProperty(name = "app.auth.member-group", defaultValue = "triplea-game:maintainers")
+  @ConfigProperty(name = "app.auth.member-group")
   String memberGroup;
 
   @Override
