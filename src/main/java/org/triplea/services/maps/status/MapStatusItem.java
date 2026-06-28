@@ -7,18 +7,18 @@ import java.util.List;
 import org.triplea.http.client.lobby.maps.listing.MapDownloadItem;
 import org.triplea.http.client.lobby.maps.listing.MapTag;
 
-public record MapsStatusView(
+public record MapStatusItem(
     String mapName,
     String description,
     String previewImageUrl,
     String lastModified,
-    List<MapTag> mapTags) {
+    List<MapTag> mapAttributes) {
 
   private static final DateTimeFormatter FORMATTER =
       DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm 'UTC'").withZone(ZoneOffset.UTC);
 
-  static MapsStatusView of(MapDownloadItem item) {
-    return new MapsStatusView(
+  static MapStatusItem of(MapDownloadItem item) {
+    return new MapStatusItem(
         item.getMapName(),
         item.getDescription(),
         item.getPreviewImageUrl(),

@@ -58,12 +58,12 @@
           <td>{map.lastModified}</td>
           <td>{map.description}</td>
           <td>
-            {#if map.mapTags.isEmpty}
+            {#if map.mapAttributes.isEmpty}
               &mdash;
             {#else}
               <ul class="tags">
-                {#for tag in map.mapTags}
-                  <li>{tag.name}: {tag.value}</li>
+                {#for attribute in map.mapAttributes}
+                  <li>{attribute.name}: {attribute.value}</li>
                 {/for}
               </ul>
             {/if}

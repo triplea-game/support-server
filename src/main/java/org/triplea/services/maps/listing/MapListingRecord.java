@@ -35,22 +35,6 @@ public class MapListingRecord {
     return tags;
   }
 
-  //  @Builder
-  //  public MapListingRecord(
-  //      @ColumnName("map_name") final String name,
-  //      @ColumnName("download_url") final String downloadUrl,
-  //      @ColumnName("preview_image_url") final String previewImageUrl,
-  //      @ColumnName("description") final String description,
-  //      @ColumnName("last_commit_date") final Instant lastCommitDate,
-  //      @ColumnName("download_size_bytes") final Long downloadSizeBytes) {
-  //    this.name = name;
-  //    this.downloadUrl = downloadUrl;
-  //    this.previewImageUrl = previewImageUrl;
-  //    this.description = description;
-  //    this.lastCommitDate = lastCommitDate;
-  //    this.downloadSizeBytes = downloadSizeBytes;
-  //  }
-
   MapDownloadItem toMapDownloadItem() {
     return MapDownloadItem.builder()
         .downloadUrl(downloadUrl)

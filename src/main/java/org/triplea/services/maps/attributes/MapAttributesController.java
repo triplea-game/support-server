@@ -22,13 +22,7 @@ import org.triplea.services.auth.CsrfTokenProvider;
 import org.triplea.services.auth.RequiresMember;
 
 /// Renders and edits the attribute catalog (the dimensions like "difficulty" and the allowed values
-/// within each dimension). Mutations are HTML form posts that 303-redirect back to the GET page so
-/// the browser history remains a series of GETs (post-redirect-get).
-///
-/// Fully gated: [RequiresMember] on the class makes the GET render and every POST
-/// members-only, enforced server-side by `MemberAuthFilter`. [CsrfProtected]
-/// additionally requires a valid double-submit token on every mutation, since the cookie session
-/// makes raw posts forgeable.
+/// within each dimension).
 @Path("/support/admin/map/attributes")
 @ApplicationScoped
 @RequiresMember

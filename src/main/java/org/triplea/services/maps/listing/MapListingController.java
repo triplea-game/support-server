@@ -30,9 +30,7 @@ public class MapListingController {
     downloadListingSupplier = MapsListingModule.build(jdbi);
   }
 
-  /// Returns the full set of maps available for download. This is useful for populating a
-  /// 'download maps listing', the intended audience is any game user searching for available to
-  /// download maps.
+  /// Returns the full set of maps available for download.
   @GET
   @Path(ServerPaths.MAPS_LISTING_PATH)
   public MapListingResponse fetchAvailableMaps() {
