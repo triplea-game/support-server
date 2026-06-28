@@ -12,7 +12,7 @@ import org.triplea.services.auth.IdentityProvider.HeaderLookup;
 /// synthesis for dev. No Quarkus container; config fields are set directly.
 class IdentityProviderTest {
 
-  private static final String MEMBER_GROUP = "triplea-maps:mapadmins";
+  private static final String MAP_ADMIN_GROUP = "triplea-maps:mapadmins";
   private static final String EMAIL_HEADER = "X-Auth-Email";
   private static final String GROUPS_HEADER = "X-Auth-Groups";
 
@@ -28,12 +28,12 @@ class IdentityProviderTest {
       var provider = new HeaderIdentityProvider();
       provider.emailHeader = EMAIL_HEADER;
       provider.groupsHeader = GROUPS_HEADER;
-      provider.memberGroup = MEMBER_GROUP;
+      provider.mapAdminGroup = MAP_ADMIN_GROUP;
       return provider;
     }
 
     @Test
-    void memberWhenGroupsContainMemberGroup() {
+    void mapAdminWhenGroupsContainMapAdminGroup() {
       var identity =
           newProvider()
               .resolve(
@@ -42,34 +42,34 @@ class IdentityProviderTest {
                           EMAIL_HEADER,
                           "user@example.com",
                           GROUPS_HEADER,
-                          "triplea-game:other, " + MEMBER_GROUP)));
+                          "triplea-maps:other, " + MAP_ADMIN_GROUP)));
 
       assertThat(identity.isAnonymous()).isFalse();
-      assertThat(identity.isMember()).isTrue();
+      assertThat(identity.isMapAdmin()).isTrue();
       assertThat(identity.email()).isEqualTo("user@example.com");
-      assertThat(identity.groups()).contains(MEMBER_GROUP, "triplea-game:other");
+      assertThat(identity.groups()).contains(MAP_ADMIN_GROUP, "triplea-maps:other");
     }
 
     @Test
-    void authenticatedButNotMemberWhenGroupAbsent() {
+    void authenticatedButNotMapAdminWhenGroupAbsent() {
       var identity =
           newProvider()
               .resolve(
                   headers(
                       Map.of(
-                          EMAIL_HEADER, "user@example.com", GROUPS_HEADER, "triplea-game:other")));
+                          EMAIL_HEADER, "user@example.com", GROUPS_HEADER, "triplea-maps:other")));
 
       assertThat(identity.isAnonymous()).isFalse();
-      assertThat(identity.isMember()).isFalse();
+      assertThat(identity.isMapAdmin()).isFalse();
     }
 
     @Test
     void anonymousWhenNoEmailHeader() {
-      var identity = newProvider().resolve(headers(Map.of(GROUPS_HEADER, MEMBER_GROUP)));
+      var identity = newProvider().resolve(headers(Map.of(GROUPS_HEADER, MAP_ADMIN_GROUP)));
 
       assertThat(identity).isEqualTo(Identity.ANONYMOUS);
       assertThat(identity.isAnonymous()).isTrue();
-      assertThat(identity.isMember()).isFalse();
+      assertThat(identity.isMapAdmin()).isFalse();
     }
 
     @Test
@@ -80,11 +80,11 @@ class IdentityProviderTest {
     }
 
     @Test
-    void memberWithNoGroupsHeaderIsNotMember() {
+    void mapAdminWithNoGroupsHeaderIsNotMapAdmin() {
       var identity = newProvider().resolve(headers(Map.of(EMAIL_HEADER, "user@example.com")));
 
       assertThat(identity.isAnonymous()).isFalse();
-      assertThat(identity.isMember()).isFalse();
+      assertThat(identity.isMapAdmin()).isFalse();
       assertThat(identity.groups()).isEmpty();
     }
   }
@@ -95,7 +95,7 @@ class IdentityProviderTest {
     private DevFakeIdentityProvider newProvider(String devFakeAuth) {
       var provider = new DevFakeIdentityProvider();
       provider.devFakeAuth = Optional.ofNullable(devFakeAuth);
-      provider.memberGroup = MEMBER_GROUP;
+      provider.mapAdminGroup = MAP_ADMIN_GROUP;
       return provider;
     }
 
@@ -103,17 +103,17 @@ class IdentityProviderTest {
     private static final HeaderLookup IGNORED = name -> "should-be-ignored";
 
     @Test
-    void memberSynthesizesMemberIdentity() {
-      var identity = newProvider("member").resolve(IGNORED);
+    void mapAdminSynthesizesMapAdminIdentity() {
+      var identity = newProvider("mapadmin").resolve(IGNORED);
 
       assertThat(identity.isAnonymous()).isFalse();
-      assertThat(identity.isMember()).isTrue();
-      assertThat(identity.groups()).containsExactly(MEMBER_GROUP);
+      assertThat(identity.isMapAdmin()).isTrue();
+      assertThat(identity.groups()).containsExactly(MAP_ADMIN_GROUP);
     }
 
     @Test
-    void memberIsCaseInsensitiveAndTrimmed() {
-      assertThat(newProvider(" Member ").resolve(IGNORED).isMember()).isTrue();
+    void mapAdminIsCaseInsensitiveAndTrimmed() {
+      assertThat(newProvider(" MapAdmin ").resolve(IGNORED).isMapAdmin()).isTrue();
     }
 
     @Test

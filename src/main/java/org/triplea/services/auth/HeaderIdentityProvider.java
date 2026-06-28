@@ -21,8 +21,8 @@ public class HeaderIdentityProvider implements IdentityProvider {
   @ConfigProperty(name = "app.auth.groups-header", defaultValue = "X-Auth-Groups")
   String groupsHeader;
 
-  @ConfigProperty(name = "app.auth.member-group")
-  String memberGroup;
+  @ConfigProperty(name = "app.auth.map-admin-group")
+  String mapAdminGroup;
 
   @Override
   public Identity resolve(HeaderLookup headers) {
@@ -31,7 +31,7 @@ public class HeaderIdentityProvider implements IdentityProvider {
       return Identity.ANONYMOUS;
     }
     Set<String> groups = parseGroups(headers.get(groupsHeader));
-    return new Identity(email.trim(), groups, memberGroup);
+    return new Identity(email.trim(), groups, mapAdminGroup);
   }
 
   private static Set<String> parseGroups(String rawGroups) {

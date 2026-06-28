@@ -15,12 +15,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.triplea.IntegTestExtension;
 
 /// Authorization integration tests for the fully-gated attribute catalog: anonymous is rejected on
-/// the GET render and on every one of the 8 mutation endpoints; a member is allowed through, but
-/// only once they supply a valid double-submit CSRF token (a member POST without one is 403).
+/// the GET render and on every one of the 8 mutation endpoints; a MapAdmin is allowed through, but
+/// only once they supply a valid double-submit CSRF token (a MapAdmin POST without one is 403).
 ///
 /// Under `@QuarkusTest` the app runs in TEST launch mode with `DEV_FAKE_AUTH` unset,
 /// so identity is derived from the `X-Auth-*` headers (the post-nginx state): anonymous = no
-/// headers, member = an email plus the member group.
+/// headers, MapAdmin = an email plus the MapAdmin group.
 @QuarkusTest
 @ExtendWith(IntegTestExtension.class)
 class MapAttributesAuthIntegrationTest {
@@ -30,9 +30,9 @@ class MapAttributesAuthIntegrationTest {
   @ConfigProperty(name = "quarkus.http.test-port", defaultValue = "8081")
   int testPort;
 
-  // A member carries whatever group the app is configured to match (driven by GITHUB_ADMIN_TEAM).
-  @ConfigProperty(name = "app.auth.member-group")
-  String memberGroup;
+  // A MapAdmin carries whatever group the app is configured to match (driven by GITHUB_ADMIN_TEAM).
+  @ConfigProperty(name = "app.auth.map-admin-group")
+  String mapAdminGroup;
 
   private HttpClient httpClient;
   private String baseUrl;
@@ -72,21 +72,21 @@ class MapAttributesAuthIntegrationTest {
   }
 
   @Test
-  void memberGetIsAllowed() throws Exception {
+  void mapAdminGetIsAllowed() throws Exception {
     assertThat(send(get(true)).statusCode()).isEqualTo(200);
   }
 
   @Test
-  void memberMutationWithoutCsrfTokenIsRejected() throws Exception {
-    // Passes the membership filter (member headers) but carries no CSRF token -> 403.
+  void mapAdminMutationWithoutCsrfTokenIsRejected() throws Exception {
+    // Passes the MapAdmin filter (MapAdmin headers) but carries no CSRF token -> 403.
     int status = send(post(new Mutation("/attribute", "name=auth-test"), true)).statusCode();
     assertThat(status).isEqualTo(403);
   }
 
   @Test
-  void memberMutationWithValidCsrfTokenSucceeds() throws Exception {
+  void mapAdminMutationWithValidCsrfTokenSucceeds() throws Exception {
     // Full double-submit flow: GET the page to obtain the csrf_token cookie, then POST it back as
-    // both the cookie and the _csrf form field. 303 means it passed the membership + CSRF filters
+    // both the cookie and the _csrf form field. 303 means it passed the MapAdmin + CSRF filters
     // and post-redirect-got. createAttribute needs no pre-existing row.
     String token = csrfTokenFromGet();
     int status =
@@ -94,7 +94,7 @@ class MapAttributesAuthIntegrationTest {
     assertThat(status).isEqualTo(303);
   }
 
-  /// Issues a member GET and pulls the `csrf_token` value out of its `Set-Cookie`.
+  /// Issues a MapAdmin GET and pulls the `csrf_token` value out of its `Set-Cookie`.
   private String csrfTokenFromGet() throws Exception {
     HttpResponse<String> response = send(get(true));
     assertThat(response.statusCode()).isEqualTo(200);
@@ -105,11 +105,12 @@ class MapAttributesAuthIntegrationTest {
         .orElseThrow(() -> new AssertionError("GET did not issue a csrf_token cookie"));
   }
 
-  private HttpRequest get(boolean member) {
-    return withAuth(HttpRequest.newBuilder().uri(URI.create(baseUrl + BASE)).GET(), member).build();
+  private HttpRequest get(boolean mapAdmin) {
+    return withAuth(HttpRequest.newBuilder().uri(URI.create(baseUrl + BASE)).GET(), mapAdmin)
+        .build();
   }
 
-  private HttpRequest post(Mutation mutation, boolean member) {
+  private HttpRequest post(Mutation mutation, boolean mapAdmin) {
     var builder = HttpRequest.newBuilder().uri(URI.create(baseUrl + BASE + mutation.path()));
     if (mutation.formBody() != null) {
       builder
@@ -118,10 +119,10 @@ class MapAttributesAuthIntegrationTest {
     } else {
       builder.POST(HttpRequest.BodyPublishers.noBody());
     }
-    return withAuth(builder, member).build();
+    return withAuth(builder, mapAdmin).build();
   }
 
-  /// A member POST carrying the CSRF token in both the cookie and the `_csrf` form field.
+  /// A MapAdmin POST carrying the CSRF token in both the cookie and the `_csrf` form field.
   private HttpRequest postWithCsrf(Mutation mutation, String token) {
     String body = "_csrf=" + token + (mutation.formBody() == null ? "" : "&" + mutation.formBody());
     var builder =
@@ -133,9 +134,9 @@ class MapAttributesAuthIntegrationTest {
     return withAuth(builder, true).build();
   }
 
-  private static HttpRequest.Builder withAuth(HttpRequest.Builder builder, boolean member) {
-    if (member) {
-      builder.header("X-Auth-Email", "member@example.com").header("X-Auth-Groups", memberGroup);
+  private HttpRequest.Builder withAuth(HttpRequest.Builder builder, boolean mapAdmin) {
+    if (mapAdmin) {
+      builder.header("X-Auth-Email", "mapadmin@example.com").header("X-Auth-Groups", mapAdminGroup);
     }
     return builder;
   }

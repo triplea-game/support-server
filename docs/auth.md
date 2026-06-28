@@ -3,7 +3,7 @@
 Binary authorization for the support server:
 
 - **Anonymous** (anyone) → read-only.
-- **Member** (of one GitHub team) → read/write.
+- **MapAdmin** (member of one GitHub team) → read/write.
 
 Enforced **server-side** in the app, with a reverse proxy (oauth2-proxy → GitHub) supplying
 identity. The two layers are independent: the app rejects unauthorized writes even if the proxy is
@@ -19,13 +19,13 @@ oauth2-proxy auth subrequest:
 | Header | Meaning |
 |---|---|
 | `X-Auth-Email` | The authenticated user's email. Absent/blank → anonymous. |
-| `X-Auth-Groups` | Comma-separated groups/teams. Membership of `app.auth.member-group` grants write. |
+| `X-Auth-Groups` | Comma-separated groups/teams. Membership of `app.auth.map-admin-group` grants write. |
 
-Header names and the member group are configurable (`src/main/resources/application.properties`):
+Header names and the MapAdmin group are configurable (`src/main/resources/application.properties`):
 
 ```properties
 # Driven by the GITHUB_ADMIN_TEAM env var (see "make run" below); default is the real team.
-app.auth.member-group=${GITHUB_ADMIN_TEAM:triplea-maps:mapadmins}
+app.auth.map-admin-group=${GITHUB_ADMIN_TEAM:triplea-maps:mapadmins}
 app.auth.email-header=X-Auth-Email
 app.auth.groups-header=X-Auth-Groups
 app.dev-fake-auth=${DEV_FAKE_AUTH:}
@@ -44,10 +44,10 @@ Package `org.triplea.services.auth`:
 
 | Type | Role |
 |---|---|
-| `Identity` | Value record: `email`, `groups`, `memberGroup`; `isAnonymous()`, `isMember()`. `ANONYMOUS` is the null-object default. |
+| `Identity` | Value record: `email`, `groups`, `mapAdminGroup`; `isAnonymous()`, `isMapAdmin()`. `ANONYMOUS` is the null-object default. |
 | `IdentityProvider` | Interface `resolve(HeaderLookup)`; `HeaderLookup` is a minimal `String get(String)` accessor (framework-agnostic). |
 | `HeaderIdentityProvider` | **Prod** — reads the `X-Auth-*` headers; no email → `ANONYMOUS`. |
-| `DevFakeIdentityProvider` | **Dev** — synthesizes identity from `DEV_FAKE_AUTH` (`member`\|`anon`), ignoring headers. |
+| `DevFakeIdentityProvider` | **Dev** — synthesizes identity from `DEV_FAKE_AUTH` (`mapadmin`\|`anon`), ignoring headers. |
 | `RequestIdentity` | Request-scoped resolver; inject it and call `get()` (memoized). Holds the source-selection gate. |
 
 ### The selection gate (prod-safety)
@@ -55,8 +55,8 @@ Package `org.triplea.services.auth`:
 `RequestIdentity.select(...)` chooses the source. The rule:
 
 - **Packaged production build (`LaunchMode.NORMAL`) ALWAYS uses the header provider**, even if
-  `DEV_FAKE_AUTH=member` is set in the environment. This is the prod-safety guarantee — the
-  worst-case failure ("everyone silently a member") cannot happen in prod.
+  `DEV_FAKE_AUTH=mapadmin` is set in the environment. This is the prod-safety guarantee — the
+  worst-case failure ("everyone silently a MapAdmin") cannot happen in prod.
 - Otherwise (dev/test): use the dev provider when `DEV_FAKE_AUTH` is present, else the header
   provider.
 
@@ -74,10 +74,10 @@ proxy headers under `make run`.
 
 | Type | Role |
 |---|---|
-| `@RequiresMember` | `@NameBinding` annotation; apply to a JAX-RS class or method to gate it. |
-| `MemberAuthFilter` | `@RequiresMember`-bound `ContainerRequestFilter`; aborts non-members with **401**. |
+| `@RequiresMapAdmin` | `@NameBinding` annotation; apply to a JAX-RS class or method to gate it. |
+| `MapAdminAuthFilter` | `@RequiresMapAdmin`-bound `ContainerRequestFilter`; aborts non-MapAdmins with **401**. |
 
-**401 for any non-member** (anonymous *or* authenticated-non-member) — a single contract that the
+**401 for any non-MapAdmin** (anonymous *or* authenticated-non-MapAdmin) — a single contract that the
 future HTMX work can map to a login redirect.
 
 ### CSRF protection
@@ -96,7 +96,7 @@ mutating browser form is therefore CSRF-protected with a **double-submit cookie*
 The token is rendered into every form as a hidden `_csrf` field *and* set as the `csrf_token`
 cookie. A forged cross-site POST can send the cookie (attached automatically) but cannot read it to
 forge a matching field, so the two won't agree → 403. `CsrfRequestFilter` runs *after*
-`MemberAuthFilter` (higher priority value), so a non-member to a gated form still gets the
+`MapAdminAuthFilter` (higher priority value), so a non-MapAdmin to a gated form still gets the
 authorization 401 rather than a 403.
 
 The CSRF cookie is `HttpOnly` (no JS reads it — the field is server-rendered), `SameSite=Strict`,
@@ -117,12 +117,12 @@ built, inherit the same machinery by adding `@CsrfProtected` and rendering `_csr
 
 | Route | Controller | Posture |
 |---|---|---|
-| `/support/maps/status` | `MapsStatusController` | **Public** (GET unannotated). Renders conditionally: read-only for anonymous; logout link + member region for members. |
-| `/support/admin/map/attributes` | `MapAttributesController` | **Members-only** (`@RequiresMember` on the class → GET render + all 8 POSTs gated). |
+| `/support/maps/status` | `MapsStatusController` | **Public** (GET unannotated). Renders conditionally: read-only for anonymous; logout link + MapAdmin region for MapAdmins. |
+| `/support/admin/map/attributes` | `MapAttributesController` | **MapAdmins-only** (`@RequiresMapAdmin` on the class → GET render + all 8 POSTs gated). |
 
 The status page passes the resolved `Identity` to its template, which branches on
-`identity.member` (write controls) and `!identity.anonymous` (logout link → `/oauth2/sign_out`).
-The actual write controls and their member-only POST endpoints are a **separate story**, not yet
+`identity.mapAdmin` (write controls) and `!identity.anonymous` (logout link → `/oauth2/sign_out`).
+The actual write controls and their MapAdmin-only POST endpoints are a **separate story**, not yet
 built; the template only has the seam.
 
 ---
@@ -135,7 +135,7 @@ front of it.
 ### `make dev` — no setup (newcomer default)
 
 ```bash
-make dev                    # DEV_FAKE_AUTH=member: behave as a logged-in team member
+make dev                    # DEV_FAKE_AUTH=mapadmin: behave as a logged-in MapAdmin
 DEV_FAKE_AUTH=anon make dev # behave as an anonymous (read-only) visitor
 ```
 
@@ -180,7 +180,7 @@ Browse **nginx at <http://localhost:8000>** (not Quarkus at :8080). Prerequisite
 > **One env var keeps the proxy gate and the app check aligned.** oauth2-proxy both *accepts*
 > (`OAUTH2_PROXY_GITHUB_TEAM`) and *emits* (`X-Auth-Request-Groups`) the same `<org>:<team-slug>`
 > form, so a single value — `GITHUB_ADMIN_TEAM` (default `triplea-maps:mapadmins`) — feeds both the
-> proxy and `app.auth.member-group`. The slug is GitHub's lowercased team slug (the team
+> proxy and `app.auth.map-admin-group`. The slug is GitHub's lowercased team slug (the team
 > *name* `MapAdmins` has slug `mapadmins`), not the display name. `make run` exports the var to both
 > the compose overlay and `quarkusDev`; override it in the shell to point at a different team.
 
@@ -219,8 +219,8 @@ not here. It mirrors `auth/nginx.conf`'s optional-auth + hard-gate + header-sani
 
 | File | Purpose |
 |---|---|
-| `src/main/java/org/triplea/services/auth/` | Identity, providers, resolver, `@RequiresMember`, filter; `@CsrfProtected` + the CSRF provider/filters. |
-| `src/main/resources/application.properties` | Header names, member group, `DEV_FAKE_AUTH` wiring, `app.auth.csrf-cookie-secure`. |
+| `src/main/java/org/triplea/services/auth/` | Identity, providers, resolver, `@RequiresMapAdmin`, filter; `@CsrfProtected` + the CSRF provider/filters. |
+| `src/main/resources/application.properties` | Header names, MapAdmin group, `DEV_FAKE_AUTH` wiring, `app.auth.csrf-cookie-secure`. |
 | `src/main/resources/templates/MapsStatusController/statusPage.html` | Conditional render + logout link. |
 | `docker-compose.auth.yml`, `auth/nginx.conf`, `.env.auth.example` | Local real-proxy overlay. |
 | `auth/verify-header-sanitization.sh` | End-to-end header-sanitization check (`make verify-auth-headers`). |

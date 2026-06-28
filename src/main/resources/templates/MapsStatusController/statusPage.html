@@ -10,22 +10,22 @@
     th { background: #f4f4f4; }
     img.thumb { max-width: 120px; max-height: 80px; }
     ul.tags { margin: 0; padding-left: 1.2em; }
-    .member-tools { border: 1px dashed #ccc; background: #fafafa; padding: 0.5em 0.75em;
+    .mapadmin-tools { border: 1px dashed #ccc; background: #fafafa; padding: 0.5em 0.75em;
                     margin-bottom: 1em; color: #555; }
   </style>
 </head>
 <body>
   {!
     The shared nav header carries the auth control: anonymous callers see an admin login link,
-    members see logout. The GET itself stays public; `identity.member` only gates the write
-    controls below. The write controls and their member-only POST endpoints are a separate story.
+    MapAdmins see logout. The GET itself stays public; `identity.mapAdmin` only gates the write
+    controls below. The write controls and their MapAdmin-only POST endpoints are a separate story.
   !}
   {#navHeader identity=identity path="/support/maps/status" /}
 
   <h1>Maps Status</h1>
 
-  {#if identity.member}
-    <div class="member-tools" data-member-tools>
+  {#if identity.mapAdmin}
+    <div class="mapadmin-tools" data-mapadmin-tools>
       Editing is enabled for your account. Write controls are not built yet.
     </div>
   {/if}

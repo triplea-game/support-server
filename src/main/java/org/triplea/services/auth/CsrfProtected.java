@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 /// token. Binds [CsrfRequestFilter] (validates the token on POST/PUT/PATCH/DELETE) and
 /// [CsrfCookieResponseFilter] (issues the double-submit cookie on safe responses).
 ///
-/// Orthogonal to [RequiresMember]: membership is authorization, CSRF is request-forgery
+/// Orthogonal to [RequiresMapAdmin]: MapAdmin status is authorization, CSRF is request-forgery
 /// protection. The browser forms behind the cookie session (`MapAttributesController`) need
 /// both; a future public form would need only CSRF.
 @NameBinding

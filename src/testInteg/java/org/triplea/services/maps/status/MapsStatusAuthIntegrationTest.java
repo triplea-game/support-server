@@ -14,11 +14,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.triplea.IntegTestExtension;
 
 /// Conditional-render integration tests for the public map status page. The GET is public (200 for
-/// everyone); what differs is the auth-aware scaffolding: a member sees the logout link and the
-/// member-only region, an anonymous caller sees neither.
+/// everyone); what differs is the auth-aware scaffolding: a MapAdmin sees the logout link and the
+/// MapAdmin-only region, an anonymous caller sees neither.
 ///
 /// Identity is derived from the `X-Auth-*` headers (the post-nginx state in TEST launch
-/// mode, `DEV_FAKE_AUTH` unset): anonymous = no headers, member = email + the member group.
+/// mode, `DEV_FAKE_AUTH` unset): anonymous = no headers, MapAdmin = email + the MapAdmin group.
 @QuarkusTest
 @ExtendWith(IntegTestExtension.class)
 class MapsStatusAuthIntegrationTest {
@@ -26,15 +26,15 @@ class MapsStatusAuthIntegrationTest {
   private static final String PATH = "/support/maps/status";
   private static final String LOGOUT_LINK = "/oauth2/sign_out";
   private static final String LOGIN_LINK = "/oauth2/start";
-  private static final String MEMBER_REGION = "data-member-tools";
+  private static final String MAP_ADMIN_REGION = "data-mapadmin-tools";
 
   @ConfigProperty(name = "quarkus.http.test-port", defaultValue = "8081")
   int testPort;
 
-  // The exact group string a member carries is whatever the app is configured to match, so the test
-  // stays correct if app.auth.member-group (driven by GITHUB_ADMIN_TEAM) changes.
-  @ConfigProperty(name = "app.auth.member-group")
-  String memberGroup;
+  // The exact group string a MapAdmin carries is whatever the app is configured to match, so the
+  // test stays correct if app.auth.map-admin-group (driven by GITHUB_ADMIN_TEAM) changes.
+  @ConfigProperty(name = "app.auth.map-admin-group")
+  String mapAdminGroup;
 
   private HttpClient httpClient;
   private String baseUrl;
@@ -50,22 +50,22 @@ class MapsStatusAuthIntegrationTest {
     var response = get(false);
 
     assertThat(response.statusCode()).isEqualTo(200);
-    assertThat(response.body()).doesNotContain(LOGOUT_LINK).doesNotContain(MEMBER_REGION);
+    assertThat(response.body()).doesNotContain(LOGOUT_LINK).doesNotContain(MAP_ADMIN_REGION);
     assertThat(response.body()).contains(LOGIN_LINK);
   }
 
   @Test
-  void memberSeesLogoutAndMemberRegion() throws Exception {
+  void mapAdminSeesLogoutAndMapAdminRegion() throws Exception {
     var response = get(true);
 
     assertThat(response.statusCode()).isEqualTo(200);
-    assertThat(response.body()).contains(LOGOUT_LINK).contains(MEMBER_REGION);
+    assertThat(response.body()).contains(LOGOUT_LINK).contains(MAP_ADMIN_REGION);
   }
 
-  private HttpResponse<String> get(boolean member) throws Exception {
+  private HttpResponse<String> get(boolean mapAdmin) throws Exception {
     var builder = HttpRequest.newBuilder().uri(URI.create(baseUrl + PATH)).GET();
-    if (member) {
-      builder.header("X-Auth-Email", "member@example.com").header("X-Auth-Groups", memberGroup);
+    if (mapAdmin) {
+      builder.header("X-Auth-Email", "mapadmin@example.com").header("X-Auth-Groups", mapAdminGroup);
     }
     return httpClient.send(builder.build(), HttpResponse.BodyHandlers.ofString());
   }

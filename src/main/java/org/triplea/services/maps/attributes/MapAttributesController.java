@@ -21,13 +21,13 @@ import org.triplea.services.auth.CsrfProtected;
 import org.triplea.services.auth.CsrfTokenProvider;
 import org.triplea.services.auth.Identity;
 import org.triplea.services.auth.RequestIdentity;
-import org.triplea.services.auth.RequiresMember;
+import org.triplea.services.auth.RequiresMapAdmin;
 
 /// Renders and edits the attribute catalog (the dimensions like "difficulty" and the allowed values
 /// within each dimension).
 @Path("/support/admin/map/attributes")
 @ApplicationScoped
-@RequiresMember
+@RequiresMapAdmin
 @CsrfProtected
 public class MapAttributesController {
 

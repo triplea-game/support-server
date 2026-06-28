@@ -3,7 +3,7 @@
   invoked as `{#navHeader identity=... path="..." /}`.
 
   Parameters:
-    - identity: the request's resolved Identity (anonymous / member / email). The GET pages
+    - identity: the request's resolved Identity (anonymous / MapAdmin / email). The GET pages
         themselves stay public; `identity` only gates which auth control is shown.
     - path: the current page's path, used as the post-login/logout redirect target (`rd=`),
         so the caller lands back on the same page (-> oauth2-proxy via nginx).

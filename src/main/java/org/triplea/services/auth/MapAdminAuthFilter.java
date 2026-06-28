@@ -8,22 +8,22 @@ import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.Provider;
 
-/// Rejects any request to a [RequiresMember]-annotated resource whose caller is not a member
-/// of the authorizing team. Anonymous and authenticated-non-member callers alike receive 401, a
+/// Rejects any request to a [RequiresMapAdmin]-annotated resource whose caller is not a MapAdmin
+/// of the authorizing team. Anonymous and authenticated-non-MapAdmin callers alike receive 401, a
 /// single contract that Phase 7 can map to a login redirect for HTMX.
 ///
 /// This is the server-side authorization gate: it holds independently of the UI (hidden buttons
 /// are not authorization) and independently of any reverse-proxy configuration (defense in depth).
 @Provider
-@RequiresMember
+@RequiresMapAdmin
 @Priority(Priorities.AUTHORIZATION)
-public class MemberAuthFilter implements ContainerRequestFilter {
+public class MapAdminAuthFilter implements ContainerRequestFilter {
 
   @Inject RequestIdentity requestIdentity;
 
   @Override
   public void filter(ContainerRequestContext requestContext) {
-    if (!requestIdentity.get().isMember()) {
+    if (!requestIdentity.get().isMapAdmin()) {
       requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
     }
   }

@@ -5,9 +5,9 @@ red=\033[31m
 nc=\033[0m
 SSH_USER ?= $${USER}
 
-# The GitHub <org>:<team-slug> whose members get write access. One source of truth for the auth
-# overlay: exported so both `docker compose` (oauth2-proxy gate) and `quarkusDev`
-# (app.auth.member-group) inherit it. Override from the shell to point at a different team.
+# The GitHub <org>:<team-slug> whose members are the app's MapAdmins (write access). One source of
+# truth for the auth overlay: exported so both `docker compose` (oauth2-proxy gate) and `quarkusDev`
+# (app.auth.map-admin-group) inherit it. Override from the shell to point at a different team.
 GITHUB_ADMIN_TEAM ?= triplea-maps:mapadmins
 export GITHUB_ADMIN_TEAM
 
@@ -52,7 +52,7 @@ database-up: ## Launches database
 	DATABASE_PORT=5432 docker compose up database
 
 dev: ## Run with fake auth — no proxy, no GitHub, zero setup (newcomer default). DEV_FAKE_AUTH=anon to test anonymous.
-	DEV_FAKE_AUTH=$${DEV_FAKE_AUTH:-member} ./gradlew quarkusDev
+	DEV_FAKE_AUTH=$${DEV_FAKE_AUTH:-mapadmin} ./gradlew quarkusDev
 
 run up: ## Run behind the real oauth2-proxy/nginx auth overlay (browse http://localhost:8000). Needs .env.auth — see docs/auth.md.
 	docker compose -f docker-compose.auth.yml up -d

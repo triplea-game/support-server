@@ -23,9 +23,9 @@ import java.util.Set;
 /// Safe methods (GET/HEAD/OPTIONS) are not checked — they don't mutate, and the GET render is
 /// what issues the cookie + field in the first place.
 ///
-/// Runs *after* [MemberAuthFilter] (higher priority value) so an anonymous caller to
-/// a member-gated form gets the authorization 401 rather than a 403 — a non-member has no business
-/// reaching the CSRF check.
+/// Runs *after* [MapAdminAuthFilter] (higher priority value) so an anonymous caller to
+/// a MapAdmin-gated form gets the authorization 401 rather than a 403 — a non-MapAdmin has no
+/// business reaching the CSRF check.
 @Provider
 @CsrfProtected
 @Priority(Priorities.AUTHORIZATION + 100)
