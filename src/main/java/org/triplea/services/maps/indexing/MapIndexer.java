@@ -73,10 +73,16 @@ class MapIndexer {
     final String description = mapDescriptionReader.apply(mapRepoListing);
 
     final String previewImageUri =
-        mapRepoListing.getUri().toString() + "/blob/master/preview.png?raw=true";
+        mapRepoListing.getUri().toString()
+            + "/blob/"
+            + mapRepoListing.getDefaultBranch()
+            + "/preview.png?raw=true";
 
     final String downloadUri =
-        mapRepoListing.getUri().toString() + "/archive/refs/heads/master.zip";
+        mapRepoListing.getUri().toString()
+            + "/archive/refs/heads/"
+            + mapRepoListing.getDefaultBranch()
+            + ".zip";
 
     final Long downloadSize = downloadSizeFetcher.apply(URI.create(downloadUri)).orElse(null);
     if (downloadSize == null) {

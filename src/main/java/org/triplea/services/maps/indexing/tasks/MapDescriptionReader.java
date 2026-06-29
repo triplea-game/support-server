@@ -38,7 +38,11 @@ public class MapDescriptionReader implements Function<MapRepoListing, String> {
 
   private Optional<String> downloadDescription(final MapRepoListing mapRepoListing) {
     final URI descriptionUri =
-        URI.create(mapRepoListing.getUri().toString() + "/blob/master/description.html?raw=true");
+        URI.create(
+            mapRepoListing.getUri().toString()
+                + "/blob/"
+                + mapRepoListing.getDefaultBranch()
+                + "/description.html?raw=true");
     try {
       HttpRequest request = HttpRequest.newBuilder(descriptionUri).GET().build();
       HttpResponse<String> response =

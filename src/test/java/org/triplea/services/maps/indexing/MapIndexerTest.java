@@ -35,8 +35,8 @@ class MapIndexerTest {
     assertThat(mapIndexingResult.getMapRepoUri()).isEqualTo(listing.getUri().toString());
 
     assertThat(mapIndexingResult.getDownloadUri())
-        .isEqualTo(listing.getUri() + "/archive/refs/heads/master.zip");
+        .isEqualTo(listing.getUri() + "/archive/refs/heads/main.zip");
     assertThat(mapIndexingResult.getPreviewImageUri())
-        .isEqualTo(listing.getUri() + "/blob/master/preview.png?raw=true");
+        .isEqualTo(listing.getUri() + "/blob/main/preview.png?raw=true");
   }
 }

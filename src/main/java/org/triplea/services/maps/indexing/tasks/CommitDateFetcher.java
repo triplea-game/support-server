@@ -20,7 +20,9 @@ public class CommitDateFetcher implements Function<MapRepoListing, Optional<Inst
   @Override
   public Optional<Instant> apply(final MapRepoListing mapRepoListing) {
     try {
-      return Optional.of(githubClient.getLatestCommitDate(mapRepoListing.getName(), "master"));
+      return Optional.of(
+          githubClient.getLatestCommitDate(
+              mapRepoListing.getName(), mapRepoListing.getDefaultBranch()));
     } catch (final Exception e) {
       log.error(
           "Could not index map: {}, unable to fetch last commit date. Either the last commit"

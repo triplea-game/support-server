@@ -41,7 +41,11 @@ public class MapNameReader implements Function<MapRepoListing, Optional<String>>
       };
 
   public static URI computeMapYamlLocation(MapRepoListing mapRepoListing) {
-    return URI.create(mapRepoListing.getUri().toString() + "/blob/master/map.yml?raw=true");
+    return URI.create(
+        mapRepoListing.getUri().toString()
+            + "/blob/"
+            + mapRepoListing.getDefaultBranch()
+            + "/map.yml?raw=true");
   }
 
   /// Determines the expected location of a map.yml file, downloads it, reads and returns the
