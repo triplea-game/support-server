@@ -39,7 +39,7 @@ alter table map_index_tag
 comment on table map_index_tag is 'Join table relating maps to tags';
 
         /*
-            assertThat(mapAttributes).contains(MapTag.builder().name("difficulty").value("easy").build());
-    assertThat(mapAttributes).contains(MapTag.builder().name("era").value("ancient").build());
+            assertThat(mapTags).contains(MapTag.builder().name("difficulty").value("easy").build());
+    assertThat(mapTags).contains(MapTag.builder().name("era").value("ancient").build());
   }
          */
