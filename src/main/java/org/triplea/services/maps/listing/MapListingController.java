@@ -15,7 +15,7 @@ import org.triplea.http.client.ServerPaths;
 import org.triplea.http.client.lobby.maps.listing.MapDownloadItem;
 import org.triplea.http.client.lobby.maps.listing.MapListingResponse;
 
-@Path("/")
+@Path("")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @ApplicationScoped
