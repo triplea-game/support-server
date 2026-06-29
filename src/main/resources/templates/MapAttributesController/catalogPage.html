@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Map Attributes Admin</title>
+  <script src="/support/htmx.min.js"></script>
   <style>
     body { font-family: sans-serif; margin: 1em; max-width: 900px; }
     h1 { margin-bottom: 0.2em; }
@@ -26,61 +27,100 @@
   <h1>Map Attributes</h1>
   <div class="nav"><a href="/support/maps/status">&larr; Maps status</a></div>
 
-  {#if attributes.isEmpty}
-    <p class="empty">No attributes defined yet. Add one below.</p>
-  {/if}
+  {!
+    HTMX swap granularity is chosen per operation by what changes on screen:
+      - list-level   (#attribute-list)  : add / delete / move attribute
+      - section-level (.attribute)       : rename attribute, add / delete / move value
+      - row-level    (the value <form>)  : rename value
+    Each mutating control keeps its `action`/`formaction` for the no-JavaScript
+    fallback (full-page POST -> 303), and layers `hx-*` on top. The wrapper element
+    (div / section / form) lives *inside* its fragment so an outerHTML swap replaces
+    it with a new element of the same id.
+  !}
+  {#fragment id="attributeList"}
+    <div id="attribute-list">
+      {#if attributes.isEmpty}
+        <p class="empty">No attributes defined yet. Add one below.</p>
+      {/if}
 
-  {#for attr in attributes}
-    <section class="attribute">
-      <form method="post" class="inline attribute-header">
-        <input type="hidden" name="_csrf" value="{csrfToken}">
-        <input type="text" name="name" value="{attr.name}" required>
-        <button formaction="/support/admin/map/attributes/attribute/{attr.id}/rename">Rename</button>
-        <button formaction="/support/admin/map/attributes/attribute/{attr.id}/move"
-                name="direction" value="up" title="Move up">&uarr;</button>
-        <button formaction="/support/admin/map/attributes/attribute/{attr.id}/move"
-                name="direction" value="down" title="Move down">&darr;</button>
-        <button formaction="/support/admin/map/attributes/attribute/{attr.id}/delete"
-                class="danger"
-                onclick="return confirm('Delete this attribute? Its values and any map assignments using them will also be removed.');">
-          Delete
-        </button>
-      </form>
+      {#for attr in attributes}
+        {#fragment id="attributeSection"}
+          <section class="attribute" id="attribute-{attr.id}">
+            <form method="post" class="inline attribute-header">
+              <input type="hidden" name="_csrf" value="{csrfToken}">
+              <input type="text" name="name" value="{attr.name}" required>
+              <button formaction="/support/admin/map/attributes/attribute/{attr.id}/rename"
+                      hx-post="/support/admin/map/attributes/attribute/{attr.id}/rename"
+                      hx-target="closest .attribute" hx-swap="outerHTML">Rename</button>
+              <button formaction="/support/admin/map/attributes/attribute/{attr.id}/move"
+                      name="direction" value="up" title="Move up"
+                      hx-post="/support/admin/map/attributes/attribute/{attr.id}/move"
+                      hx-target="#attribute-list" hx-swap="outerHTML">&uarr;</button>
+              <button formaction="/support/admin/map/attributes/attribute/{attr.id}/move"
+                      name="direction" value="down" title="Move down"
+                      hx-post="/support/admin/map/attributes/attribute/{attr.id}/move"
+                      hx-target="#attribute-list" hx-swap="outerHTML">&darr;</button>
+              <button formaction="/support/admin/map/attributes/attribute/{attr.id}/delete"
+                      class="danger"
+                      hx-post="/support/admin/map/attributes/attribute/{attr.id}/delete"
+                      hx-target="#attribute-list" hx-swap="outerHTML"
+                      hx-confirm="Delete this attribute? Its values and any map assignments using them will also be removed.">
+                Delete
+              </button>
+            </form>
 
-      <div class="values">
-        {#if attr.values.isEmpty}
-          <div class="empty">No values yet.</div>
-        {/if}
-        {#for v in attr.values}
-          <form method="post" class="inline value-row">
-            <input type="hidden" name="_csrf" value="{csrfToken}">
-            <input type="text" name="value" value="{v.value}" required>
-            <button formaction="/support/admin/map/attributes/value/{v.id}/rename">Rename</button>
-            <button formaction="/support/admin/map/attributes/value/{v.id}/move"
-                    name="direction" value="up" title="Move up">&uarr;</button>
-            <button formaction="/support/admin/map/attributes/value/{v.id}/move"
-                    name="direction" value="down" title="Move down">&darr;</button>
-            <button formaction="/support/admin/map/attributes/value/{v.id}/delete"
-                    class="danger"
-                    onclick="return confirm('Delete this value? Any maps assigned to it will lose the assignment.');">
-              Delete
-            </button>
-          </form>
-        {/for}
+            <div class="values">
+              {#if attr.values.isEmpty}
+                <div class="empty">No values yet.</div>
+              {/if}
+              {#for v in attr.values}
+                {#fragment id="valueRow"}
+                  <form method="post" class="inline value-row" id="value-{v.id}">
+                    <input type="hidden" name="_csrf" value="{csrfToken}">
+                    <input type="text" name="value" value="{v.value}" required>
+                    <button formaction="/support/admin/map/attributes/value/{v.id}/rename"
+                            hx-post="/support/admin/map/attributes/value/{v.id}/rename"
+                            hx-target="closest form" hx-swap="outerHTML">Rename</button>
+                    <button formaction="/support/admin/map/attributes/value/{v.id}/move"
+                            name="direction" value="up" title="Move up"
+                            hx-post="/support/admin/map/attributes/value/{v.id}/move"
+                            hx-target="closest .attribute" hx-swap="outerHTML">&uarr;</button>
+                    <button formaction="/support/admin/map/attributes/value/{v.id}/move"
+                            name="direction" value="down" title="Move down"
+                            hx-post="/support/admin/map/attributes/value/{v.id}/move"
+                            hx-target="closest .attribute" hx-swap="outerHTML">&darr;</button>
+                    <button formaction="/support/admin/map/attributes/value/{v.id}/delete"
+                            class="danger"
+                            hx-post="/support/admin/map/attributes/value/{v.id}/delete"
+                            hx-target="closest .attribute" hx-swap="outerHTML"
+                            hx-confirm="Delete this value? Any maps assigned to it will lose the assignment.">
+                      Delete
+                    </button>
+                  </form>
+                {/fragment}
+              {/for}
 
-        <form method="post"
-              action="/support/admin/map/attributes/attribute/{attr.id}/value"
-              class="inline add-row">
-          <input type="hidden" name="_csrf" value="{csrfToken}">
-          <input type="text" name="value" placeholder="New value" required>
-          <button>Add value</button>
-        </form>
-      </div>
-    </section>
-  {/for}
+              <form method="post"
+                    action="/support/admin/map/attributes/attribute/{attr.id}/value"
+                    class="inline add-row"
+                    hx-post="/support/admin/map/attributes/attribute/{attr.id}/value"
+                    hx-target="closest .attribute" hx-swap="outerHTML">
+                <input type="hidden" name="_csrf" value="{csrfToken}">
+                <input type="text" name="value" placeholder="New value" required>
+                <button>Add value</button>
+              </form>
+            </div>
+          </section>
+        {/fragment}
+      {/for}
+    </div>
+  {/fragment}
 
   <section class="add-attribute">
-    <form method="post" action="/support/admin/map/attributes/attribute" class="inline">
+    <form method="post" action="/support/admin/map/attributes/attribute" class="inline"
+          hx-post="/support/admin/map/attributes/attribute"
+          hx-target="#attribute-list" hx-swap="outerHTML"
+          hx-on::after-request="if(event.detail.successful) this.reset()">
       <input type="hidden" name="_csrf" value="{csrfToken}">
       <label>New attribute:</label>
       <input type="text" name="name" placeholder="e.g. difficulty" required>
