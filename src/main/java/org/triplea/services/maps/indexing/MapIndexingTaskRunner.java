@@ -101,6 +101,22 @@ class MapIndexingTaskRunner implements Runnable {
         mapIndexDao.upsert(result);
         return new IndexingResult(IndexingResult.ResultCode.SUCCESSFULLY_INDEXED, List.of());
       } catch (MapIndexer.IndexingException e) {
+        // Record the failure as a disabled map_index row so the error surfaces on the status page.
+        // The map's real name/size may have been unreadable (that is often the error), so we fall
+        // back to the repo name and size 0, and reuse the commit date already fetched above. For a
+        // previously-indexed map the upsert keeps its existing metadata and only disables it.
+        mapIndexDao.upsertDisabled(
+            MapIndex.builder()
+                .mapName(listing.getName())
+                .mapRepoUri(listing.getUri().toString())
+                .lastCommitDate(latestCommitOnGithub)
+                .description("(map indexing failed)")
+                .defaultBranch(listing.getDefaultBranch())
+                .downloadUri(MapIndexer.downloadUri(listing))
+                .previewImageUri(MapIndexer.previewImageUri(listing))
+                .mapDownloadSizeInBytes(0L)
+                .build(),
+            String.join("\n\n", e.getErrors()));
         return new IndexingResult(IndexingResult.ResultCode.REPO_ERROR, e.getErrors());
       }
     } else {

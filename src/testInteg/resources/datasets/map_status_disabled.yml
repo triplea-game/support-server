@@ -1,0 +1,13 @@
+map_index:
+  - id: 20
+    map_name: broken-map
+    # Do not use "http:" in test data, DB rider logs a noisy warning about this.
+    repo_url: 'http-broken-repo'
+    default_branch: 'master'
+    description: '(map indexing failed)'
+    download_url: 'http-broken-repo/archives/master.zip'
+    preview_image_url: 'http-broken-preview'
+    download_size_bytes: 0
+    last_commit_date: 2000-12-01 23:59:20.0
+    enabled: false
+    disable_reason: 'could not read map.yml'

@@ -17,6 +17,7 @@ public record MapStatusItem(
     String previewImageUrl,
     String lastModified,
     boolean enabled,
+    String disableReason,
     List<MapTag> mapAttributes,
     Map<Integer, Integer> selections) {
 
@@ -31,6 +32,7 @@ public record MapStatusItem(
         row.previewImageUrl(),
         FORMATTER.format(row.lastCommitDate()),
         row.enabled(),
+        row.disableReason(),
         row.tags(),
         row.selections());
   }

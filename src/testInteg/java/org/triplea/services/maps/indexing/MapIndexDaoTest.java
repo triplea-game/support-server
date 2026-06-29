@@ -57,6 +57,35 @@ class MapIndexDaoTest {
   }
 
   @Test
+  @ExpectedDataSet("expected/map_index_post_disable_error.yml")
+  void upsertDisabledDisablesExistingMapAndKeepsItsMetadata() {
+    // an indexing error on an already-indexed map disables it with the error reason, but the
+    // existing data columns (e.g. map_name) are preserved rather than overwritten with fallbacks.
+    mapIndexDao.upsertDisabled(
+        TestData.mapIndex.toBuilder().mapName("map-name-updated").build(),
+        "could not read map.yml");
+  }
+
+  @Test
+  @ExpectedDataSet("expected/map_indexing_status_error.yml")
+  void recordIndexingStatusRecordsError() {
+    mapIndexDao.recordIndexingStatus(
+        TestData.mapRepoListing,
+        new MapIndexingTaskRunner.IndexingResult(
+            MapIndexingTaskRunner.IndexingResult.ResultCode.REPO_ERROR,
+            List.of("could not read map.yml")));
+  }
+
+  @Test
+  @ExpectedDataSet("expected/map_indexing_status_success.yml")
+  void recordIndexingStatusRecordsSuccess() {
+    mapIndexDao.recordIndexingStatus(
+        TestData.mapRepoListing,
+        new MapIndexingTaskRunner.IndexingResult(
+            MapIndexingTaskRunner.IndexingResult.ResultCode.SUCCESSFULLY_INDEXED, List.of()));
+  }
+
+  @Test
   void getLastCommitDate() {
     assertThat(
         mapIndexDao.getLastCommitDate(TestData.mapIndex.getMapRepoUri()),

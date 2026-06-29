@@ -5,6 +5,7 @@
 -- when the testcontainers Postgres is reused across restarts.
 
 truncate table map_index_attribute, map_index, map_attribute_value, map_attribute restart identity cascade;
+truncate table map_indexing_status restart identity;
 truncate table error_report_history restart identity;
 
 insert into map_attribute (name, display_order) values
@@ -48,6 +49,28 @@ insert into map_index (
    'https://github.com/triplea-maps/world_war_ii_global/archive/master.zip',
    'master');
 
+-- A map that failed to index: present but disabled, with the indexing error captured in
+-- disable_reason. This mirrors what MapIndexingTaskRunner writes on an IndexingException for a
+-- never-successfully-indexed repo (map name falls back to the repo name, size 0). It has no
+-- attributes and is hidden from the public download listing, but shows on the status page with
+-- its error reason.
+insert into map_index (
+  map_name, last_commit_date, repo_url, preview_image_url,
+  description, download_size_bytes, download_url, default_branch,
+  enabled, disable_reason
+) values
+  ('napoleonic_empires',
+   now() - interval '5 days',
+   'https://github.com/triplea-maps/napoleonic_empires',
+   'https://raw.githubusercontent.com/triplea-maps/napoleonic_empires/master/preview.png',
+   '(map indexing failed)',
+   0,
+   'https://github.com/triplea-maps/napoleonic_empires/archive/master.zip',
+   'master',
+   false,
+   'Failed to read map-name. Expected to read attribute "map_name" in a ''map.yml'' located at: https://github.com/triplea-maps/napoleonic_empires/blob/master/map.yml
+The file might not exist, or the attribute might not exist in the file (check spelling, check indentation)');
+
 insert into map_index_attribute (map_index_id, map_attribute_id, map_attribute_value_id)
 select mi.id, av.map_attribute_id, av.id
 from map_index mi
@@ -60,6 +83,23 @@ join (values
         ('World War II Global', 'hard')
      ) as t(map_name, attribute_value) on mi.map_name = t.map_name
 join map_attribute_value av on av.value = t.attribute_value;
+
+-- Indexing-status audit rows mirroring the seeded maps: the enabled maps indexed successfully;
+-- the disabled napoleonic_empires repo errored (repo_name is the repo's last path segment, as the
+-- indexer derives it). Keeps the tracking table consistent with map_index for dev.
+insert into map_indexing_status
+  (repo_url, repo_name, last_indexing_attempt, last_success, result_code, error_message)
+select repo_url, regexp_replace(repo_url, '^.*/', ''), last_commit_date, last_commit_date,
+       'SUCCESSFULLY_INDEXED', null
+from map_index
+where enabled;
+
+insert into map_indexing_status
+  (repo_url, repo_name, last_indexing_attempt, last_success, result_code, error_message)
+select repo_url, regexp_replace(repo_url, '^.*/', ''), last_commit_date, null,
+       'REPO_ERROR', disable_reason
+from map_index
+where not enabled;
 
 insert into error_report_history
   (user_ip, system_id, report_title, game_version, created_issue_link, date_created) values

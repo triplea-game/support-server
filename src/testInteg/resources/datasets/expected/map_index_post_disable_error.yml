@@ -1,0 +1,8 @@
+map_index:
+  - id: 10
+    # map_name stays the originally-indexed value, NOT the fallback passed to upsertDisabled
+    map_name: map-name
+    repo_url: "http-map-repo-url"
+    enabled: false
+    disable_reason: "could not read map.yml"
+    last_commit_date: 2000-12-01 23:59:20.0

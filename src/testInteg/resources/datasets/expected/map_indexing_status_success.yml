@@ -1,0 +1,4 @@
+map_indexing_status:
+  - repo_url: "http-map-repo-url"
+    repo_name: "http-map-repo-url"
+    result_code: SUCCESSFULLY_INDEXED

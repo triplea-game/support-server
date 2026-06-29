@@ -34,6 +34,7 @@ public class MapStatusDao {
                       m.description,
                       m.last_commit_date,
                       m.enabled,
+                      m.disable_reason,
                       a.id               attribute_id,
                       a.name             attribute_name,
                       v.id               value_id,
@@ -58,6 +59,7 @@ public class MapStatusDao {
                                       rowView.getColumn("description", String.class),
                                       rowView.getColumn("last_commit_date", Instant.class),
                                       rowView.getColumn("enabled", Boolean.class),
+                                      rowView.getColumn("disable_reason", String.class),
                                       new ArrayList<>(),
                                       new LinkedHashMap<>()));
 

@@ -17,5 +17,6 @@ public record MapStatusRow(
     String description,
     Instant lastCommitDate,
     boolean enabled,
+    String disableReason,
     List<MapTag> tags,
     Map<Integer, Integer> selections) {}

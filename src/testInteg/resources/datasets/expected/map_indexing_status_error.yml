@@ -1,0 +1,5 @@
+map_indexing_status:
+  - repo_url: "http-map-repo-url"
+    repo_name: "http-map-repo-url"
+    result_code: REPO_ERROR
+    error_message: "could not read map.yml"

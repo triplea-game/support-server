@@ -24,6 +24,24 @@ class MapIndexer {
   @Nonnull private final Function<MapRepoListing, String> mapDescriptionReader;
   @Nonnull private final Function<URI, Optional<Long>> downloadSizeFetcher;
 
+  /// The URL the map archive is downloaded from, derived from the repo and its default branch.
+  /// Always computable from the listing alone, so it is also used to build the placeholder row
+  /// written when indexing fails (see `MapIndexingTaskRunner`).
+  static String downloadUri(final MapRepoListing mapRepoListing) {
+    return mapRepoListing.getUri().toString()
+        + "/archive/refs/heads/"
+        + mapRepoListing.getDefaultBranch()
+        + ".zip";
+  }
+
+  /// The preview-image URL, derived from the repo and its default branch.
+  static String previewImageUri(final MapRepoListing mapRepoListing) {
+    return mapRepoListing.getUri().toString()
+        + "/blob/"
+        + mapRepoListing.getDefaultBranch()
+        + "/preview.png?raw=true";
+  }
+
   static MapIndexer build(final GithubClient githubApiClient) {
     return MapIndexer.builder()
         .lastCommitDateFetcher(CommitDateFetcher.builder().githubClient(githubApiClient).build())
@@ -72,17 +90,9 @@ class MapIndexer {
 
     final String description = mapDescriptionReader.apply(mapRepoListing);
 
-    final String previewImageUri =
-        mapRepoListing.getUri().toString()
-            + "/blob/"
-            + mapRepoListing.getDefaultBranch()
-            + "/preview.png?raw=true";
+    final String previewImageUri = previewImageUri(mapRepoListing);
 
-    final String downloadUri =
-        mapRepoListing.getUri().toString()
-            + "/archive/refs/heads/"
-            + mapRepoListing.getDefaultBranch()
-            + ".zip";
+    final String downloadUri = downloadUri(mapRepoListing);
 
     final Long downloadSize = downloadSizeFetcher.apply(URI.create(downloadUri)).orElse(null);
     if (downloadSize == null) {

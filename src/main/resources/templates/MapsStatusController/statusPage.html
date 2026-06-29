@@ -16,6 +16,11 @@
     form.attr-row select { flex: 1; }
     .mapadmin-tools { border: 1px dashed #ccc; background: #fafafa; padding: 0.5em 0.75em;
                     margin-bottom: 1em; color: #555; }
+    td.status .disabled { color: #b00; font-weight: bold; }
+    details.disable-reason { margin-top: 0.25em; }
+    details.disable-reason summary { cursor: pointer; color: #b00; }
+    details.disable-reason pre { white-space: pre-wrap; margin: 0.25em 0 0; color: #555;
+                    font-size: 0.85em; }
   </style>
 </head>
 <body>
@@ -52,7 +57,25 @@
         <tr>
           <td><img class="thumb" src="{map.previewImageUrl}" alt="{map.mapName} preview"></td>
           <td>{map.mapName}</td>
-          <td>{map.enabledLabel}</td>
+          {!
+            Status: "Available" when enabled, otherwise "Disabled" plus the disable reason. For an
+            indexing failure the reason is the (multi-line) error message, tucked inside a
+            collapsible so the table stays readable; map makers expand it to see why their map
+            failed to index.
+          !}
+          <td class="status">
+            {#if map.enabled}
+              {map.enabledLabel}
+            {#else}
+              <span class="disabled">{map.enabledLabel}</span>
+              {#if map.disableReason}
+                <details class="disable-reason">
+                  <summary>reason</summary>
+                  <pre>{map.disableReason}</pre>
+                </details>
+              {/if}
+            {/if}
+          </td>
           <td>{map.lastModified}</td>
           <td>{map.description}</td>
           {!

@@ -35,11 +35,22 @@ class MapStatusDaoTest {
     var map = maps.get(0);
     assertThat(map.id()).isEqualTo(10L);
     assertThat(map.mapName()).isEqualTo("map-name");
+    assertThat(map.enabled()).isTrue();
+    assertThat(map.disableReason()).isNull();
     assertThat(map.tags())
         .containsExactlyInAnyOrder(
             MapTag.builder().name("era").value("ancient").build(),
             MapTag.builder().name("difficulty").value("easy").build());
     assertThat(map.selections()).containsOnly(entry(3300, 100), entry(8800, 200));
+  }
+
+  @Test
+  @DataSet(value = "map_status_disabled.yml", useSequenceFiltering = false)
+  void listSurfacesDisabledMapWithReason() {
+    var map = dao.listMapsWithAttributes().get(0);
+
+    assertThat(map.enabled()).isFalse();
+    assertThat(map.disableReason()).isEqualTo("could not read map.yml");
   }
 
   @Test
