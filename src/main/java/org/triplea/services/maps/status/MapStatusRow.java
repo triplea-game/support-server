@@ -23,5 +23,6 @@ public record MapStatusRow(
     String disableReason,
     boolean adminEnabled,
     String adminDisableReason,
+    Instant lastIndexed,
     List<MapTag> tags,
     Map<Integer, Integer> selections) {}

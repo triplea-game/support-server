@@ -52,6 +52,7 @@
         <th>Status</th>
         <th>Admin</th>
         <th>Last Commit</th>
+        <th>Last Indexed</th>
         <th>Description</th>
         <th>Attributes</th>
       </tr>
@@ -123,6 +124,7 @@
             </td>
           {/fragment}
           <td>{map.lastModified}</td>
+          <td>{map.lastIndexed}</td>
           <td>{map.description}</td>
           {!
             The attributes cell is the HTMX swap unit: each dropdown posts its dimension's new

@@ -20,6 +20,7 @@ public record MapStatusItem(
     String disableReason,
     boolean adminEnabled,
     String adminDisableReason,
+    String lastIndexed,
     List<MapTag> mapAttributes,
     Map<Integer, Integer> selections) {
 
@@ -37,6 +38,7 @@ public record MapStatusItem(
         row.disableReason(),
         row.adminEnabled(),
         row.adminDisableReason(),
+        row.lastIndexed() == null ? "Never" : FORMATTER.format(row.lastIndexed()),
         row.tags(),
         row.selections());
   }

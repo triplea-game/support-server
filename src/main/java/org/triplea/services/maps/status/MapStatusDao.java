@@ -37,11 +37,13 @@ public class MapStatusDao {
                       m.disable_reason,
                       m.admin_enabled,
                       m.admin_disable_reason,
+                      s.last_indexing_attempt last_indexed,
                       a.id               attribute_id,
                       a.name             attribute_name,
                       v.id               value_id,
                       v.value            value_text
                     from map_index m
+                    left join map_indexing_status s on s.repo_url = m.repo_url
                     left join map_index_attribute mia on mia.map_index_id = m.id
                     left join map_attribute a on a.id = mia.map_attribute_id
                     left join map_attribute_value v on v.id = mia.map_attribute_value_id
@@ -64,6 +66,7 @@ public class MapStatusDao {
                                       rowView.getColumn("disable_reason", String.class),
                                       rowView.getColumn("admin_enabled", Boolean.class),
                                       rowView.getColumn("admin_disable_reason", String.class),
+                                      rowView.getColumn("last_indexed", Instant.class),
                                       new ArrayList<>(),
                                       new LinkedHashMap<>()));
 
