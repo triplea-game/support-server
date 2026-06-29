@@ -42,9 +42,9 @@ class MapIndexingTaskRunner implements Runnable {
 
     int totalNumberMaps = mapUris.size();
 
-    // remove deleted maps
-    int mapsDeleted =
-        mapIndexDao.removeMapsNotIn(
+    // disable maps whose repo is no longer on Github (kept in the table, flagged 'DELETED')
+    int mapsDisabled =
+        mapIndexDao.disableMapsNotIn(
             mapUris.stream()
                 .map(MapRepoListing::getUri)
                 .map(URI::toString)
@@ -78,12 +78,12 @@ class MapIndexingTaskRunner implements Runnable {
         "Map indexing finished in {} ms,"
             + " repos found: {},"
             + " repos with map.yml: {},"
-            + " maps deleted: {},"
+            + " maps disabled (no longer on Github): {},"
             + " errors encountered: {}",
         (System.currentTimeMillis() - startTimeEpochMillis),
         totalNumberMaps,
         mapsIndexed,
-        mapsDeleted,
+        mapsDisabled,
         errors);
   }
 

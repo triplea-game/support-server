@@ -29,13 +29,24 @@ public class MapIndexDao {
             + "   download_url = :downloadUri,"
             + "   preview_image_url = :previewImageUri,"
             + "   download_size_bytes = :mapDownloadSizeInBytes,"
-            + "   last_commit_date = :lastCommitDate";
+            + "   last_commit_date = :lastCommitDate,"
+            // A successful (re-)index re-enables the map and clears any disable reason, so a repo
+            // that was disabled (e.g. marked 'DELETED' after vanishing from Github) comes back
+            // enabled the moment it indexes cleanly again.
+            + "   enabled = true,"
+            + "   disable_reason = null";
     jdbi.withHandle(handle -> handle.createUpdate(query).bindBean(mapIndex).execute());
   }
 
-  /// Deletes maps that are not in the parameter list from the map_index table.
-  int removeMapsNotIn(List<String> mapUriList) {
-    String update = "delete from map_index where repo_url not in(<mapUriList>)";
+  /// Disables maps whose repo is no longer present on Github (not in the parameter list) by
+  /// setting `enabled = false` with reason 'DELETED'. The row is kept rather than deleted so a
+  /// repo that later reappears can be re-enabled by {@link #upsert}. Only currently-enabled rows
+  /// are touched, leaving an existing disable reason (e.g. an admin disable) intact.
+  int disableMapsNotIn(List<String> mapUriList) {
+    String update =
+        "update map_index"
+            + " set enabled = false, disable_reason = 'DELETED', date_updated = now()"
+            + " where repo_url not in(<mapUriList>) and enabled";
     return jdbi.withHandle(
         handle -> handle.createUpdate(update).bindList("mapUriList", mapUriList).execute());
   }

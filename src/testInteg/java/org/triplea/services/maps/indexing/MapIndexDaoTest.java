@@ -40,9 +40,20 @@ class MapIndexDaoTest {
   }
 
   @Test
-  @ExpectedDataSet("expected/map_index_post_remove.yml")
-  void removeMaps() {
-    mapIndexDao.removeMapsNotIn(List.of("http-map-repo-url"));
+  @ExpectedDataSet("expected/map_index_post_disable.yml")
+  void disableMapsNotInDisablesMissingMaps() {
+    // the seeded map's repo is not in the list, so the row is disabled (flagged 'DELETED')
+    // rather than deleted from the table.
+    mapIndexDao.disableMapsNotIn(List.of("http-some-other-repo"));
+  }
+
+  @Test
+  @DataSet(value = "map_index_disabled.yml", useSequenceFiltering = false)
+  @ExpectedDataSet("expected/map_index_reenabled.yml")
+  void upsertReenablesDisabledMap() {
+    // upserting a previously-disabled map (e.g. a 'DELETED' repo that came back) re-enables it
+    // and clears the disable reason; the CHECK constraint guarantees the cleared reason is null.
+    mapIndexDao.upsert(TestData.mapIndex);
   }
 
   @Test

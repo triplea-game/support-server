@@ -1,0 +1,14 @@
+map_index:
+  - id: 10
+    map_name: map-name
+    # Do not use "http:" in test data, DB rider logs a noisy warning about this.
+    # repo_url must otherwise begin with 'http' per column constraint
+    repo_url: 'http-map-repo-url'
+    default_branch: 'master'
+    description: description-repo-1
+    download_url: 'http-map-repo-url/archives/master.zip'
+    preview_image_url: 'http-preview-image-url'
+    download_size_bytes: 4000
+    last_commit_date: 2000-12-01 23:59:20.0
+    enabled: false
+    disable_reason: DELETED
