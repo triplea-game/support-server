@@ -5,6 +5,7 @@ import io.quarkus.qute.TemplateInstance;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.FormParam;
@@ -71,6 +72,10 @@ public class MapsStatusController {
         List<AttributeWithValues> attributes,
         String csrfToken,
         Identity identity);
+
+    /// One map's admin-approval `<td>` — the swap unit after an admin enable/disable.
+    public static native TemplateInstance statusPage$adminStatus(
+        MapStatusItem map, String csrfToken, Identity identity);
   }
 
   @GET
@@ -98,6 +103,35 @@ public class MapsStatusController {
     return hxRequest.isBlank() ? redirectHome() : cellFragment(mapId);
   }
 
+  /// Admin-disables a map. A reason is required (it's shown to map makers explaining why the map is
+  /// not public, and the DB constraint rejects a disabled map without one).
+  @POST
+  @Path("/{mapId}/admin-disable")
+  @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+  @RequiresMapAdmin
+  public Response adminDisableMap(
+      @PathParam("mapId") long mapId,
+      @FormParam("reason") @DefaultValue("") String reason,
+      @HeaderParam("HX-Request") @DefaultValue("") String hxRequest) {
+    if (reason.isBlank()) {
+      throw new BadRequestException("A reason is required to disable a map.");
+    }
+    statusDao.disableMap(mapId, reason.trim());
+    return hxRequest.isBlank() ? redirectHome() : adminFragment(mapId);
+  }
+
+  /// Admin-approves a map. No reason needed; this clears any "pending approval"/disable reason.
+  @POST
+  @Path("/{mapId}/admin-enable")
+  @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+  @RequiresMapAdmin
+  public Response adminEnableMap(
+      @PathParam("mapId") long mapId,
+      @HeaderParam("HX-Request") @DefaultValue("") String hxRequest) {
+    statusDao.approveMap(mapId);
+    return hxRequest.isBlank() ? redirectHome() : adminFragment(mapId);
+  }
+
   /// Re-renders just the edited map's attributes cell for an HTMX `outerHTML` swap.
   private Response cellFragment(long mapId) {
     var identity = requestIdentity.get();
@@ -109,6 +143,19 @@ public class MapsStatusController {
     return Response.ok(
             Templates.statusPage$mapAttributes(
                 map, attributeDao.listAttributes(), csrfToken(identity), identity))
+        .type(MediaType.TEXT_HTML)
+        .build();
+  }
+
+  /// Re-renders just the map's admin-approval cell for an HTMX `outerHTML` swap.
+  private Response adminFragment(long mapId) {
+    var identity = requestIdentity.get();
+    var map =
+        loadMaps().stream()
+            .filter(m -> m.id() == mapId)
+            .findFirst()
+            .orElseThrow(NotFoundException::new);
+    return Response.ok(Templates.statusPage$adminStatus(map, csrfToken(identity), identity))
         .type(MediaType.TEXT_HTML)
         .build();
   }

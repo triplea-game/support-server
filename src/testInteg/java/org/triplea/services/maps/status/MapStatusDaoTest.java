@@ -37,6 +37,8 @@ class MapStatusDaoTest {
     assertThat(map.mapName()).isEqualTo("map-name");
     assertThat(map.enabled()).isTrue();
     assertThat(map.disableReason()).isNull();
+    assertThat(map.adminEnabled()).isTrue();
+    assertThat(map.adminDisableReason()).isNull();
     assertThat(map.tags())
         .containsExactlyInAnyOrder(
             MapTag.builder().name("era").value("ancient").build(),
@@ -79,5 +81,25 @@ class MapStatusDaoTest {
 
     var map = dao.listMapsWithAttributes().get(0);
     assertThat(map.selections()).containsOnly(entry(3300, 100));
+  }
+
+  @Test
+  void disableMapSetsAdminFlagAndReason() {
+    dao.disableMap(10, "spam map");
+
+    var map = dao.listMapsWithAttributes().get(0);
+    assertThat(map.adminEnabled()).isFalse();
+    assertThat(map.adminDisableReason()).isEqualTo("spam map");
+    assertThat(map.enabled()).isTrue(); // indexer flag is independent and untouched
+  }
+
+  @Test
+  void approveMapEnablesAndClearsReason() {
+    dao.disableMap(10, "spam map");
+    dao.approveMap(10);
+
+    var map = dao.listMapsWithAttributes().get(0);
+    assertThat(map.adminEnabled()).isTrue();
+    assertThat(map.adminDisableReason()).isNull();
   }
 }

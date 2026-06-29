@@ -32,7 +32,7 @@ public class MapListingDao {
                         left join map_index_attribute mia on mia.map_index_id = m.id
                         left join map_attribute_value v on v.id = mia.map_attribute_value_id
                         left join map_attribute a on a.id = mia.map_attribute_id
-                        where m.enabled
+                        where m.enabled and m.admin_enabled
                         order by m.last_commit_date desc, m.map_name, a.display_order, v.display_order
                         """)
                 .registerRowMapper(BeanMapper.factory(MapListingRecord.class))

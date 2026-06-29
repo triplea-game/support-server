@@ -71,6 +71,16 @@ insert into map_index (
    'Failed to read map-name. Expected to read attribute "map_name" in a ''map.yml'' located at: https://github.com/triplea-maps/napoleonic_empires/blob/master/map.yml
 The file might not exist, or the attribute might not exist in the file (check spelling, check indentation)');
 
+-- Explicit MapAdmin-approval mix. Direct inserts default to admin-approved (admin_enabled = true);
+-- flip one map to admin-disabled so the four seeded maps span every combination of the two
+-- independent axes:
+--   270 BC               indexer-enabled  + admin-approved -> publicly listed
+--   World War II Global  indexer-enabled  + admin-approved -> publicly listed
+--   Medieval             indexer-enabled  + admin-disabled -> hidden by admin (pending approval)
+--   napoleonic_empires   indexer-disabled + admin-approved -> hidden by the indexer
+update map_index set admin_enabled = false, admin_disable_reason = 'pending approval'
+where map_name = 'Medieval';
+
 insert into map_index_attribute (map_index_id, map_attribute_id, map_attribute_value_id)
 select mi.id, av.map_attribute_id, av.id
 from map_index mi

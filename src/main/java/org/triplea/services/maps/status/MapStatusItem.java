@@ -18,6 +18,8 @@ public record MapStatusItem(
     String lastModified,
     boolean enabled,
     String disableReason,
+    boolean adminEnabled,
+    String adminDisableReason,
     List<MapTag> mapAttributes,
     Map<Integer, Integer> selections) {
 
@@ -33,6 +35,8 @@ public record MapStatusItem(
         FORMATTER.format(row.lastCommitDate()),
         row.enabled(),
         row.disableReason(),
+        row.adminEnabled(),
+        row.adminDisableReason(),
         row.tags(),
         row.selections());
   }
@@ -40,6 +44,11 @@ public record MapStatusItem(
   /// Human-readable label for the Status column: "Available" when enabled, else "Disabled".
   public String enabledLabel() {
     return enabled ? "Available" : "Disabled";
+  }
+
+  /// Human-readable label for the Admin column: "Approved" when admin-enabled, else "Disabled".
+  public String adminEnabledLabel() {
+    return adminEnabled ? "Approved" : "Disabled";
   }
 
   /// True when this map's value for `attributeId` is `valueId` (marks the chosen `<option>`).

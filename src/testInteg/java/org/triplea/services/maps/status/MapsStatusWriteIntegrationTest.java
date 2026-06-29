@@ -33,6 +33,8 @@ class MapsStatusWriteIntegrationTest {
   private static final String PATH = "/support/maps/status";
   private static final String SET_DIFFICULTY = PATH + "/10/attribute/8800";
   private static final String CLEAR_ERA = PATH + "/10/attribute/3300";
+  private static final String ADMIN_DISABLE = PATH + "/10/admin-disable";
+  private static final String ADMIN_ENABLE = PATH + "/10/admin-enable";
 
   @ConfigProperty(name = "quarkus.http.test-port", defaultValue = "8081")
   int testPort;
@@ -86,6 +88,59 @@ class MapsStatusWriteIntegrationTest {
             .uri(URI.create(baseUrl + SET_DIFFICULTY))
             .header("Content-Type", "application/x-www-form-urlencoded")
             .POST(HttpRequest.BodyPublishers.ofString("valueId=201"))
+            .build();
+
+    assertThat(send(request).statusCode()).isEqualTo(401);
+  }
+
+  @Test
+  void adminDisableViaHtmxReturnsCellShowingDisabledWithReason() throws Exception {
+    var response = postHtmx(ADMIN_DISABLE, "reason=spam+map");
+
+    assertThat(response.statusCode()).isEqualTo(200);
+    String body = response.body();
+    assertThat(body).doesNotContain("<!DOCTYPE", "<html", "<table");
+    assertThat(body).contains("id=\"map-admin-10\"");
+    assertThat(body).contains("Disabled");
+    assertThat(body).contains("spam map"); // the admin's reason is shown
+    assertThat(body).contains("/admin-enable"); // a disabled map now offers the Enable control
+  }
+
+  @Test
+  void adminDisableWithoutReasonIsRejected() throws Exception {
+    var response = postHtmx(ADMIN_DISABLE, "reason=");
+
+    assertThat(response.statusCode()).isEqualTo(400);
+  }
+
+  @Test
+  @DataSet(value = "map_status_admin_pending.yml", useSequenceFiltering = false)
+  void adminEnableViaHtmxReturnsCellShowingApproved() throws Exception {
+    var response = postHtmx(ADMIN_ENABLE, null);
+
+    assertThat(response.statusCode()).isEqualTo(200);
+    String body = response.body();
+    assertThat(body).doesNotContain("<!DOCTYPE", "<html", "<table");
+    assertThat(body).contains("id=\"map-admin-10\"");
+    assertThat(body).contains("Approved");
+    assertThat(body).contains("/admin-disable"); // an approved map now offers the Disable control
+  }
+
+  @Test
+  void adminDisableWithoutHxRequestHeaderRedirects() throws Exception {
+    var response = postNoHx(ADMIN_DISABLE, "reason=spam+map");
+
+    assertThat(response.statusCode()).isEqualTo(303);
+    assertThat(response.headers().firstValue("location").orElseThrow()).endsWith(PATH);
+  }
+
+  @Test
+  void anonymousCannotAdminDisable() throws Exception {
+    var request =
+        HttpRequest.newBuilder()
+            .uri(URI.create(baseUrl + ADMIN_DISABLE))
+            .header("Content-Type", "application/x-www-form-urlencoded")
+            .POST(HttpRequest.BodyPublishers.ofString("reason=spam+map"))
             .build();
 
     assertThat(send(request).statusCode()).isEqualTo(401);

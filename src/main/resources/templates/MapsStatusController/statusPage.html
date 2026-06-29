@@ -16,11 +16,14 @@
     form.attr-row select { flex: 1; }
     .mapadmin-tools { border: 1px dashed #ccc; background: #fafafa; padding: 0.5em 0.75em;
                     margin-bottom: 1em; color: #555; }
-    td.status .disabled { color: #b00; font-weight: bold; }
+    td.status .disabled, td.admin-status .disabled { color: #b00; font-weight: bold; }
     details.disable-reason { margin-top: 0.25em; }
     details.disable-reason summary { cursor: pointer; color: #b00; }
     details.disable-reason pre { white-space: pre-wrap; margin: 0.25em 0 0; color: #555;
                     font-size: 0.85em; }
+    td.admin-status .admin-reason { margin-top: 0.25em; color: #555; font-size: 0.85em; }
+    form.admin-row { display: flex; gap: 0.4em; align-items: center; margin: 0.5em 0 0; }
+    form.admin-row input[type=text] { flex: 1; }
   </style>
 </head>
 <body>
@@ -47,6 +50,7 @@
         <th>Thumbnail</th>
         <th>Name</th>
         <th>Status</th>
+        <th>Admin</th>
         <th>Last Commit</th>
         <th>Description</th>
         <th>Attributes</th>
@@ -76,6 +80,48 @@
               {/if}
             {/if}
           </td>
+          {!
+            The Admin column reports the independent MapAdmin approval flag: "Approved", or
+            "Disabled" plus the admin's reason (new maps read "pending approval"). For a MapAdmin it
+            also carries the approve/disable control; like the attributes cell it is its own HTMX
+            swap unit (`outerHTML` on the enclosing <td>), with the <form> action/submit kept as the
+            no-JavaScript fallback (full-page POST -> 303). A disable requires a reason; an enable
+            needs none.
+          !}
+          {#fragment id="adminStatus"}
+            <td id="map-admin-{map.id}" class="admin-status">
+              {#if map.adminEnabled}
+                {map.adminEnabledLabel}
+              {#else}
+                <span class="disabled">{map.adminEnabledLabel}</span>
+                {#if map.adminDisableReason}
+                  <div class="admin-reason">{map.adminDisableReason}</div>
+                {/if}
+              {/if}
+              {#if identity.mapAdmin}
+                {#if map.adminEnabled}
+                  <form method="post"
+                        action="/support/maps/status/{map.id}/admin-disable"
+                        class="admin-row"
+                        hx-post="/support/maps/status/{map.id}/admin-disable"
+                        hx-target="closest td" hx-swap="outerHTML">
+                    <input type="hidden" name="_csrf" value="{csrfToken}">
+                    <input type="text" name="reason" placeholder="reason" required>
+                    <button>Disable</button>
+                  </form>
+                {#else}
+                  <form method="post"
+                        action="/support/maps/status/{map.id}/admin-enable"
+                        class="admin-row"
+                        hx-post="/support/maps/status/{map.id}/admin-enable"
+                        hx-target="closest td" hx-swap="outerHTML">
+                    <input type="hidden" name="_csrf" value="{csrfToken}">
+                    <button>Enable</button>
+                  </form>
+                {/if}
+              {/if}
+            </td>
+          {/fragment}
           <td>{map.lastModified}</td>
           <td>{map.description}</td>
           {!

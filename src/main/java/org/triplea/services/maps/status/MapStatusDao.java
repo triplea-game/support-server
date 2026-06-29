@@ -35,6 +35,8 @@ public class MapStatusDao {
                       m.last_commit_date,
                       m.enabled,
                       m.disable_reason,
+                      m.admin_enabled,
+                      m.admin_disable_reason,
                       a.id               attribute_id,
                       a.name             attribute_name,
                       v.id               value_id,
@@ -60,6 +62,8 @@ public class MapStatusDao {
                                       rowView.getColumn("last_commit_date", Instant.class),
                                       rowView.getColumn("enabled", Boolean.class),
                                       rowView.getColumn("disable_reason", String.class),
+                                      rowView.getColumn("admin_enabled", Boolean.class),
+                                      rowView.getColumn("admin_disable_reason", String.class),
                                       new ArrayList<>(),
                                       new LinkedHashMap<>()));
 
@@ -114,6 +118,40 @@ public class MapStatusDao {
                     """)
                 .bind("mapId", mapId)
                 .bind("attributeId", attributeId)
+                .execute());
+  }
+
+  /// Admin-approves the map: sets `admin_enabled` and clears its disable reason. Independent of the
+  /// indexer's `enabled` flag, so an approved map is publicly listed only if it also indexes
+  /// cleanly.
+  public void approveMap(long mapId) {
+    jdbi.useHandle(
+        handle ->
+            handle
+                .createUpdate(
+                    """
+                    update map_index
+                    set admin_enabled = true, admin_disable_reason = null
+                    where id = :mapId
+                    """)
+                .bind("mapId", mapId)
+                .execute());
+  }
+
+  /// Admin-disables the map with a required reason, hiding it from the public listing regardless of
+  /// its indexer health. The not-null reason satisfies `map_index_admin_disable_reason_ck`.
+  public void disableMap(long mapId, String reason) {
+    jdbi.useHandle(
+        handle ->
+            handle
+                .createUpdate(
+                    """
+                    update map_index
+                    set admin_enabled = false, admin_disable_reason = :reason
+                    where id = :mapId
+                    """)
+                .bind("mapId", mapId)
+                .bind("reason", reason)
                 .execute());
   }
 }

@@ -45,4 +45,12 @@ class MapListingDaoTest {
     assertThat(mapTags).contains(MapTag.builder().name("difficulty").value("easy").build());
     assertThat(mapTags).contains(MapTag.builder().name("era").value("ancient").build());
   }
+
+  @Test
+  @DataSet(value = "map_index_admin_disabled.yml", useSequenceFiltering = false)
+  void adminDisabledMapIsExcluded() {
+    // The map is indexer-enabled but not admin-approved, so the listing (which requires both)
+    // returns nothing.
+    assertThat(mapListingDao.fetchMapListings()).isEmpty();
+  }
 }

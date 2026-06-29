@@ -21,10 +21,15 @@ public class MapIndexDao {
     String query =
         "insert into map_index("
             + "    map_name, repo_url, default_branch, description, "
-            + "    download_url, preview_image_url, download_size_bytes, last_commit_date)\n"
+            + "    download_url, preview_image_url, download_size_bytes, last_commit_date, "
+            // A brand-new repo starts unapproved ("pending approval"), hidden from the public
+            // listing until a MapAdmin approves it, no matter its indexing health. The ON CONFLICT
+            // update below never names the admin columns, so an existing map's approval is kept.
+            + "    admin_enabled, admin_disable_reason)\n"
             + "values("
             + "     :mapName, :mapRepoUri, :defaultBranch, :description, "
-            + "     :downloadUri, :previewImageUri, :mapDownloadSizeInBytes, :lastCommitDate)\n"
+            + "     :downloadUri, :previewImageUri, :mapDownloadSizeInBytes, :lastCommitDate, "
+            + "     false, 'pending approval')\n"
             + "on conflict(repo_url)\n"
             + "do update set\n"
             + "   map_name = :mapName,"
@@ -53,11 +58,15 @@ public class MapIndexDao {
         "insert into map_index("
             + "    map_name, repo_url, default_branch, description, "
             + "    download_url, preview_image_url, download_size_bytes, last_commit_date, "
-            + "    enabled, disable_reason)\n"
+            + "    enabled, disable_reason, "
+            // As in upsert(): a brand-new repo starts unapproved, independent of its indexing
+            // health. The ON CONFLICT update leaves the admin columns alone.
+            + "    admin_enabled, admin_disable_reason)\n"
             + "values("
             + "     :mapName, :mapRepoUri, :defaultBranch, :description, "
             + "     :downloadUri, :previewImageUri, :mapDownloadSizeInBytes, :lastCommitDate, "
-            + "     false, :disableReason)\n"
+            + "     false, :disableReason, "
+            + "     false, 'pending approval')\n"
             + "on conflict(repo_url)\n"
             + "do update set\n"
             + "   enabled = false,"

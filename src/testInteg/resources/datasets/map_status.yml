@@ -10,6 +10,8 @@ map_index:
     preview_image_url: 'http-preview-image-url'
     download_size_bytes: 4000
     last_commit_date: 2000-12-01 23:59:20.0
+    # Approved baseline: indexer-enabled (default) + admin-approved.
+    admin_enabled: true
 
 map_attribute:
   - id: 3300

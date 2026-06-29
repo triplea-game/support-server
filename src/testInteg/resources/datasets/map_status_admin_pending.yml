@@ -1,3 +1,5 @@
+# Map 10 indexer-enabled but awaiting MapAdmin approval: admin_enabled = false with the default
+# 'pending approval' reason. Used to exercise the admin-enable (approve) endpoint.
 map_index:
   - id: 10
     map_name: map-name
@@ -10,4 +12,5 @@ map_index:
     preview_image_url: 'http-preview-image-url'
     download_size_bytes: 4000
     last_commit_date: 2000-12-01 23:59:20.0
-    admin_enabled: true
+    admin_enabled: false
+    admin_disable_reason: 'pending approval'
