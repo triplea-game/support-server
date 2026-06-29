@@ -11,23 +11,24 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import java.util.Optional;
-import java.util.function.Function;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jdbi.v3.core.Jdbi;
 import org.triplea.http.client.HttpHeaders;
 import org.triplea.http.client.ServerPaths;
-import org.triplea.http.client.error.report.CanUploadErrorReportResponse;
-import org.triplea.http.client.error.report.CanUploadRequest;
 import org.triplea.http.client.error.report.ErrorReportRequest;
 import org.triplea.http.client.error.report.ErrorReportResponse;
 import org.triplea.http.client.github.GithubClient;
-import org.triplea.services.error.reporting.upload.CanUploadErrorReportStrategy;
 import org.triplea.services.error.reporting.upload.CreateIssueParams;
 import org.triplea.services.error.reporting.upload.ErrorReportModule;
 import org.triplea.utils.IpAddressExtractor;
 
 /// Http controller that binds the error upload endpoint with the error report upload handler.
-@Path("/")
+///
+/// The full path is declared on the class (not `@Path("/")` + a method-level path): the
+/// `ServerPaths` constants begin with a leading slash, so a class path of `/` would concatenate to
+/// a double slash (`//support/error-report`) and never match. See also [ErrorReportController]'s
+/// sibling, the can-upload check controller, which follows the same single-path-per-class pattern.
+@Path(ServerPaths.ERROR_REPORT_PATH)
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @ApplicationScoped
@@ -45,30 +46,16 @@ public class ErrorReportController {
   String errorReportingRepo;
 
   private ErrorReportModule errorReportIngestion;
-  private Function<CanUploadRequest, CanUploadErrorReportResponse> canReportModule;
 
   @PostConstruct
   void init() {
     var githubClient = GithubClient.build(githubApiToken.orElse(""), tripleaOrgName);
     errorReportIngestion = ErrorReportModule.build(githubClient, errorReportingRepo, jdbi);
-    canReportModule = CanUploadErrorReportStrategy.build(jdbi);
-  }
-
-  @POST
-  @Path(ServerPaths.CAN_UPLOAD_ERROR_REPORT_PATH)
-  public CanUploadErrorReportResponse canUploadErrorReport(CanUploadRequest canUploadRequest) {
-    if (canUploadRequest == null
-        || canUploadRequest.getErrorTitle() == null
-        || canUploadRequest.getGameVersion() == null) {
-      throw new IllegalArgumentException("Missing request attributes title or game version");
-    }
-    return canReportModule.apply(canUploadRequest);
   }
 
   /// Endpoint where users can submit an error report, the server will use an API token of a generic
   /// user to in turn create a GitHub issue using the data from the error report.
   @POST
-  @Path(ServerPaths.ERROR_REPORT_PATH)
   public ErrorReportResponse uploadErrorReport(
       @Context RoutingContext routingContext, ErrorReportRequest errorReport) {
 
