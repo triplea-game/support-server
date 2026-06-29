@@ -1,4 +1,4 @@
-package org.triplea.services.index;
+package org.triplea.services;
 
 import io.quarkus.qute.CheckedTemplate;
 import io.quarkus.qute.TemplateInstance;
@@ -15,7 +15,7 @@ import org.triplea.services.auth.RequestIdentity;
 /// MapAdmins, the admin tools. The login control lives in the shared nav header.
 @Path("/support")
 @ApplicationScoped
-public class SupportIndexController {
+public class SupportHomeController {
 
   @Inject RequestIdentity requestIdentity;
 
