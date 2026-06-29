@@ -16,5 +16,6 @@ public record MapStatusRow(
     String previewImageUrl,
     String description,
     Instant lastCommitDate,
+    boolean enabled,
     List<MapTag> tags,
     Map<Integer, Integer> selections) {}

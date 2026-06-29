@@ -16,6 +16,7 @@ public record MapStatusItem(
     String description,
     String previewImageUrl,
     String lastModified,
+    boolean enabled,
     List<MapTag> mapAttributes,
     Map<Integer, Integer> selections) {
 
@@ -29,8 +30,14 @@ public record MapStatusItem(
         row.description(),
         row.previewImageUrl(),
         FORMATTER.format(row.lastCommitDate()),
+        row.enabled(),
         row.tags(),
         row.selections());
+  }
+
+  /// Human-readable label for the Status column: "Available" when enabled, else "Disabled".
+  public String enabledLabel() {
+    return enabled ? "Available" : "Disabled";
   }
 
   /// True when this map's value for `attributeId` is `valueId` (marks the chosen `<option>`).
