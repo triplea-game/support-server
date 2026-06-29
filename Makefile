@@ -48,9 +48,6 @@ test check: ## Runs all checks used to verify a Pull-Request
 clean: ## Removes build artifacts and stops docker containers and removes docker volumes
 	./gradlew clean
 
-database-up: ## Launches database
-	DATABASE_PORT=5432 docker compose up database
-
 dev: ## Run with fake auth — no proxy, no GitHub, zero setup (newcomer default). DEV_FAKE_AUTH=anon to test anonymous.
 	DEV_FAKE_AUTH=$${DEV_FAKE_AUTH:-mapadmin} ./gradlew quarkusDev
 
@@ -65,11 +62,8 @@ verify-auth-headers: ## Verify nginx strips spoofed inbound X-Auth-* headers (se
 	docker compose -f docker-compose.auth.yml up -d
 	./auth/verify-header-sanitization.sh
 
-psql: ## Connects to locally running docker database
-	docker exec -u postgres -it support-server-database-1 psql support_db
-
-logs: ## Util command to print the server logs (when running via docker)
-	docker logs support-server-server-1
+psql: ## Connects to the Quarkus Dev Services Postgres started by `make run`/`make dev`
+	docker exec -it "$$(docker ps -q --filter label=io.quarkus.devservice.launch-mode=DEVELOPMENT)" psql -U quarkus quarkus
 
 local: ## Uses 'triplea' game-client dependency as built from local disc, useful if working on shared libraries between 'support-server' and 'triplea'
 	./gradlew --info --include-build ../triplea compileJava

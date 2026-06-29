@@ -3,11 +3,11 @@ Use `make check` to validate the project
 ## Tech Stack
 - Java 25, Quarkus (HTTP server), JDBI (no ORM), Postgres, Lombok
 - Quarkus fast-jar (`build/quarkus-app/`) as deployment artifact
-- Docker + docker-compose for local dev and integration tests
+- Quarkus Dev Services (Testcontainers) provides Postgres for local dev and integration tests
 
 ## Testing
 - `src/test/` — unit tests; no database or server required
-- `src/testInteg/` — integration tests; require Docker (`docker compose up database flyway` starts Postgres on port 5432; Quarkus starts in-process via `@QuarkusTest`)
+- `src/testInteg/` — integration tests; require Docker (Quarkus Dev Services auto-starts a disposable Postgres via Testcontainers; Quarkus starts in-process via `@QuarkusTest`)
 - Do not put integration tests in `src/test/` or unit tests in `src/testInteg/`
 
 ## Code Style

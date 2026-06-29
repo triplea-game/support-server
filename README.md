@@ -33,39 +33,34 @@ Warning: First make sure that the local triplea project can build cleanly.
 ### Integration Tests
 
 These are tests that run against a live database. They use `@QuarkusTest`, which starts the
-Quarkus application in-process - no separately managed server is needed.
+Quarkus application in-process - no separately managed server is needed. Quarkus Dev Services
+automatically starts a disposable Postgres container (via Testcontainers) and runs Flyway
+migrations, so there is no manual database setup step.
 
-Before running integration tests, start Postgres and run Flyway migrations:
-
-```
-docker compose up database flyway
-```
-
-Then run the tests with:
+Run the tests with:
 
 ```
 ./gradlew check
 ```
 
-The `make verify` command does both steps in sequence.
+Or use `make verify`, which also runs formatting.
 
 
 ## Deployment
 
 ### Output Artifacts
 
-(1) 'Application' Docker image for running the support-server application
-
-(2) 'Flyway' Docker image containing database migrations
+'Application' Docker image for running the support-server application. Flyway database
+migrations are bundled into the application and run automatically on startup.
 
 
 ### CI/CD
 
-On merge to master:
+On merge to main:
 - builds a new docker image & publishes the new image to Github Packages
 
 See:
-- `.github/workflows/master.yml`
+- `.github/workflows/main.yml`
 
 
 ## Map Indexing Overview
