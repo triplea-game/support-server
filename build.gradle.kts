@@ -102,7 +102,7 @@ val quarkusPlatformVersion = "3.37.0"
 val gsonVersion = "2.14.0"
 val junitVersion = "6.1.0"
 val mockitoVersion = "5.23.0"
-val tripleaVersion = "2.7.15496"
+val tripleaVersion = "2.7.15622"
 
 dependencies {
     implementation(enforcedPlatform("io.quarkus.platform:quarkus-bom:$quarkusPlatformVersion"))
