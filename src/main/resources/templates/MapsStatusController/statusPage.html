@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Maps Status</title>
+  <script src="/support/htmx.min.js"></script>
   <style>
     body { font-family: sans-serif; margin: 1em; }
     table { border-collapse: collapse; width: 100%; }
@@ -10,6 +11,9 @@
     th { background: #f4f4f4; }
     img.thumb { max-width: 120px; max-height: 80px; }
     ul.tags { margin: 0; padding-left: 1.2em; }
+    form.attr-row { display: flex; gap: 0.4em; align-items: center; margin: 0 0 0.25em; }
+    form.attr-row label { min-width: 6em; }
+    form.attr-row select { flex: 1; }
     .mapadmin-tools { border: 1px dashed #ccc; background: #fafafa; padding: 0.5em 0.75em;
                     margin-bottom: 1em; color: #555; }
   </style>
@@ -17,8 +21,8 @@
 <body>
   {!
     The shared nav header carries the auth control: anonymous callers see an admin login link,
-    MapAdmins see logout. The GET itself stays public; `identity.mapAdmin` only gates the write
-    controls below. The write controls and their MapAdmin-only POST endpoints are a separate story.
+    MapAdmins see logout. The GET itself stays public; `identity.mapAdmin` gates the edit controls
+    in the attributes column, whose POSTs are MapAdmin-only and CSRF-protected.
   !}
   {#navHeader identity=identity path="/support/maps/status" /}
 
@@ -26,7 +30,8 @@
 
   {#if identity.mapAdmin}
     <div class="mapadmin-tools" data-mapadmin-tools>
-      Editing is enabled for your account. Write controls are not built yet.
+      Editing is enabled for your account. Change a map's attribute with the dropdowns below;
+      pick &mdash; none &mdash; to clear it.
     </div>
   {/if}
 
@@ -38,7 +43,7 @@
         <th>Name</th>
         <th>Last Commit</th>
         <th>Description</th>
-        <th>Tags</th>
+        <th>Attributes</th>
       </tr>
     </thead>
     <tbody>
@@ -48,17 +53,50 @@
           <td>{map.mapName}</td>
           <td>{map.lastModified}</td>
           <td>{map.description}</td>
-          <td>
-            {#if map.mapAttributes.isEmpty}
-              &mdash;
-            {#else}
-              <ul class="tags">
-                {#for attribute in map.mapAttributes}
-                  <li>{attribute.name}: {attribute.value}</li>
+          {!
+            The attributes cell is the HTMX swap unit: each dropdown posts its dimension's new
+            value (empty = clear), `hx-target`s the enclosing <td> and swaps it `outerHTML` for the
+            re-rendered fragment below. The <form> keeps `action`/submit for the no-JavaScript
+            fallback (full-page POST -> 303); `hx-trigger="change, submit"` auto-saves on change for
+            HTMX clients and still intercepts the no-JS "Set" button when scripting is present.
+          !}
+          {#fragment id="mapAttributes"}
+            <td id="map-attributes-{map.id}">
+              {#if identity.mapAdmin}
+                {#for dim in attributes}
+                  <form method="post"
+                        action="/support/maps/status/{map.id}/attribute/{dim.id}"
+                        class="attr-row"
+                        hx-post="/support/maps/status/{map.id}/attribute/{dim.id}"
+                        hx-target="closest td" hx-swap="outerHTML"
+                        hx-trigger="change, submit">
+                    <input type="hidden" name="_csrf" value="{csrfToken}">
+                    <label for="attr-{map.id}-{dim.id}">{dim.name}:</label>
+                    <select id="attr-{map.id}-{dim.id}" name="valueId">
+                      <option value=""{#if !map.hasAttribute(dim.id)} selected{/if}>&mdash; none &mdash;</option>
+                      {#for opt in dim.values}
+                        <option value="{opt.id}"{#if map.isSelected(dim.id, opt.id)} selected{/if}>{opt.value}</option>
+                      {/for}
+                    </select>
+                    <button>Set</button>
+                  </form>
                 {/for}
-              </ul>
-            {/if}
-          </td>
+                {#if attributes.isEmpty}
+                  <span>No attributes defined. <a href="/support/admin/map/attributes">Manage attributes</a></span>
+                {/if}
+              {#else}
+                {#if map.mapAttributes.isEmpty}
+                  &mdash;
+                {#else}
+                  <ul class="tags">
+                    {#for attribute in map.mapAttributes}
+                      <li>{attribute.name}: {attribute.value}</li>
+                    {/for}
+                  </ul>
+                {/if}
+              {/if}
+            </td>
+          {/fragment}
         </tr>
       {/for}
     </tbody>
