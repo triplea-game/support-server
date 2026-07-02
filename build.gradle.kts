@@ -98,7 +98,7 @@ spotless {
     }
 }
 
-val quarkusPlatformVersion = "3.37.0"
+val quarkusPlatformVersion = "3.37.1"
 val gsonVersion = "2.14.0"
 val junitVersion = "6.1.0"
 val mockitoVersion = "5.23.0"
