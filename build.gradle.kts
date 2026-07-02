@@ -116,8 +116,8 @@ dependencies {
     implementation("io.quarkus:quarkus-scheduler")          // @Scheduled background tasks
     implementation("org.flywaydb:flyway-database-postgresql")
     // JDBI — framework-agnostic, wires against any DataSource
-    implementation("org.jdbi:jdbi3-core:3.53.0")
-    implementation("org.jdbi:jdbi3-sqlobject:3.53.0")
+    implementation("org.jdbi:jdbi3-core:3.54.0")
+    implementation("org.jdbi:jdbi3-sqlobject:3.54.0")
 
     // Gson — used by GithubApiClient
     implementation("com.google.code.gson:gson:$gsonVersion")
