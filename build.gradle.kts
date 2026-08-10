@@ -123,7 +123,7 @@ dependencies {
     implementation("com.google.code.gson:gson:$gsonVersion")
 
     // SnakeYAML Engine — used by MapNameReader to parse map.yml files
-    implementation("org.snakeyaml:snakeyaml-engine:2.10")
+    implementation("org.snakeyaml:snakeyaml-engine:3.1")
 
     // Annotations previously pulled in transitively by DropWizard
     implementation("com.google.guava:guava:33.6.0-jre")           // @VisibleForTesting
