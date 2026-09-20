@@ -62,3 +62,31 @@ jobs:
         env:
           LINODE_ACCESS_TOKEN: ${{ secrets.LINODE_READ_ONLY_TOKEN }}
         run: SSH_USER=deploy make deploy
+
+  # End-to-end smoke test of the just-deployed server, through the real public
+  # path (lobby nginx -> private network -> support container). A red job here
+  # turns the main build red, which emails on failure. This is an alarm, not a
+  # gate: the deploy has already happened, so it signals "this deploy broke
+  # prod" rather than preventing it.
+  smoke:
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      # Only /support is publicly proxied (/q/health is private-net only), so we
+      # probe the public status page: anonymous GET returns 200 and it reads the
+      # DB, so a 200 confirms the app booted and its datasource is reachable.
+      # Retry with backoff to ride out container/JVM/Flyway warmup after deploy.
+      - name: Smoke-test the deployed server
+        run: |
+          url="https://prod.triplea-game.org/support/maps/status"
+          for attempt in $(seq 1 12); do
+            code=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 10 "$url" || echo "000")
+            if [ "$code" = "200" ]; then
+              echo "Smoke check passed: HTTP $code from $url (attempt $attempt)"
+              exit 0
+            fi
+            echo "Attempt $attempt: HTTP $code from $url; retrying in 10s"
+            sleep 10
+          done
+          echo "Smoke check FAILED: $url never returned 200"
+          exit 1

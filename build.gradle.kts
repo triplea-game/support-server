@@ -114,6 +114,7 @@ dependencies {
     implementation("io.quarkus:quarkus-jdbc-postgresql")    // PostgreSQL + Dev Services
     implementation("io.quarkus:quarkus-flyway")             // DB migrations on startup
     implementation("io.quarkus:quarkus-scheduler")          // @Scheduled background tasks
+    implementation("io.quarkus:quarkus-smallrye-health")    // /q/health readiness + liveness probes
     implementation("org.flywaydb:flyway-database-postgresql")
     // JDBI — framework-agnostic, wires against any DataSource
     implementation("org.jdbi:jdbi3-core:3.53.0")
