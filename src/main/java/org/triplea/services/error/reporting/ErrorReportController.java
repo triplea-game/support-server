@@ -23,11 +23,6 @@ import org.triplea.services.error.reporting.upload.ErrorReportModule;
 import org.triplea.utils.IpAddressExtractor;
 
 /// Http controller that binds the error upload endpoint with the error report upload handler.
-///
-/// The full path is declared on the class (not `@Path("/")` + a method-level path): the
-/// `ServerPaths` constants begin with a leading slash, so a class path of `/` would concatenate to
-/// a double slash (`//support/error-report`) and never match. See also [ErrorReportController]'s
-/// sibling, the can-upload check controller, which follows the same single-path-per-class pattern.
 @Path(ServerPaths.ERROR_REPORT_PATH)
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)

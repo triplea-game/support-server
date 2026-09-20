@@ -13,7 +13,7 @@ import org.triplea.services.auth.RequestIdentity;
 
 /// Renders the public support landing page: links onward to the maps status page and, for
 /// MapAdmins, the admin tools. The login control lives in the shared nav header.
-@Path("/support")
+@Path("support")
 @ApplicationScoped
 public class SupportHomeController {
 

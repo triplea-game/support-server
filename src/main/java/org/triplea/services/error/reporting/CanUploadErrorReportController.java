@@ -17,11 +17,6 @@ import org.triplea.services.error.reporting.upload.CanUploadErrorReportStrategy;
 
 /// Http controller for the pre-flight check that tells a client whether it may upload an error
 /// report (eg: not a duplicate of an existing report).
-///
-/// The full path is declared on the class rather than `@Path("/")` + a method path: the
-/// `ServerPaths` constants begin with a leading slash, so a class path of `/` would concatenate to
-/// a double slash (`//support/error-report-check`) and never match. Split out from
-/// [ErrorReportController] so each endpoint is its own single-path root resource.
 @Path(ServerPaths.CAN_UPLOAD_ERROR_REPORT_PATH)
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)

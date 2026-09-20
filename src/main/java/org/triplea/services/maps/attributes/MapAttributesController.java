@@ -34,7 +34,7 @@ import org.triplea.services.auth.RequiresMapAdmin;
 ///   - **HTMX** -> `200` with the smallest correct re-rendered fragment (a value row, a section,
 ///     or the whole list), swapped into the page in place.
 ///   - **No JavaScript** -> the classic POST-redirect-GET (`303` back to [#SELF]).
-@Path("/support/admin/map/attributes")
+@Path("support/admin/map/attributes")
 @ApplicationScoped
 @RequiresMapAdmin
 @CsrfProtected
@@ -81,7 +81,7 @@ public class MapAttributesController {
   }
 
   @POST
-  @Path("/attribute")
+  @Path("attribute")
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   public Response createAttribute(
       @FormParam("name") String name,
@@ -91,7 +91,7 @@ public class MapAttributesController {
   }
 
   @POST
-  @Path("/attribute/{id}/rename")
+  @Path("attribute/{id}/rename")
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   public Response renameAttribute(
       @PathParam("id") int id,
@@ -102,7 +102,7 @@ public class MapAttributesController {
   }
 
   @POST
-  @Path("/attribute/{id}/delete")
+  @Path("attribute/{id}/delete")
   public Response deleteAttribute(
       @PathParam("id") int id, @HeaderParam("HX-Request") @DefaultValue("") String hxRequest) {
     dao.deleteAttribute(id);
@@ -110,7 +110,7 @@ public class MapAttributesController {
   }
 
   @POST
-  @Path("/attribute/{id}/move")
+  @Path("attribute/{id}/move")
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   public Response moveAttribute(
       @PathParam("id") int id,
@@ -121,7 +121,7 @@ public class MapAttributesController {
   }
 
   @POST
-  @Path("/attribute/{id}/value")
+  @Path("attribute/{id}/value")
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   public Response createValue(
       @PathParam("id") int id,
@@ -132,7 +132,7 @@ public class MapAttributesController {
   }
 
   @POST
-  @Path("/value/{id}/rename")
+  @Path("value/{id}/rename")
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   public Response renameValue(
       @PathParam("id") int id,
@@ -145,7 +145,7 @@ public class MapAttributesController {
   }
 
   @POST
-  @Path("/value/{id}/delete")
+  @Path("value/{id}/delete")
   public Response deleteValue(
       @PathParam("id") int id, @HeaderParam("HX-Request") @DefaultValue("") String hxRequest) {
     if (hxRequest.isBlank()) {
@@ -159,7 +159,7 @@ public class MapAttributesController {
   }
 
   @POST
-  @Path("/value/{id}/move")
+  @Path("value/{id}/move")
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   public Response moveValue(
       @PathParam("id") int id,
