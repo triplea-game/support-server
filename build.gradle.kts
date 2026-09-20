@@ -1,8 +1,8 @@
 plugins {
     id("java")
     id("io.freefair.lombok") version "9.5.0"
-    id("com.diffplug.spotless") version "8.9.0"
-    id("io.quarkus") version "3.38.1"
+    id("com.diffplug.spotless") version "8.10.2"
+    id("io.quarkus") version "3.39.4"
 }
 
 java {
@@ -98,7 +98,7 @@ spotless {
     }
 }
 
-val quarkusPlatformVersion = "3.38.1"
+val quarkusPlatformVersion = "3.39.4"
 val gsonVersion = "2.14.0"
 val junitVersion = "6.1.3"
 val mockitoVersion = "5.23.0"
@@ -117,8 +117,8 @@ dependencies {
     implementation("io.quarkus:quarkus-smallrye-health")    // /q/health readiness + liveness probes
     implementation("org.flywaydb:flyway-database-postgresql")
     // JDBI — framework-agnostic, wires against any DataSource
-    implementation("org.jdbi:jdbi3-core:3.53.0")
-    implementation("org.jdbi:jdbi3-sqlobject:3.53.0")
+    implementation("org.jdbi:jdbi3-core:3.54.0")
+    implementation("org.jdbi:jdbi3-sqlobject:3.54.0")
 
     // Gson — used by GithubApiClient
     implementation("com.google.code.gson:gson:$gsonVersion")
@@ -127,7 +127,7 @@ dependencies {
     implementation("org.snakeyaml:snakeyaml-engine:3.1.1")
 
     // Annotations previously pulled in transitively by DropWizard
-    implementation("com.google.guava:guava:33.6.0-jre")           // @VisibleForTesting
+    implementation("com.google.guava:guava:33.7.1-jre")           // @VisibleForTesting
     implementation("com.google.code.findbugs:jsr305:3.0.2")      // @Nonnull
 
     // TripleA shared libraries
@@ -148,8 +148,8 @@ dependencies {
     testImplementation("org.assertj:assertj-core:3.27.7")
     testImplementation("org.mockito:mockito-core:$mockitoVersion")
     testImplementation("org.mockito:mockito-junit-jupiter:$mockitoVersion")
-    testImplementation("org.wiremock:wiremock:3.13.1")
+    testImplementation("org.wiremock:wiremock:3.13.2")
     testImplementation("ru.lanwen.wiremock:wiremock-junit5:1.3.1")
     testImplementation("uk.co.datumedge:hamcrest-json:0.3")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher:6.1.0")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:6.1.3")
 }
