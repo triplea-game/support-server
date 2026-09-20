@@ -38,7 +38,7 @@ import org.triplea.services.maps.attributes.MapAttributeDao;
 ///
 /// The class is `@CsrfProtected` so the GET issues the CSRF cookie the edit forms need; the GET
 /// itself is a safe method and so bypasses the CSRF check.
-@Path("/support/maps/status")
+@Path("support/maps/status")
 @ApplicationScoped
 @CsrfProtected
 public class MapsStatusController {
@@ -87,7 +87,7 @@ public class MapsStatusController {
   }
 
   @POST
-  @Path("/{mapId}/attribute/{attributeId}")
+  @Path("{mapId}/attribute/{attributeId}")
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   @RequiresMapAdmin
   public Response setMapAttribute(
@@ -106,7 +106,7 @@ public class MapsStatusController {
   /// Admin-disables a map. A reason is required (it's shown to map makers explaining why the map is
   /// not public, and the DB constraint rejects a disabled map without one).
   @POST
-  @Path("/{mapId}/admin-disable")
+  @Path("{mapId}/admin-disable")
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   @RequiresMapAdmin
   public Response adminDisableMap(
@@ -122,7 +122,7 @@ public class MapsStatusController {
 
   /// Admin-approves a map. No reason needed; this clears any "pending approval"/disable reason.
   @POST
-  @Path("/{mapId}/admin-enable")
+  @Path("{mapId}/admin-enable")
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   @RequiresMapAdmin
   public Response adminEnableMap(

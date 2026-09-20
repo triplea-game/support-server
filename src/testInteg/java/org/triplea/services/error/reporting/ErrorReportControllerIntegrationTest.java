@@ -52,7 +52,7 @@ class ErrorReportControllerIntegrationTest {
 
     var httpRequest =
         HttpRequest.newBuilder()
-            .uri(URI.create(baseUrl + ServerPaths.ERROR_REPORT_PATH))
+            .uri(URI.create(baseUrl + "/" + ServerPaths.ERROR_REPORT_PATH))
             .header("Content-Type", "application/json")
             .header(HttpHeaders.SYSTEM_ID_HEADER, "test-system-id")
             .header(HttpHeaders.VERSION_HEADER, "test")
@@ -71,7 +71,7 @@ class ErrorReportControllerIntegrationTest {
 
     var httpRequest =
         HttpRequest.newBuilder()
-            .uri(URI.create(baseUrl + ServerPaths.CAN_UPLOAD_ERROR_REPORT_PATH))
+            .uri(URI.create(baseUrl + "/" + ServerPaths.CAN_UPLOAD_ERROR_REPORT_PATH))
             .header("Content-Type", "application/json")
             .header(HttpHeaders.SYSTEM_ID_HEADER, "test-system-id")
             .header(HttpHeaders.VERSION_HEADER, "test")
