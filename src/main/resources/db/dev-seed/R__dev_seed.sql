@@ -1,7 +1,7 @@
 -- Repeatable Flyway migration: re-runs whenever this file's checksum changes.
 -- Active only under the dev profile via:
 --   %dev.quarkus.flyway.locations=db/migration,db/dev-seed
--- Truncate + reinsert so `make run` always boots into a known seed state, even
+-- Truncate + reinsert so `just run` always boots into a known seed state, even
 -- when the testcontainers Postgres is reused across restarts.
 
 truncate table map_index_attribute, map_index, map_attribute_value, map_attribute restart identity cascade;

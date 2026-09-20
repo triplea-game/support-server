@@ -6,7 +6,7 @@
 # so the containers must share the host network to reach it. On macOS/Windows host networking
 # differs — containers would reach the host via host.docker.internal and you'd publish ports.
 #
-# Started by `make run`; requires a local .env.auth (copy from .env.auth.example). See docs/auth.md.
+# Started by `just run`; requires a local .env.auth (copy from .env.auth.example). See docs/auth.md.
 
 services:
   oauth2-proxy:
@@ -27,9 +27,9 @@ services:
       OAUTH2_PROXY_SCOPE: user:email read:org
       # <org>:<team-slug> whose members are the app's MapAdmins (write access). Same env var the app
       # reads for app.auth.map-admin-group, so the proxy gate and the app check can never drift. Set by
-      # `make run`; the format and the emitted X-Auth-Groups string are identical (oauth2-proxy
+      # `just run`; the format and the emitted X-Auth-Groups string are identical (oauth2-proxy
       # both accepts and emits <org>:<slug>).
-      OAUTH2_PROXY_GITHUB_TEAM: ${GITHUB_ADMIN_TEAM:?set GITHUB_ADMIN_TEAM (use make run)}
+      OAUTH2_PROXY_GITHUB_TEAM: ${GITHUB_ADMIN_TEAM:?set GITHUB_ADMIN_TEAM (use just run)}
       OAUTH2_PROXY_EMAIL_DOMAINS: "*"
       # http locally — must be true (secure cookies) once TLS terminates in front (prod).
       OAUTH2_PROXY_COOKIE_SECURE: "false"

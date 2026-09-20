@@ -18,17 +18,16 @@ triplea_github_access.token=CHANGE_ME
 - Postgres (database layer)
 - Docker & Docker Compose
 - gradle (build tool)
-- Makefile (developer build commands)
+- just (developer build commands)
 
 
 ## Development
 
-If working on shared code between `triplea` and `support-server`, see: `make localBuild`.
+If working on shared code between `triplea` and `support-server`, see: `just local`.
 Warning: First make sure that the local triplea project can build cleanly.
 
-- Run `make help` for list of full commands
-- `make verify` will run formatting and all tests (unit+integ)
-- `make diff-test` does a dry-run deployment to test
+- Run `just` (or `just help`) for list of full commands
+- `just check` will run formatting and all tests (unit+integ)
 
 ### Integration Tests
 
@@ -43,7 +42,7 @@ Run the tests with:
 ./gradlew check
 ```
 
-Or use `make verify`, which also runs formatting.
+Or use `just check`, which also runs formatting.
 
 
 ## Deployment

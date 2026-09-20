@@ -1,4 +1,4 @@
-Use `make check` to validate the project
+Use `just check` to validate the project
 
 ## Tech Stack
 - Java 25, Quarkus (HTTP server), JDBI (no ORM), Postgres, Lombok
@@ -11,7 +11,7 @@ Use `make check` to validate the project
 - Do not put integration tests in `src/test/` or unit tests in `src/testInteg/`
 
 ## Code Style
-- Google Java Format is enforced via Spotless (`make format` or `./gradlew spotlessApply`)
+- Google Java Format is enforced via Spotless (`just format` or `./gradlew spotlessApply`)
 - No wildcard imports (Spotless removes them)
 - Use Lombok annotations (`@Value`, `@Builder`, `@Data`, `@RequiredArgsConstructor`, etc.) instead of hand-written boilerplate
 - never use `Optional` class variables, annotate them as nullable instead

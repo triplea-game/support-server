@@ -11,7 +11,8 @@ jobs:
         with:
           distribution: temurin
           java-version: 25
+      - uses: extractions/setup-just@v4
       - name: Run Build Checks
-        run: make check
+        run: just check
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

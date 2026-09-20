@@ -15,7 +15,7 @@
 # login instead).
 #
 # Requires the auth overlay running (nginx :8000 + oauth2-proxy + host quarkusDev :8080) — start it
-# with `make run`, or run this via `make verify-auth-headers` which brings the proxy up first.
+# with `just run`, or run this via `just verify-auth-headers` which brings the proxy up first.
 #
 # This is the "what we can do now" version: the app still runs on the host via quarkusDev. The
 # longer-term direction is to containerize the app too and drive the whole stack from docker compose
@@ -43,11 +43,11 @@ bad()  { red   "FAIL  $1"; fail=$((fail + 1)); }
 # --- preflight: both tiers must be reachable -----------------------------------------------------
 preflight() {
   if ! curl -sf -o /dev/null "$APP_URL$STATUS_PATH"; then
-    red "App not reachable at $APP_URL — start it with 'make run' (or 'make dev')."
+    red "App not reachable at $APP_URL — start it with 'just run' (or 'just dev')."
     exit 2
   fi
   if ! curl -sf -o /dev/null "$NGINX_URL$STATUS_PATH"; then
-    red "nginx not reachable at $NGINX_URL — start the proxy ('make run' or 'make verify-auth-headers')."
+    red "nginx not reachable at $NGINX_URL — start the proxy ('just run' or 'just verify-auth-headers')."
     exit 2
   fi
 }

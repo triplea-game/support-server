@@ -16,11 +16,11 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 /// - A packaged production build ([LaunchMode#NORMAL]) ALWAYS uses [HeaderIdentityProvider],
 ///   even if `DEV_FAKE_AUTH` is set in the environment — the prod-safety guarantee.
 /// - Otherwise (dev/test), the [DevFakeIdentityProvider] is used when `DEV_FAKE_AUTH` is
-///   present, and the header provider when it is absent (e.g. `make run` behind nginx).
+///   present, and the header provider when it is absent (e.g. `just run` behind nginx).
 ///
 /// Gating on `DEV_FAKE_AUTH` presence rather than the `%dev` profile is deliberate:
-/// both `make dev` and `make run` run in `%dev`, so a profile gate would let
-/// dev-fake-auth clobber the real proxy headers under `make run`.
+/// both `just dev` and `just run` run in `%dev`, so a profile gate would let
+/// dev-fake-auth clobber the real proxy headers under `just run`.
 ///
 /// `Identity` is a (final) record value type, so it cannot itself be a normal-scoped CDI
 /// bean — hence this resolver rather than a `@Produces Identity`.

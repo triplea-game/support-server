@@ -49,7 +49,7 @@ class ProdSafetyTest {
 
   @Test
   void devWithoutFakeAuthUsesHeaderProvider() {
-    // e.g. `make run` behind nginx: %dev profile but DEV_FAKE_AUTH unset -> real headers.
+    // e.g. `just run` behind nginx: %dev profile but DEV_FAKE_AUTH unset -> real headers.
     assertThat(RequestIdentity.select(LaunchMode.DEVELOPMENT, "", headerProvider, devProvider))
         .isSameAs(headerProvider);
     assertThat(RequestIdentity.select(LaunchMode.DEVELOPMENT, null, headerProvider, devProvider))
