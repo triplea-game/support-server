@@ -84,18 +84,23 @@ local:
 build:
     ./gradlew quarkusBuild
 
-# Create 'docker container' build artifacts
-docker-build: build
-    docker build . --tag ghcr.io/triplea-game/support-server/server:latest
+image := "ghcr.io/triplea-game/support-server/server"
 
-# Push 'docker container' build artifacts to github docker container registry
-docker-push: docker-build
-    docker push ghcr.io/triplea-game/support-server/server:latest
+# Build the docker image as ':latest', plus ':<tag>' when given (CI passes sha-<commit>)
+docker-build tag="": build
+    docker build . --tag {{image}}:latest
+    if [ -n "{{tag}}" ]; then docker tag {{image}}:latest {{image}}:{{tag}}; fi
 
-# Trigger prod to pull latest docker and restart services
-deploy:
+# Push the docker image to the github container registry as ':latest', plus ':<tag>' when given
+docker-push tag="": (docker-build tag)
+    docker push {{image}}:latest
+    if [ -n "{{tag}}" ]; then docker push {{image}}:{{tag}}; fi
+
+# Deploy an image tag to prod (CI passes sha-<commit>)
+deploy tag="latest":
     ANSIBLE_CONFIG="deploy/ansible.cfg" \
       ansible-playbook \
         -e ansible_user=${SSH_USER:-$USER} \
+        -e support_tag={{tag}} \
         --inventory deploy/ansible/inventory.linode.yml \
         deploy/ansible/playbook.yml

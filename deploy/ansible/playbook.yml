@@ -1,4 +1,9 @@
 - hosts: tag_support
   tasks:
-    - name: Deploy latest Support Server
-      command: sudo -u support /opt/support/deploy-support.sh
+    - name: Deploy Support Server image tag
+      # The command path and run-as user must match the NOPASSWD sudoers rule
+      # the infrastructure repo's support/service role installs at
+      # /etc/sudoers.d/deploy-support ('deploy ALL=(support) NOPASSWD:
+      # /opt/support/deploy-support.sh'); any mismatch makes sudo prompt for a
+      # password and fail in CI. Keep in sync if that role's path changes.
+      command: sudo -u support /opt/support/deploy-support.sh {{ support_tag | default('latest') | quote }}
