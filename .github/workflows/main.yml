@@ -51,6 +51,11 @@ jobs:
     concurrency:
       group: ${{ github.workflow }}-deploy-${{ github.ref }}
       cancel-in-progress: false
+    permissions:
+      contents: read
+    # Deploys never cancel, so a hung one would hold the queue for GitHub's 6h
+    # default; the host script's own waits finish well inside this.
+    timeout-minutes: 15
 
     steps:
       - name: Checkout repository
@@ -92,6 +97,7 @@ jobs:
     concurrency:
       group: ${{ github.workflow }}-smoke-${{ github.ref }}
       cancel-in-progress: false
+    permissions: {}
     steps:
       # Only /support is publicly proxied (/q/health is private-net only), so we
       # probe the public status page: anonymous GET returns 200 and it reads the

@@ -3,7 +3,8 @@
     - name: Deploy Support Server image tag
       # The command path and run-as user must match the NOPASSWD sudoers rule
       # the infrastructure repo's support/service role installs at
-      # /etc/sudoers.d/deploy-support ('deploy ALL=(support) NOPASSWD:
-      # /opt/support/deploy-support.sh'); any mismatch makes sudo prompt for a
-      # password and fail in CI. Keep in sync if that role's path changes.
+      # /etc/sudoers.d/deploy-support: it lets 'deploy' run only this script, as
+      # 'support', without a password, and lists no arguments, so any tag is
+      # allowed. Any mismatch makes sudo prompt for a password and fail in CI.
+      # Re-running an old workflow run redeploys that run's sha, ie a rollback.
       command: sudo -u support /opt/support/deploy-support.sh {{ support_tag | default('latest') | quote }}
