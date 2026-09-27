@@ -52,6 +52,16 @@ Or use `just check`, which also runs formatting.
 'Application' Docker image for running the support-server application. Flyway database
 migrations are bundled into the application and run automatically on startup.
 
+### Database migrations
+
+Every migration must be backward compatible with the previous release's code. Rolling back
+redeploys the previous image against the already-migrated database, and that release must still
+start and work (Flyway is configured to ignore the newer, unknown migrations rather than fail).
+In practice:
+
+- Migrations are additive: new tables, new nullable or defaulted columns, new indexes.
+- Drop or rename a column or table only in the release *after* the code stops using it.
+
 
 ### CI/CD
 

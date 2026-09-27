@@ -25,6 +25,8 @@ Use `just check` to validate the project
 ## Database
 - No ORM — use JDBI with SQL object pattern
 - Migration naming convention: `V{major}.{minor}.{patch}__description.sql`
+- Every migration must be backward compatible with the previous release's code (see README
+  "Database migrations"): additive only; drop or rename in the release after the code stops using it
 
 ## Session / context management
 
