@@ -8,4 +8,5 @@ COPY build/quarkus-app/*.jar /app/
 COPY build/quarkus-app/app/ /app/app/
 COPY build/quarkus-app/quarkus/ /app/quarkus/
 
-CMD java -jar /app/quarkus-run.jar
+# Exec form makes java PID 1, so 'docker stop' SIGTERM reaches Quarkus for a graceful shutdown.
+CMD ["java", "-jar", "/app/quarkus-run.jar"]
