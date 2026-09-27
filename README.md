@@ -27,7 +27,8 @@ If working on shared code between `triplea` and `support-server`, see: `just loc
 Warning: First make sure that the local triplea project can build cleanly.
 
 - Run `just` (or `just help`) for list of full commands
-- `just check` will run formatting and all tests (unit+integ)
+- `just check` will verify formatting and run all tests (unit+integ); `just format` fixes formatting
+- `just all` formats, then checks
 
 ### Integration Tests
 
@@ -42,7 +43,7 @@ Run the tests with:
 ./gradlew check
 ```
 
-Or use `just check`, which also runs formatting.
+Or use `just check`, the same command CI runs.
 
 
 ## Deployment

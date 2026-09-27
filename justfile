@@ -44,9 +44,9 @@ format:
 
 alias test := check
 
-# Run all checks used to verify a Pull-Request
+# Run all checks used to verify a Pull-Request; fails on unformatted code (fix with `just format`)
 check:
-    ./gradlew spotlessApply check
+    ./gradlew check
 
 # Remove build artifacts and stop docker containers and remove docker volumes
 clean:
