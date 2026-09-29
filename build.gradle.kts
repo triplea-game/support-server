@@ -1,8 +1,8 @@
 plugins {
     id("java")
-    id("io.freefair.lombok") version "9.5.0"
-    id("com.diffplug.spotless") version "8.10.2"
-    id("io.quarkus") version "3.39.4"
+    id("io.freefair.lombok") version "9.7.0"
+    id("com.diffplug.spotless") version "8.10.3"
+    id("io.quarkus") version "3.40.0"
 }
 
 java {
@@ -98,10 +98,10 @@ spotless {
     }
 }
 
-val quarkusPlatformVersion = "3.39.4"
+val quarkusPlatformVersion = "3.39.5"
 val gsonVersion = "2.14.0"
 val junitVersion = "6.1.3"
-val mockitoVersion = "5.23.0"
+val mockitoVersion = "5.24.0"
 val tripleaVersion = "2.7.15622"
 
 dependencies {
