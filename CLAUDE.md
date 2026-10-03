@@ -1,4 +1,4 @@
-See `AGENTS.md` (this directory) for project-wide guidance.
+@AGENTS.md
 
 Nested `AGENTS.md` files exist throughout the source tree (under `lib/`,
 `game-app/`, `http-clients/`, `gradle/`, `docs/`, etc.). When working in or
