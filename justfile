@@ -8,12 +8,9 @@ nc := '\033[0m'
 # (app.auth.map-admin-group) inherit it. Override from the shell to point at a different team.
 export GITHUB_ADMIN_TEAM := env_var_or_default("GITHUB_ADMIN_TEAM", "triplea-maps:mapadmins")
 
-# Show this help text
-help:
+# Show available recipes
+default:
     @just --list
-
-# Run formatting and all checks
-all: format check
 
 # Install pre-commit as a pre-push git hook (requires pre-commit to be installed)
 setup:
@@ -43,6 +40,8 @@ format:
     ./gradlew spotlessApply
 
 alias test := check
+alias run := up
+alias stop := down
 
 # Run all checks used to verify a Pull-Request; fails on unformatted code (fix with `just format`)
 check:
@@ -53,31 +52,29 @@ clean:
     ./gradlew clean
 
 # Run with fake auth — no proxy, no GitHub, zero setup (newcomer default). DEV_FAKE_AUTH=anon to test anonymous.
-dev:
+up:
     DEV_FAKE_AUTH=${DEV_FAKE_AUTH:-mapadmin} ./gradlew quarkusDev
 
-alias up := run
-
 # Run behind the real oauth2-proxy/nginx auth overlay (browse http://localhost:8000). Needs .env.auth — see docs/auth.md.
-run:
+up-auth:
     docker compose -f docker-compose.auth.yml up -d
     ./gradlew quarkusDev
 
-# Stop the oauth2-proxy/nginx auth overlay started by `just run`
-run-stop:
+# Stop the oauth2-proxy/nginx auth overlay started by `just up-auth`; the database keeps running
+down:
     docker compose -f docker-compose.auth.yml down
 
-# Verify nginx strips spoofed inbound X-Auth-* headers (security check). Brings the proxy up; needs the app running (just run).
+# Verify nginx strips spoofed inbound X-Auth-* headers (security check). Brings the proxy up; needs the app running (just up-auth).
 verify-auth-headers:
     docker compose -f docker-compose.auth.yml up -d
     ./auth/verify-header-sanitization.sh
 
-# Connect to the Quarkus Dev Services Postgres started by `just run`/`just dev`
+# Connect to the Quarkus Dev Services Postgres started by `just up`/`just up-auth`
 psql:
     docker exec -it "$(docker ps -q --filter label=io.quarkus.devservice.launch-mode=DEVELOPMENT)" psql -U quarkus quarkus
 
 # Use 'triplea' game-client dependency as built from local disc, useful if working on shared libraries between 'support-server' and 'triplea'
-local:
+build-with-libs:
     ./gradlew --info --include-build ../triplea compileJava
 
 # Build the Quarkus application artifact

@@ -23,12 +23,11 @@ triplea_github_access.token=CHANGE_ME
 
 ## Development
 
-If working on shared code between `triplea` and `support-server`, see: `just local`.
+If working on shared code between `triplea` and `support-server`, see: `just build-with-libs`.
 Warning: First make sure that the local triplea project can build cleanly.
 
-- Run `just` (or `just help`) for list of full commands
+- Run `just` for list of full commands
 - `just check` will verify formatting and run all tests (unit+integ); `just format` fixes formatting
-- `just all` formats, then checks
 
 ### Integration Tests
 

@@ -24,7 +24,7 @@ oauth2-proxy auth subrequest:
 Header names and the MapAdmin group are configurable (`src/main/resources/application.properties`):
 
 ```properties
-# Driven by the GITHUB_ADMIN_TEAM env var (see "just run" below); default is the real team.
+# Driven by the GITHUB_ADMIN_TEAM env var (see "just up-auth" below); default is the real team.
 app.auth.map-admin-group=${GITHUB_ADMIN_TEAM:triplea-maps:mapadmins}
 app.auth.email-header=X-Auth-Email
 app.auth.groups-header=X-Auth-Groups
@@ -61,8 +61,8 @@ Package `org.triplea.services.auth`:
   provider.
 
 Gating on `DEV_FAKE_AUTH` **presence** rather than the `%dev` profile is deliberate: both
-`just dev` and `just run` run in `%dev`, so a profile gate would let dev-fake-auth clobber the real
-proxy headers under `just run`.
+`just up` and `just up-auth` run in `%dev`, so a profile gate would let dev-fake-auth clobber the real
+proxy headers under `just up-auth`.
 
 > `Identity` is a final record, so it can't be a normal-scoped CDI bean (no proxy). Hence the
 > `RequestIdentity` resolver instead of a `@Produces Identity`. Header access uses the injectable
@@ -132,21 +132,21 @@ built; the template only has the seam.
 The server is always a single `quarkusDev` process; the only variable is whether the proxy sits in
 front of it.
 
-### `just dev` — no setup (newcomer default)
+### `just up` — no setup (newcomer default)
 
 ```bash
-just dev                    # DEV_FAKE_AUTH=mapadmin: behave as a logged-in MapAdmin
-DEV_FAKE_AUTH=anon just dev # behave as an anonymous (read-only) visitor
+just up                    # DEV_FAKE_AUTH=mapadmin: behave as a logged-in MapAdmin
+DEV_FAKE_AUTH=anon just up # behave as an anonymous (read-only) visitor
 ```
 
 No proxy, no GitHub, no secrets. Browse Quarkus directly at <http://localhost:8080>.
 
-### `just run` — real proxy overlay
+### `just up-auth` — real proxy overlay
 
 Exercises the actual GitHub gate / login redirect / header sanitization locally.
 
 ```bash
-just run   # docker compose -f docker-compose.auth.yml up -d  +  ./gradlew quarkusDev
+just up-auth   # docker compose -f docker-compose.auth.yml up -d  +  ./gradlew quarkusDev
 ```
 
 Browse **nginx at <http://localhost:8000>** (not Quarkus at :8080). Prerequisite: a local
@@ -181,7 +181,7 @@ Browse **nginx at <http://localhost:8000>** (not Quarkus at :8080). Prerequisite
 > (`OAUTH2_PROXY_GITHUB_TEAM`) and *emits* (`X-Auth-Request-Groups`) the same `<org>:<team-slug>`
 > form, so a single value — `GITHUB_ADMIN_TEAM` (default `triplea-maps:mapadmins`) — feeds both the
 > proxy and `app.auth.map-admin-group`. The slug is GitHub's lowercased team slug (the team
-> *name* `MapAdmins` has slug `mapadmins`), not the display name. `just run` exports the var to both
+> *name* `MapAdmins` has slug `mapadmins`), not the display name. `just up-auth` exports the var to both
 > the compose overlay and `quarkusDev`; override it in the shell to point at a different team.
 
 ### Verifying header sanitization
@@ -191,7 +191,7 @@ proxy, not the app — so it can't be a `@QuarkusTest`. `auth/verify-header-sani
 end-to-end against the running overlay:
 
 ```bash
-just run                  # in one terminal: proxy + quarkusDev
+just up-auth              # in one terminal: proxy + quarkusDev
 just verify-auth-headers  # in another: brings the proxy up (idempotent) and runs the check
 ```
 
