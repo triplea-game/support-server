@@ -8,6 +8,9 @@ nc := '\033[0m'
 # (app.auth.map-admin-group) inherit it. Override from the shell to point at a different team.
 export GITHUB_ADMIN_TEAM := env_var_or_default("GITHUB_ADMIN_TEAM", "triplea-maps:mapadmins")
 
+# Matches %dev.quarkus.datasource.devservices.db-name in application.properties.
+dev_db := "support_db"
+
 # Show available recipes
 default:
     @just --list
@@ -47,8 +50,11 @@ alias stop := down
 check:
     ./gradlew check
 
-# Remove build artifacts and stop docker containers and remove docker volumes
+# Wipe local state: the Dev Services database (data included) and build artifacts
 clean:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    for id in $(just _dev-db); do docker rm -f -v "$id"; done
     ./gradlew clean
 
 # Run with fake auth — no proxy, no GitHub, zero setup (newcomer default). DEV_FAKE_AUTH=anon to test anonymous.
@@ -71,7 +77,7 @@ verify-auth-headers:
 
 # Connect to the Quarkus Dev Services Postgres started by `just up`/`just up-auth`
 psql:
-    docker exec -it "$(docker ps -q --filter label=io.quarkus.devservice.launch-mode=DEVELOPMENT)" psql -U quarkus quarkus
+    docker exec -it "$(just _dev-db | head -n 1)" psql -U quarkus {{dev_db}}
 
 # Use 'triplea' game-client dependency as built from local disc, useful if working on shared libraries between 'support-server' and 'triplea'
 build-with-libs:
@@ -101,3 +107,11 @@ deploy tag="latest":
         -e support_tag={{tag}} \
         --inventory deploy/ansible/inventory.linode.yml \
         deploy/ansible/playbook.yml
+
+# Print the ids of this repo's Dev Services Postgres containers, running or stopped.
+_dev-db:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    for id in $(docker ps -aq --filter label=io.quarkus.devservice.launch-mode=DEVELOPMENT); do
+      if docker inspect "$id" | grep -q '"POSTGRES_DB={{dev_db}}"'; then echo "$id"; fi
+    done
