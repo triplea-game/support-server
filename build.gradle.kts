@@ -1,8 +1,8 @@
 plugins {
     id("java")
-    id("io.freefair.lombok") version "9.5.0"
-    id("com.diffplug.spotless") version "8.10.2"
-    id("io.quarkus") version "3.39.4"
+    id("io.freefair.lombok") version "9.8.0"
+    id("com.diffplug.spotless") version "8.10.3"
+    id("io.quarkus") version "3.40.1"
 }
 
 java {
@@ -98,10 +98,10 @@ spotless {
     }
 }
 
-val quarkusPlatformVersion = "3.39.4"
+val quarkusPlatformVersion = "3.40.1"
 val gsonVersion = "2.14.0"
 val junitVersion = "6.1.3"
-val mockitoVersion = "5.23.0"
+val mockitoVersion = "5.24.0"
 val tripleaVersion = "2.7.15622"
 
 dependencies {
@@ -117,17 +117,17 @@ dependencies {
     implementation("io.quarkus:quarkus-smallrye-health")    // /q/health readiness + liveness probes
     implementation("org.flywaydb:flyway-database-postgresql")
     // JDBI — framework-agnostic, wires against any DataSource
-    implementation("org.jdbi:jdbi3-core:3.54.0")
-    implementation("org.jdbi:jdbi3-sqlobject:3.54.0")
+    implementation("org.jdbi:jdbi3-core:3.55.0")
+    implementation("org.jdbi:jdbi3-sqlobject:3.55.0")
 
     // Gson — used by GithubApiClient
     implementation("com.google.code.gson:gson:$gsonVersion")
 
     // SnakeYAML Engine — used by MapNameReader to parse map.yml files
-    implementation("org.snakeyaml:snakeyaml-engine:3.1.1")
+    implementation("org.snakeyaml:snakeyaml-engine:3.2")
 
     // Annotations previously pulled in transitively by DropWizard
-    implementation("com.google.guava:guava:33.7.1-jre")           // @VisibleForTesting
+    implementation("com.google.guava:guava:33.7.2-jre")           // @VisibleForTesting
     implementation("com.google.code.findbugs:jsr305:3.0.2")      // @Nonnull
 
     // TripleA shared libraries
