@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Map Tags Admin</title>
+  <script src="/support/htmx.min.js"></script>
+  <style>
+    body { font-family: sans-serif; margin: 1em; max-width: 900px; }
+    h1 { margin-bottom: 0.2em; }
+    .nav { margin-bottom: 1em; }
+    #tag-list { border: 1px solid #ccc; padding: 0.5em; }
+    .tag-row { padding: 0.25em 0; }
+    form.inline { display: flex; gap: 0.5em; align-items: center; margin: 0; }
+    form.inline input[type=text] { flex: 1; }
+    button { cursor: pointer; }
+    button.danger { color: #a00; }
+    .empty { color: #888; font-style: italic; padding: 0.5em; }
+    .add-tag { margin-top: 1.5em; padding: 1em; border: 1px solid #ccc; background: #fafafa; }
+  </style>
+</head>
+<body>
+  {#navHeader identity=identity path="/support/admin/map/tags" /}
+
+  <h1>Map Tags</h1>
+  <div class="nav"><a href="/support/maps/status">&larr; Maps status</a></div>
+
+  {!
+    HTMX swaps the tag row for rename and the whole list (#tag-list) for add / delete / move.
+    Each mutating control keeps its `action`/`formaction` for the no-JavaScript fallback
+    (full-page POST -> 303), and layers `hx-*` on top. The wrapper element lives *inside* its
+    fragment so an outerHTML swap replaces it with a new element of the same id.
+  !}
+  {#fragment id="tagList"}
+    <div id="tag-list">
+      {#if tags.isEmpty}
+        <p class="empty">No tags defined yet. Add one below.</p>
+      {/if}
+
+      {#for tag in tags}
+        {#fragment id="tagRow"}
+          <form method="post" class="inline tag-row" id="tag-{tag.id}">
+            <input type="hidden" name="_csrf" value="{csrfToken}">
+            <input type="text" name="name" value="{tag.name}" required>
+            <button formaction="/support/admin/map/tags/tag/{tag.id}/rename"
+                    hx-post="/support/admin/map/tags/tag/{tag.id}/rename"
+                    hx-target="closest form" hx-swap="outerHTML">Rename</button>
+            <button formaction="/support/admin/map/tags/tag/{tag.id}/move"
+                    name="direction" value="up" title="Move up"
+                    hx-post="/support/admin/map/tags/tag/{tag.id}/move"
+                    hx-target="#tag-list" hx-swap="outerHTML">&uarr;</button>
+            <button formaction="/support/admin/map/tags/tag/{tag.id}/move"
+                    name="direction" value="down" title="Move down"
+                    hx-post="/support/admin/map/tags/tag/{tag.id}/move"
+                    hx-target="#tag-list" hx-swap="outerHTML">&darr;</button>
+            <button formaction="/support/admin/map/tags/tag/{tag.id}/delete"
+                    class="danger"
+                    hx-post="/support/admin/map/tags/tag/{tag.id}/delete"
+                    hx-target="#tag-list" hx-swap="outerHTML"
+                    hx-confirm="Delete this tag?">
+              Delete
+            </button>
+          </form>
+        {/fragment}
+      {/for}
+    </div>
+  {/fragment}
+
+  <section class="add-tag">
+    <form method="post" action="/support/admin/map/tags/tag" class="inline"
+          hx-post="/support/admin/map/tags/tag"
+          hx-target="#tag-list" hx-swap="outerHTML"
+          hx-on::after-request="if(event.detail.successful) this.reset()">
+      <input type="hidden" name="_csrf" value="{csrfToken}">
+      <label>New tag:</label>
+      <input type="text" name="name" placeholder="e.g. naval" required>
+      <button>Add tag</button>
+    </form>
+  </section>
+</body>
+</html>

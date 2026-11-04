@@ -3,5 +3,7 @@
 delete from map_index_attribute;
 delete from map_attribute_value;
 delete from map_attribute;
+delete from map_index_tag;
+delete from map_tag;
 delete from map_index;
 delete from map_indexing_status;

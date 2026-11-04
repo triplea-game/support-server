@@ -11,10 +11,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.triplea.DbOnlyExtension;
 import org.triplea.http.client.lobby.maps.listing.MapTag;
+import org.triplea.services.maps.tags.MapTagDao;
 
 /// Read/write tests for the status page's map-attribute access. Seeds one map (id 10) assigned
 /// era=ancient (attribute 3300 -> value 100) and difficulty=easy (attribute 8800 -> value 200);
-/// the catalog also holds era values 101/102 and difficulty value 201 to switch between.
+/// the catalog also holds era values 101/102 and difficulty value 201 to switch between. The tag
+/// tests add `map_index_tags.yml`: map 10 has tags 7100 and 7200, tag 7300 is unassigned.
 @DataSet(value = "map_status.yml", useSequenceFiltering = false)
 @QuarkusTest
 @ExtendWith(DbOnlyExtension.class)
@@ -22,9 +24,11 @@ import org.triplea.http.client.lobby.maps.listing.MapTag;
 class MapStatusDaoTest {
 
   private final MapStatusDao dao;
+  private final MapTagDao tagDao;
 
   MapStatusDaoTest(final Jdbi jdbi) {
     this.dao = new MapStatusDao(jdbi);
+    this.tagDao = new MapTagDao(jdbi);
   }
 
   @Test
@@ -101,5 +105,59 @@ class MapStatusDaoTest {
     var map = dao.listMapsWithAttributes().get(0);
     assertThat(map.adminEnabled()).isTrue();
     assertThat(map.adminDisableReason()).isNull();
+  }
+
+  @Test
+  void mapWithoutTagsHasNoTagIds() {
+    assertThat(dao.listMapsWithAttributes().get(0).tagIds()).isEmpty();
+  }
+
+  @Test
+  @DataSet(value = "map_status.yml,map_index_tags.yml", useSequenceFiltering = false)
+  void listReturnsTagIds() {
+    assertThat(dao.listMapsWithAttributes().get(0).tagIds()).containsExactlyInAnyOrder(7100, 7200);
+  }
+
+  @Test
+  @DataSet(value = "map_status.yml,map_index_tags.yml", useSequenceFiltering = false)
+  void addTagFindsTheTagByNameInAnyCase() {
+    dao.addTag(10, "World War 2");
+
+    assertThat(dao.listMapsWithAttributes().get(0).tagIds())
+        .containsExactlyInAnyOrder(7100, 7200, 7300);
+  }
+
+  @Test
+  @DataSet(value = "map_status.yml,map_index_tags.yml", useSequenceFiltering = false)
+  void addTagWithUnknownNameIsNoOp() {
+    dao.addTag(10, "no such tag");
+
+    assertThat(dao.listMapsWithAttributes().get(0).tagIds()).containsExactlyInAnyOrder(7100, 7200);
+  }
+
+  @Test
+  @DataSet(value = "map_status.yml,map_index_tags.yml", useSequenceFiltering = false)
+  void addingATagTwiceKeepsOne() {
+    dao.addTag(10, "world war 2");
+    dao.addTag(10, "world war 2");
+
+    assertThat(dao.listMapsWithAttributes().get(0).tagIds())
+        .containsExactlyInAnyOrder(7100, 7200, 7300);
+  }
+
+  @Test
+  @DataSet(value = "map_status.yml,map_index_tags.yml", useSequenceFiltering = false)
+  void removeTagRemovesOnlyThatTag() {
+    dao.removeTag(10, 7100);
+
+    assertThat(dao.listMapsWithAttributes().get(0).tagIds()).containsExactly(7200);
+  }
+
+  @Test
+  @DataSet(value = "map_status.yml,map_index_tags.yml", useSequenceFiltering = false)
+  void deletingATagRemovesItFromMaps() {
+    tagDao.deleteTag(7100);
+
+    assertThat(dao.listMapsWithAttributes().get(0).tagIds()).containsExactly(7200);
   }
 }

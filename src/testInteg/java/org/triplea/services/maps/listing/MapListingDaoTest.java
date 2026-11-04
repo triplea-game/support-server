@@ -53,4 +53,19 @@ class MapListingDaoTest {
     // returns nothing.
     assertThat(mapListingDao.fetchMapListings()).isEmpty();
   }
+
+  @Test
+  @DataSet(
+      value = "map_index.yml,map_attributes.yml,map_index_tags.yml",
+      useSequenceFiltering = false)
+  void tagsFollowTheAttributesInTagListOrder() {
+    var mapTags = mapListingDao.fetchMapListings().get(0).getMapTags();
+
+    assertThat(mapTags)
+        .containsExactly(
+            MapTag.builder().name("era").value("ancient").build(),
+            MapTag.builder().name("difficulty").value("easy").build(),
+            MapTag.builder().name("Tags").value("fantasy").displayOrder(10).build(),
+            MapTag.builder().name("Tags").value("naval").displayOrder(20).build());
+  }
 }

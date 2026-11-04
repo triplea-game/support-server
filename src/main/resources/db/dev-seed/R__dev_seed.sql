@@ -4,7 +4,7 @@
 -- Truncate + reinsert so `just up-auth` always boots into a known seed state, even
 -- when the testcontainers Postgres is reused across restarts.
 
-truncate table map_index_attribute, map_index, map_attribute_value, map_attribute restart identity cascade;
+truncate table map_index_attribute, map_index_tag, map_index, map_attribute_value, map_attribute, map_tag restart identity cascade;
 truncate table map_indexing_status restart identity;
 truncate table error_report_history restart identity;
 
@@ -93,6 +93,24 @@ join (values
         ('World War II Global', 'hard')
      ) as t(map_name, attribute_value) on mi.map_name = t.map_name
 join map_attribute_value av on av.value = t.attribute_value;
+
+-- The tag list (display_order steps by 10, as the tags admin page appends) and each map's tags.
+insert into map_tag (name, display_order) values
+  ('Beginner friendly', 0),
+  ('WW2',               10),
+  ('Naval',             20);
+
+insert into map_index_tag (map_index_id, map_tag_id)
+select mi.id, mt.id
+from map_index mi
+join (values
+        ('270 BC',              'Beginner friendly'),
+        ('270 BC',              'Naval'),
+        ('Medieval',            'Beginner friendly'),
+        ('World War II Global', 'WW2'),
+        ('World War II Global', 'Naval')
+     ) as t(map_name, tag_name) on mi.map_name = t.map_name
+join map_tag mt on mt.name = t.tag_name;
 
 -- Indexing-status audit rows mirroring the seeded maps: the enabled maps indexed successfully;
 -- the disabled napoleonic_empires repo errored (repo_name is the repo's last path segment, as the

@@ -9,21 +9,24 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.List;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.triplea.DbOnlyExtension;
 
-/// End-to-end tests for the status page's MapAdmin attribute-edit endpoint
-/// (`POST /support/maps/status/{mapId}/attribute/{attributeId}`).
+/// End-to-end tests for the status page's MapAdmin edit endpoints
+/// (`POST /support/maps/status/{mapId}/attribute/{attributeId}`, `.../{mapId}/tags/add`,
+/// `.../{mapId}/tags/{tagId}/remove` and the admin enable/disable).
 ///
 /// Covers HTMX behaviour (a POST carrying `HX-Request` returns the re-rendered attributes `<td>`
 /// fragment, never a full document; without it, the no-JS `303` redirect) and authorization (the
 /// public GET is open, but the mutation is MapAdmin-only and CSRF-protected).
 ///
 /// Seeds map 10 with era=ancient (attribute 3300 -> value 100) and difficulty=easy (8800 -> 200);
-/// the catalog also has difficulty value 201 ("hard"). Every test re-seeds, so order is irrelevant.
+/// the catalog also has difficulty value 201 ("hard"). The tag tests add `map_index_tags.yml`: map
+/// 10 has tags 7100 and 7200, tag 7300 is unassigned. Every test re-seeds, so order is irrelevant.
 @DataSet(value = "map_status.yml", useSequenceFiltering = false)
 @QuarkusTest
 @ExtendWith(DbOnlyExtension.class)
@@ -35,6 +38,8 @@ class MapsStatusWriteIntegrationTest {
   private static final String CLEAR_ERA = PATH + "/10/attribute/3300";
   private static final String ADMIN_DISABLE = PATH + "/10/admin-disable";
   private static final String ADMIN_ENABLE = PATH + "/10/admin-enable";
+  private static final String ADD_TAG = PATH + "/10/tags/add";
+  private static final String REMOVE_NAVAL = PATH + "/10/tags/7100/remove";
 
   @ConfigProperty(name = "quarkus.http.test-port", defaultValue = "8081")
   int testPort;
@@ -158,6 +163,77 @@ class MapsStatusWriteIntegrationTest {
             .build();
 
     assertThat(send(request).statusCode()).isEqualTo(403);
+  }
+
+  @Test
+  @DataSet(value = "map_status.yml,map_index_tags.yml", useSequenceFiltering = false)
+  void addTagViaHtmxReturnsOnlyTheCellWithTheNewChip() throws Exception {
+    var response = postHtmx(ADD_TAG, "tagName=+World+War+2+"); // trimmed, any case
+
+    assertThat(response.statusCode()).isEqualTo(200);
+    String body = response.body();
+    assertThat(body).doesNotContain("<!DOCTYPE", "<html", "<table");
+    assertThat(body).contains("id=\"map-tags-10\"");
+    assertThat(body)
+        .contains(
+            "aria-label=\"Remove tag world war 2\"",
+            "aria-label=\"Remove tag naval\"",
+            "aria-label=\"Remove tag fantasy\"");
+    assertThat(body).contains("name=\"tagName\"").doesNotContain("World War 2");
+  }
+
+  @Test
+  @DataSet(value = "map_status.yml,map_index_tags.yml", useSequenceFiltering = false)
+  void removeTagViaHtmxDropsTheChip() throws Exception {
+    var response = postHtmx(REMOVE_NAVAL, null);
+
+    assertThat(response.statusCode()).isEqualTo(200);
+    String body = response.body();
+    assertThat(body).contains("id=\"map-tags-10\"");
+    assertThat(body).contains("aria-label=\"Remove tag fantasy\"");
+    assertThat(body).doesNotContain("Remove tag naval");
+  }
+
+  @Test
+  @DataSet(value = "map_status.yml,map_index_tags.yml", useSequenceFiltering = false)
+  void tagEditsWithoutHxRequestHeaderRedirect() throws Exception {
+    for (var post :
+        List.of(buildPost(ADD_TAG, "tagName=naval", false), buildPost(REMOVE_NAVAL, null, false))) {
+      var response = send(post);
+
+      assertThat(response.statusCode()).as(post.uri().getPath()).isEqualTo(303);
+      assertThat(response.headers().firstValue("location").orElseThrow()).endsWith(PATH);
+    }
+  }
+
+  @Test
+  void anonymousCannotEditTags() throws Exception {
+    for (String path : List.of(ADD_TAG, REMOVE_NAVAL)) {
+      var request =
+          HttpRequest.newBuilder()
+              .uri(URI.create(baseUrl + path))
+              .header("Content-Type", "application/x-www-form-urlencoded")
+              .POST(HttpRequest.BodyPublishers.ofString("tagName=naval"))
+              .build();
+
+      assertThat(send(request).statusCode()).as(path).isEqualTo(401);
+    }
+  }
+
+  @Test
+  void mapAdminCannotEditTagsWithoutCsrfToken() throws Exception {
+    for (String path : List.of(ADD_TAG, REMOVE_NAVAL)) {
+      var request =
+          HttpRequest.newBuilder()
+              .uri(URI.create(baseUrl + path))
+              .header("Content-Type", "application/x-www-form-urlencoded")
+              .header("X-Auth-Email", "mapadmin@example.com")
+              .header("X-Auth-Groups", mapAdminGroup)
+              .POST(HttpRequest.BodyPublishers.ofString("tagName=naval"))
+              .build();
+
+      assertThat(send(request).statusCode()).as(path).isEqualTo(403);
+    }
   }
 
   // --- helpers: a MapAdmin POST carrying a valid double-submit CSRF token (cookie + field) ---
