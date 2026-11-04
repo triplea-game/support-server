@@ -12,53 +12,80 @@ import org.triplea.http.client.lobby.maps.listing.MapTag;
 public class MapListingDao {
   private final Jdbi jdbi;
 
+  /// Enabled maps (newest commit first), each with its attribute tags and then its tags of the tag
+  /// list, in tag-list order, each as a `MapTag` named "Tags".
   List<MapDownloadItem> fetchMapListings() {
     return jdbi.withHandle(
-        handle ->
-            handle
-                .createQuery(
-                    """
-                        select
-                          m.id,
-                          m.map_name,
-                          m.download_url,
-                          m.download_size_bytes,
-                          m.preview_image_url,
-                          m.description,
-                          m.last_commit_date,
-                          v.value attribute_value,
-                          a.name  attribute_name
-                        from map_index m
-                        left join map_index_attribute mia on mia.map_index_id = m.id
-                        left join map_attribute_value v on v.id = mia.map_attribute_value_id
-                        left join map_attribute a on a.id = mia.map_attribute_id
-                        where m.enabled and m.admin_enabled
-                        order by m.last_commit_date desc, m.map_name, a.display_order, v.display_order
-                        """)
-                .registerRowMapper(BeanMapper.factory(MapListingRecord.class))
-                .registerRowMapper(BeanMapper.factory(MapTag.class))
-                .reduceRows(
-                    new LinkedHashMap<Long, MapListingRecord>(),
-                    (accumulator, rowView) -> {
-                      var listing =
-                          accumulator.computeIfAbsent(
-                              rowView.getColumn("id", Long.class),
-                              id -> rowView.getRow(MapListingRecord.class));
+        handle -> {
+          var listings =
+              handle
+                  .createQuery(
+                      """
+                      select
+                        m.id,
+                        m.map_name,
+                        m.download_url,
+                        m.download_size_bytes,
+                        m.preview_image_url,
+                        m.description,
+                        m.last_commit_date,
+                        v.value attribute_value,
+                        a.name  attribute_name
+                      from map_index m
+                      left join map_index_attribute mia on mia.map_index_id = m.id
+                      left join map_attribute_value v on v.id = mia.map_attribute_value_id
+                      left join map_attribute a on a.id = mia.map_attribute_id
+                      where m.enabled and m.admin_enabled
+                      order by m.last_commit_date desc, m.map_name, a.display_order, v.display_order
+                      """)
+                  .registerRowMapper(BeanMapper.factory(MapListingRecord.class))
+                  .registerRowMapper(BeanMapper.factory(MapTag.class))
+                  .reduceRows(
+                      new LinkedHashMap<Long, MapListingRecord>(),
+                      (accumulator, rowView) -> {
+                        var listing =
+                            accumulator.computeIfAbsent(
+                                rowView.getColumn("id", Long.class),
+                                id -> rowView.getRow(MapListingRecord.class));
 
-                      if (rowView.getColumn("attribute_value", String.class) != null) {
-                        listing
-                            .getTags()
-                            .add(
-                                MapTag.builder()
-                                    .name(rowView.getColumn("attribute_name", String.class))
-                                    .value(rowView.getColumn("attribute_value", String.class))
-                                    .build());
-                      }
-                      return accumulator;
-                    })
-                .values()
-                .stream()
-                .map(MapListingRecord::toMapDownloadItem)
-                .toList());
+                        if (rowView.getColumn("attribute_value", String.class) != null) {
+                          listing
+                              .getTags()
+                              .add(
+                                  MapTag.builder()
+                                      .name(rowView.getColumn("attribute_name", String.class))
+                                      .value(rowView.getColumn("attribute_value", String.class))
+                                      .build());
+                        }
+                        return accumulator;
+                      });
+
+          handle
+              .createQuery(
+                  """
+                  select mit.map_index_id, t.name, t.display_order
+                  from map_index_tag mit
+                  join map_tag t on t.id = mit.map_tag_id
+                  order by t.display_order, t.id
+                  """)
+              .reduceRows(
+                  listings,
+                  (accumulator, rowView) -> {
+                    var listing = accumulator.get(rowView.getColumn("map_index_id", Long.class));
+                    if (listing != null) { // null: the map is not listed
+                      listing
+                          .getTags()
+                          .add(
+                              MapTag.builder()
+                                  .name("Tags")
+                                  .value(rowView.getColumn("name", String.class))
+                                  .displayOrder(rowView.getColumn("display_order", Integer.class))
+                                  .build());
+                    }
+                    return accumulator;
+                  });
+
+          return listings.values().stream().map(MapListingRecord::toMapDownloadItem).toList();
+        });
   }
 }

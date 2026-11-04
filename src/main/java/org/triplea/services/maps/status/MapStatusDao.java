@@ -4,12 +4,14 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import org.jdbi.v3.core.Jdbi;
 import org.triplea.http.client.lobby.maps.listing.MapTag;
 
-/// Reads maps together with their currently-assigned attribute values for the status page, and
-/// writes a single map's attribute assignment in `map_index_attribute`.
+/// Reads maps together with their currently-assigned attribute values and tags for the status page,
+/// and writes a single map's attribute assignment in `map_index_attribute` and its tags in
+/// `map_index_tag`.
 ///
 /// Each map holds at most one value per attribute dimension (the table's primary key is
 /// `(map_index_id, map_attribute_id)`), so a write is an upsert keyed on that pair and a clear is a
@@ -19,8 +21,9 @@ public class MapStatusDao {
 
   private final Jdbi jdbi;
 
-  /// All maps (newest commit first), each with its read-only tag list and its attribute->value
-  /// selections. Maps with no attributes still appear, with empty tags and selections.
+  /// All maps (newest commit first), each with its read-only tag list, its attribute->value
+  /// selections and the ids of its assigned tags. Maps with no attributes still appear, with empty
+  /// tags and selections.
   public List<MapStatusRow> listMapsWithAttributes() {
     return jdbi.withHandle(
         handle ->
@@ -38,6 +41,7 @@ public class MapStatusDao {
                       m.admin_enabled,
                       m.admin_disable_reason,
                       s.last_indexing_attempt last_indexed,
+                      array(select map_tag_id from map_index_tag where map_index_id = m.id) tag_ids,
                       a.id               attribute_id,
                       a.name             attribute_name,
                       v.id               value_id,
@@ -68,7 +72,8 @@ public class MapStatusDao {
                                       rowView.getColumn("admin_disable_reason", String.class),
                                       rowView.getColumn("last_indexed", Instant.class),
                                       new ArrayList<>(),
-                                      new LinkedHashMap<>()));
+                                      new LinkedHashMap<>(),
+                                      Set.of(rowView.getColumn("tag_ids", Integer[].class))));
 
                       Integer valueId = rowView.getColumn("value_id", Integer.class);
                       if (valueId != null) {
@@ -122,6 +127,28 @@ public class MapStatusDao {
                 .bind("mapId", mapId)
                 .bind("attributeId", attributeId)
                 .execute());
+  }
+
+  /// Replaces the map's tags with `tagIds` (empty clears them). Ids missing from `map_tag`, such as
+  /// a tag deleted after the page was rendered, are skipped.
+  public void setTags(long mapId, List<Integer> tagIds) {
+    jdbi.useTransaction(
+        handle -> {
+          handle
+              .createUpdate("delete from map_index_tag where map_index_id = :mapId")
+              .bind("mapId", mapId)
+              .execute();
+          handle
+              .createUpdate(
+                  """
+                  insert into map_index_tag (map_index_id, map_tag_id)
+                  select :mapId, id from map_tag where id = any(:tagIds)
+                  on conflict do nothing
+                  """)
+              .bind("mapId", mapId)
+              .bindArray("tagIds", Integer.class, tagIds)
+              .execute();
+        });
   }
 
   /// Admin-approves the map: sets `admin_enabled` and clears its disable reason. Independent of the

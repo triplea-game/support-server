@@ -30,7 +30,7 @@
   {!
     The shared nav header carries the auth control: anonymous callers see an admin login link,
     MapAdmins see logout. The GET itself stays public; `identity.mapAdmin` gates the edit controls
-    in the attributes column, whose POSTs are MapAdmin-only and CSRF-protected.
+    in the attributes and tags columns, whose POSTs are MapAdmin-only and CSRF-protected.
   !}
   {#navHeader identity=identity path="/support/maps/status" /}
 
@@ -39,7 +39,7 @@
   {#if identity.mapAdmin}
     <div class="mapadmin-tools" data-mapadmin-tools>
       Editing is enabled for your account. Change a map's attribute with the dropdowns below;
-      pick &mdash; none &mdash; to clear it.
+      pick &mdash; none &mdash; to clear it. In the tags list, Ctrl/Cmd-click selects several tags.
     </div>
   {/if}
 
@@ -55,6 +55,7 @@
         <th>Last Indexed</th>
         <th>Description</th>
         <th>Attributes</th>
+        <th>Tags</th>
       </tr>
     </thead>
     <tbody>
@@ -164,6 +165,45 @@
                   <ul class="tags">
                     {#for attribute in map.mapAttributes}
                       <li>{attribute.name}: {attribute.value}</li>
+                    {/for}
+                  </ul>
+                {/if}
+              {/if}
+            </td>
+          {/fragment}
+          {!
+            The tags cell works like the attributes cell: one multi-select posts every selected
+            `tagId` (none = clear) on change, and the response replaces the whole <td>.
+          !}
+          {#fragment id="mapTags"}
+            <td id="map-tags-{map.id}">
+              {#if identity.mapAdmin}
+                {#if tags.isEmpty}
+                  <span>No tags defined. <a href="/support/admin/map/tags">Manage tags</a></span>
+                {#else}
+                  <form method="post"
+                        action="/support/maps/status/{map.id}/tags"
+                        class="attr-row"
+                        hx-post="/support/maps/status/{map.id}/tags"
+                        hx-target="closest td" hx-swap="outerHTML"
+                        hx-trigger="change, submit">
+                    <input type="hidden" name="_csrf" value="{csrfToken}">
+                    <select name="tagId" multiple aria-label="Tags of {map.mapName}"
+                            title="Ctrl/Cmd-click selects several tags">
+                      {#for tag in tags}
+                        <option value="{tag.id}"{#if map.hasTag(tag.id)} selected{/if}>{tag.name}</option>
+                      {/for}
+                    </select>
+                    <button>Set</button>
+                  </form>
+                {/if}
+              {#else}
+                {#if map.tagIds.isEmpty}
+                  &mdash;
+                {#else}
+                  <ul class="tags">
+                    {#for tag in tags}
+                      {#if map.hasTag(tag.id)}<li>{tag.name}</li>{/if}
                     {/for}
                   </ul>
                 {/if}

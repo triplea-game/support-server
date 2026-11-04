@@ -15,15 +15,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.triplea.DbOnlyExtension;
 
-/// End-to-end tests for the status page's MapAdmin attribute-edit endpoint
-/// (`POST /support/maps/status/{mapId}/attribute/{attributeId}`).
+/// End-to-end tests for the status page's MapAdmin edit endpoints
+/// (`POST /support/maps/status/{mapId}/attribute/{attributeId}`, `.../{mapId}/tags` and the admin
+/// enable/disable).
 ///
 /// Covers HTMX behaviour (a POST carrying `HX-Request` returns the re-rendered attributes `<td>`
 /// fragment, never a full document; without it, the no-JS `303` redirect) and authorization (the
 /// public GET is open, but the mutation is MapAdmin-only and CSRF-protected).
 ///
 /// Seeds map 10 with era=ancient (attribute 3300 -> value 100) and difficulty=easy (8800 -> 200);
-/// the catalog also has difficulty value 201 ("hard"). Every test re-seeds, so order is irrelevant.
+/// the catalog also has difficulty value 201 ("hard"). The tag tests add `map_index_tags.yml`: map
+/// 10 has tags 7100 and 7200, tag 7300 is unassigned. Every test re-seeds, so order is irrelevant.
 @DataSet(value = "map_status.yml", useSequenceFiltering = false)
 @QuarkusTest
 @ExtendWith(DbOnlyExtension.class)
@@ -35,6 +37,7 @@ class MapsStatusWriteIntegrationTest {
   private static final String CLEAR_ERA = PATH + "/10/attribute/3300";
   private static final String ADMIN_DISABLE = PATH + "/10/admin-disable";
   private static final String ADMIN_ENABLE = PATH + "/10/admin-enable";
+  private static final String SET_TAGS = PATH + "/10/tags";
 
   @ConfigProperty(name = "quarkus.http.test-port", defaultValue = "8081")
   int testPort;
@@ -155,6 +158,65 @@ class MapsStatusWriteIntegrationTest {
             .header("X-Auth-Email", "mapadmin@example.com")
             .header("X-Auth-Groups", mapAdminGroup)
             .POST(HttpRequest.BodyPublishers.ofString("valueId=201"))
+            .build();
+
+    assertThat(send(request).statusCode()).isEqualTo(403);
+  }
+
+  @Test
+  @DataSet(value = "map_status.yml,map_index_tags.yml", useSequenceFiltering = false)
+  void setTagsViaHtmxReturnsOnlyTheCellWithBothTagsSelected() throws Exception {
+    var response = postHtmx(SET_TAGS, "tagId=7200&tagId=7300");
+
+    assertThat(response.statusCode()).isEqualTo(200);
+    String body = response.body();
+    assertThat(body).doesNotContain("<!DOCTYPE", "<html", "<table");
+    assertThat(body).contains("id=\"map-tags-10\"");
+    assertThat(body).contains("value=\"7200\" selected", "value=\"7300\" selected");
+    assertThat(body).doesNotContain("value=\"7100\" selected");
+  }
+
+  @Test
+  @DataSet(value = "map_status.yml,map_index_tags.yml", useSequenceFiltering = false)
+  void emptyTagsPostViaHtmxClearsTheTags() throws Exception {
+    var response = postHtmx(SET_TAGS, null);
+
+    assertThat(response.statusCode()).isEqualTo(200);
+    String body = response.body();
+    assertThat(body).contains("id=\"map-tags-10\"");
+    assertThat(body).doesNotContain("\" selected");
+  }
+
+  @Test
+  @DataSet(value = "map_status.yml,map_index_tags.yml", useSequenceFiltering = false)
+  void setTagsWithoutHxRequestHeaderRedirects() throws Exception {
+    var response = postNoHx(SET_TAGS, "tagId=7300");
+
+    assertThat(response.statusCode()).isEqualTo(303);
+    assertThat(response.headers().firstValue("location").orElseThrow()).endsWith(PATH);
+  }
+
+  @Test
+  void anonymousCannotSetTags() throws Exception {
+    var request =
+        HttpRequest.newBuilder()
+            .uri(URI.create(baseUrl + SET_TAGS))
+            .header("Content-Type", "application/x-www-form-urlencoded")
+            .POST(HttpRequest.BodyPublishers.ofString("tagId=7300"))
+            .build();
+
+    assertThat(send(request).statusCode()).isEqualTo(401);
+  }
+
+  @Test
+  void mapAdminCannotSetTagsWithoutCsrfToken() throws Exception {
+    var request =
+        HttpRequest.newBuilder()
+            .uri(URI.create(baseUrl + SET_TAGS))
+            .header("Content-Type", "application/x-www-form-urlencoded")
+            .header("X-Auth-Email", "mapadmin@example.com")
+            .header("X-Auth-Groups", mapAdminGroup)
+            .POST(HttpRequest.BodyPublishers.ofString("tagId=7300"))
             .build();
 
     assertThat(send(request).statusCode()).isEqualTo(403);

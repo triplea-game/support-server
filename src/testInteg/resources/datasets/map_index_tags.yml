@@ -1,0 +1,19 @@
+# Tag list plus the tags of map 10. Load after a dataset that seeds map 10 (e.g. map_status.yml).
+# Map 10 has 7100 "naval" (order 20) and 7200 "fantasy" (order 10), so id order and tag-list
+# order differ; 7300 "world war 2" (order 30) is unassigned.
+map_tag:
+  - id: 7100
+    name: naval
+    display_order: 20
+  - id: 7200
+    name: fantasy
+    display_order: 10
+  - id: 7300
+    name: world war 2
+    display_order: 30
+
+map_index_tag:
+  - map_index_id: 10
+    map_tag_id: 7100
+  - map_index_id: 10
+    map_tag_id: 7200

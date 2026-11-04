@@ -1,5 +1,6 @@
 Powers the "map tags" admin page where MapAdmins maintain one flat, ordered list
-of free map tags (e.g. "naval"). Assigning tags to maps comes later.
+of free map tags (e.g. "naval"). MapAdmins assign them to maps on the status page
+(`../status`); the map listing (`../listing`) sends each as a `MapTag` named "Tags".
 
 The page uses HTMX the same way as the map attributes page (see
 `../attributes/README.md`): each mutation posts in the background and swaps back

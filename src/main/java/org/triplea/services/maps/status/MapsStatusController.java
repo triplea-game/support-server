@@ -28,13 +28,15 @@ import org.triplea.services.auth.RequestIdentity;
 import org.triplea.services.auth.RequiresMapAdmin;
 import org.triplea.services.maps.attributes.AttributeWithValues;
 import org.triplea.services.maps.attributes.MapAttributeDao;
+import org.triplea.services.maps.tags.MapTagDao;
+import org.triplea.services.maps.tags.MapTagRow;
 
-/// Renders the public map status page: a listing of all indexed maps and their attributes.
+/// Renders the public map status page: a listing of all indexed maps, their attributes and tags.
 ///
-/// The GET render is public; the per-map attribute edit controls (one dropdown per dimension) are
-/// shown only to a MapAdmin. Setting/clearing a map's value runs through the single MapAdmin-only
+/// The GET render is public; the per-map edit controls (one dropdown per attribute dimension, one
+/// multi-select for the tags) are shown only to a MapAdmin. Each change runs through a MapAdmin
 /// mutation below, which — keyed off the `HX-Request` header HTMX sets — answers HTMX with the
-/// re-rendered attributes cell and a no-JavaScript client with the classic POST-redirect-GET.
+/// re-rendered cell and a no-JavaScript client with the classic POST-redirect-GET.
 ///
 /// The class is `@CsrfProtected` so the GET issues the CSRF cookie the edit forms need; the GET
 /// itself is a safe method and so bypasses the CSRF check.
@@ -51,11 +53,13 @@ public class MapsStatusController {
 
   private MapStatusDao statusDao;
   private MapAttributeDao attributeDao;
+  private MapTagDao tagDao;
 
   @PostConstruct
   void init() {
     statusDao = new MapStatusDao(jdbi);
     attributeDao = new MapAttributeDao(jdbi);
+    tagDao = new MapTagDao(jdbi);
   }
 
   @CheckedTemplate
@@ -63,6 +67,7 @@ public class MapsStatusController {
     public static native TemplateInstance statusPage(
         List<MapStatusItem> maps,
         List<AttributeWithValues> attributes,
+        List<MapTagRow> tags,
         String csrfToken,
         Identity identity);
 
@@ -76,6 +81,10 @@ public class MapsStatusController {
     /// One map's admin-approval `<td>` — the swap unit after an admin enable/disable.
     public static native TemplateInstance statusPage$adminStatus(
         MapStatusItem map, String csrfToken, Identity identity);
+
+    /// One map's tags `<td>` — the swap unit after its tags are saved.
+    public static native TemplateInstance statusPage$mapTags(
+        MapStatusItem map, List<MapTagRow> tags, String csrfToken, Identity identity);
   }
 
   @GET
@@ -83,7 +92,11 @@ public class MapsStatusController {
   public TemplateInstance statusPage() {
     var identity = requestIdentity.get();
     return Templates.statusPage(
-        loadMaps(), attributeDao.listAttributes(), csrfToken(identity), identity);
+        loadMaps(),
+        attributeDao.listAttributes(),
+        tagDao.listTags(),
+        csrfToken(identity),
+        identity);
   }
 
   @POST
@@ -101,6 +114,19 @@ public class MapsStatusController {
       statusDao.setAttribute(mapId, attributeId, Integer.parseInt(valueId.trim()));
     }
     return hxRequest.isBlank() ? redirectHome() : cellFragment(mapId);
+  }
+
+  /// Replaces the map's tags with the posted `tagId`s; none clears them.
+  @POST
+  @Path("{mapId}/tags")
+  @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+  @RequiresMapAdmin
+  public Response setMapTags(
+      @PathParam("mapId") long mapId,
+      @FormParam("tagId") List<Integer> tagIds,
+      @HeaderParam("HX-Request") @DefaultValue("") String hxRequest) {
+    statusDao.setTags(mapId, tagIds);
+    return hxRequest.isBlank() ? redirectHome() : tagsFragment(mapId);
   }
 
   /// Admin-disables a map. A reason is required (it's shown to map makers explaining why the map is
@@ -156,6 +182,20 @@ public class MapsStatusController {
             .findFirst()
             .orElseThrow(NotFoundException::new);
     return Response.ok(Templates.statusPage$adminStatus(map, csrfToken(identity), identity))
+        .type(MediaType.TEXT_HTML)
+        .build();
+  }
+
+  /// Re-renders just the map's tags cell for an HTMX `outerHTML` swap.
+  private Response tagsFragment(long mapId) {
+    var identity = requestIdentity.get();
+    var map =
+        loadMaps().stream()
+            .filter(m -> m.id() == mapId)
+            .findFirst()
+            .orElseThrow(NotFoundException::new);
+    return Response.ok(
+            Templates.statusPage$mapTags(map, tagDao.listTags(), csrfToken(identity), identity))
         .type(MediaType.TEXT_HTML)
         .build();
   }

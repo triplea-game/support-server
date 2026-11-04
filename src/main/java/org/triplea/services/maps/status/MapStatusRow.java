@@ -3,6 +3,7 @@ package org.triplea.services.maps.status;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.triplea.http.client.lobby.maps.listing.MapTag;
 
 /// A map and its currently-assigned attributes, as read for the status page.
@@ -13,6 +14,8 @@ import org.triplea.http.client.lobby.maps.listing.MapTag;
 ///
 /// `enabled`/`disableReason` are the indexer's health flag; `adminEnabled`/`adminDisableReason` are
 /// the independent MapAdmin approval flag. A map is publicly listed only when both are enabled.
+///
+/// `tagIds` are the ids of the map's tags from the `map_tag` list.
 public record MapStatusRow(
     long id,
     String mapName,
@@ -25,4 +28,5 @@ public record MapStatusRow(
     String adminDisableReason,
     Instant lastIndexed,
     List<MapTag> tags,
-    Map<Integer, Integer> selections) {}
+    Map<Integer, Integer> selections,
+    Set<Integer> tagIds) {}
