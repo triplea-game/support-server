@@ -4,21 +4,11 @@
 -- Truncate + reinsert so `just up-auth` always boots into a known seed state, even
 -- when the testcontainers Postgres is reused across restarts.
 
+-- The attribute tables are no longer seeded (tags replaced them) but still exist until a later
+-- release drops them; truncating them clears attributes a reused database still holds.
 truncate table map_index_attribute, map_index_tag, map_index, map_attribute_value, map_attribute, map_tag restart identity cascade;
 truncate table map_indexing_status restart identity;
 truncate table error_report_history restart identity;
-
-insert into map_attribute (name, display_order) values
-  ('era',        10),
-  ('difficulty', 20);
-
-insert into map_attribute_value (value, map_attribute_id, display_order) values
-  ('ancient',  (select id from map_attribute where name = 'era'),        1),
-  ('medieval', (select id from map_attribute where name = 'era'),        2),
-  ('modern',   (select id from map_attribute where name = 'era'),        3),
-  ('easy',     (select id from map_attribute where name = 'difficulty'), 1),
-  ('medium',   (select id from map_attribute where name = 'difficulty'), 2),
-  ('hard',     (select id from map_attribute where name = 'difficulty'), 3);
 
 insert into map_index (
   map_name, last_commit_date, repo_url, preview_image_url,
@@ -52,7 +42,7 @@ insert into map_index (
 -- A map that failed to index: present but disabled, with the indexing error captured in
 -- disable_reason. This mirrors what MapIndexingTaskRunner writes on an IndexingException for a
 -- never-successfully-indexed repo (map name falls back to the repo name, size 0). It has no
--- attributes and is hidden from the public download listing, but shows on the status page with
+-- tags and is hidden from the public download listing, but shows on the status page with
 -- its error reason.
 insert into map_index (
   map_name, last_commit_date, repo_url, preview_image_url,
@@ -80,19 +70,6 @@ The file might not exist, or the attribute might not exist in the file (check sp
 --   napoleonic_empires   indexer-disabled + admin-approved -> hidden by the indexer
 update map_index set admin_enabled = false, admin_disable_reason = 'pending approval'
 where map_name = 'Medieval';
-
-insert into map_index_attribute (map_index_id, map_attribute_id, map_attribute_value_id)
-select mi.id, av.map_attribute_id, av.id
-from map_index mi
-join (values
-        ('270 BC',              'ancient'),
-        ('270 BC',              'medium'),
-        ('Medieval',            'medieval'),
-        ('Medieval',            'easy'),
-        ('World War II Global', 'modern'),
-        ('World War II Global', 'hard')
-     ) as t(map_name, attribute_value) on mi.map_name = t.map_name
-join map_attribute_value av on av.value = t.attribute_value;
 
 -- The tag list (display_order steps by 10, as the tags admin page appends) and each map's tags.
 insert into map_tag (name, display_order) values

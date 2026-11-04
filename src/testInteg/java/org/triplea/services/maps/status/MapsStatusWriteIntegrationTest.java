@@ -17,16 +17,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.triplea.DbOnlyExtension;
 
 /// End-to-end tests for the status page's MapAdmin edit endpoints
-/// (`POST /support/maps/status/{mapId}/attribute/{attributeId}`, `.../{mapId}/tags/add`,
-/// `.../{mapId}/tags/{tagId}/remove` and the admin enable/disable).
+/// (`POST /support/maps/status/{mapId}/tags/add`, `.../{mapId}/tags/{tagId}/remove` and the admin
+/// enable/disable).
 ///
-/// Covers HTMX behaviour (a POST carrying `HX-Request` returns the re-rendered attributes `<td>`
-/// fragment, never a full document; without it, the no-JS `303` redirect) and authorization (the
-/// public GET is open, but the mutation is MapAdmin-only and CSRF-protected).
+/// Covers HTMX behaviour (a POST carrying `HX-Request` returns the re-rendered `<td>` fragment,
+/// never a full document; without it, the no-JS `303` redirect) and authorization (the public GET
+/// is open, but the mutation is MapAdmin-only and CSRF-protected).
 ///
-/// Seeds map 10 with era=ancient (attribute 3300 -> value 100) and difficulty=easy (8800 -> 200);
-/// the catalog also has difficulty value 201 ("hard"). The tag tests add `map_index_tags.yml`: map
-/// 10 has tags 7100 and 7200, tag 7300 is unassigned. Every test re-seeds, so order is irrelevant.
+/// Seeds map 10. The tag tests add `map_index_tags.yml`: map 10 has tags 7100 and 7200, tag 7300 is
+/// unassigned. Every test re-seeds, so order is irrelevant.
 @DataSet(value = "map_status.yml", useSequenceFiltering = false)
 @QuarkusTest
 @ExtendWith(DbOnlyExtension.class)
@@ -34,8 +33,6 @@ import org.triplea.DbOnlyExtension;
 class MapsStatusWriteIntegrationTest {
 
   private static final String PATH = "/support/maps/status";
-  private static final String SET_DIFFICULTY = PATH + "/10/attribute/8800";
-  private static final String CLEAR_ERA = PATH + "/10/attribute/3300";
   private static final String ADMIN_DISABLE = PATH + "/10/admin-disable";
   private static final String ADMIN_ENABLE = PATH + "/10/admin-enable";
   private static final String ADD_TAG = PATH + "/10/tags/add";
@@ -54,48 +51,6 @@ class MapsStatusWriteIntegrationTest {
   void setUp() {
     httpClient = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NEVER).build();
     baseUrl = "http://localhost:" + testPort;
-  }
-
-  @Test
-  void setAttributeViaHtmxReturnsOnlyTheCellWithNewSelection() throws Exception {
-    var response = postHtmx(SET_DIFFICULTY, "valueId=201"); // difficulty -> hard
-
-    assertThat(response.statusCode()).isEqualTo(200);
-    String body = response.body();
-    assertThat(body).doesNotContain("<!DOCTYPE", "<html", "<table");
-    assertThat(body).contains("id=\"map-attributes-10\"");
-    assertThat(body).contains("value=\"201\" selected"); // hard is now the chosen option
-    assertThat(body).doesNotContain("value=\"200\" selected"); // easy no longer chosen
-  }
-
-  @Test
-  void clearAttributeViaHtmxLeavesNoValueSelected() throws Exception {
-    var response = postHtmx(CLEAR_ERA, "valueId="); // era -> none
-
-    assertThat(response.statusCode()).isEqualTo(200);
-    String body = response.body();
-    assertThat(body).contains("id=\"map-attributes-10\"");
-    assertThat(body).doesNotContain("value=\"100\" selected"); // ancient no longer chosen
-  }
-
-  @Test
-  void withoutHxRequestHeaderTheEndpointRedirects() throws Exception {
-    var response = postNoHx(SET_DIFFICULTY, "valueId=201");
-
-    assertThat(response.statusCode()).isEqualTo(303);
-    assertThat(response.headers().firstValue("location").orElseThrow()).endsWith(PATH);
-  }
-
-  @Test
-  void anonymousIsRejected() throws Exception {
-    var request =
-        HttpRequest.newBuilder()
-            .uri(URI.create(baseUrl + SET_DIFFICULTY))
-            .header("Content-Type", "application/x-www-form-urlencoded")
-            .POST(HttpRequest.BodyPublishers.ofString("valueId=201"))
-            .build();
-
-    assertThat(send(request).statusCode()).isEqualTo(401);
   }
 
   @Test
@@ -149,20 +104,6 @@ class MapsStatusWriteIntegrationTest {
             .build();
 
     assertThat(send(request).statusCode()).isEqualTo(401);
-  }
-
-  @Test
-  void mapAdminWithoutCsrfTokenIsRejected() throws Exception {
-    var request =
-        HttpRequest.newBuilder()
-            .uri(URI.create(baseUrl + SET_DIFFICULTY))
-            .header("Content-Type", "application/x-www-form-urlencoded")
-            .header("X-Auth-Email", "mapadmin@example.com")
-            .header("X-Auth-Groups", mapAdminGroup)
-            .POST(HttpRequest.BodyPublishers.ofString("valueId=201"))
-            .build();
-
-    assertThat(send(request).statusCode()).isEqualTo(403);
   }
 
   @Test

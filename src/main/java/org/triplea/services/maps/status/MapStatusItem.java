@@ -2,16 +2,9 @@ package org.triplea.services.maps.status;
 
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import org.triplea.http.client.lobby.maps.listing.MapTag;
 
-/// View model for one map row on the status page.
-///
-/// `mapAttributes` is the read-only `name: value` list shown to everyone; `selections` (attribute
-/// id -> value id) backs the MapAdmin edit dropdowns via [#isSelected] / [#hasAttribute]; `tagIds`
-/// marks the map's tags via [#hasTag].
+/// View model for one map row on the status page. `tagIds` marks the map's tags via [#hasTag].
 public record MapStatusItem(
     long id,
     String mapName,
@@ -23,8 +16,6 @@ public record MapStatusItem(
     boolean adminEnabled,
     String adminDisableReason,
     String lastIndexed,
-    List<MapTag> mapAttributes,
-    Map<Integer, Integer> selections,
     Set<Integer> tagIds) {
 
   private static final DateTimeFormatter FORMATTER =
@@ -42,8 +33,6 @@ public record MapStatusItem(
         row.adminEnabled(),
         row.adminDisableReason(),
         row.lastIndexed() == null ? "Never" : FORMATTER.format(row.lastIndexed()),
-        row.tags(),
-        row.selections(),
         row.tagIds());
   }
 
@@ -55,16 +44,6 @@ public record MapStatusItem(
   /// Human-readable label for the Admin column: "Approved" when admin-enabled, else "Disabled".
   public String adminEnabledLabel() {
     return adminEnabled ? "Approved" : "Disabled";
-  }
-
-  /// True when this map's value for `attributeId` is `valueId` (marks the chosen `<option>`).
-  public boolean isSelected(int attributeId, int valueId) {
-    return selections.getOrDefault(attributeId, Integer.MIN_VALUE) == valueId;
-  }
-
-  /// True when this map has any value for `attributeId` (i.e. the "— none —" option is not chosen).
-  public boolean hasAttribute(int attributeId) {
-    return selections.containsKey(attributeId);
   }
 
   /// True when the map has the tag `tagId` (marks the chosen `<option>`).

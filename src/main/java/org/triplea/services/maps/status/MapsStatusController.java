@@ -26,17 +26,15 @@ import org.triplea.services.auth.CsrfTokenProvider;
 import org.triplea.services.auth.Identity;
 import org.triplea.services.auth.RequestIdentity;
 import org.triplea.services.auth.RequiresMapAdmin;
-import org.triplea.services.maps.attributes.AttributeWithValues;
-import org.triplea.services.maps.attributes.MapAttributeDao;
 import org.triplea.services.maps.tags.MapTagDao;
 import org.triplea.services.maps.tags.MapTagRow;
 
-/// Renders the public map status page: a listing of all indexed maps, their attributes and tags.
+/// Renders the public map status page: a listing of all indexed maps and their tags.
 ///
-/// The GET render is public; the per-map edit controls (one dropdown per attribute dimension, tag
-/// chips with a remove button and an add-tag input) are shown only to a MapAdmin. Each change runs
-/// through a MapAdmin mutation below, which, keyed off the `HX-Request` header HTMX sets, answers
-/// HTMX with the re-rendered cell and a no-JavaScript client with the classic POST-redirect-GET.
+/// The GET render is public; the per-map edit controls (tag chips with a remove button, an add-tag
+/// input and the admin approval) are shown only to a MapAdmin. Each change runs through a MapAdmin
+/// mutation below, which, keyed off the `HX-Request` header HTMX sets, answers HTMX with the
+/// re-rendered cell and a no-JavaScript client with the classic POST-redirect-GET.
 ///
 /// The class is `@CsrfProtected` so the GET issues the CSRF cookie the edit forms need; the GET
 /// itself is a safe method and so bypasses the CSRF check.
@@ -52,31 +50,18 @@ public class MapsStatusController {
   @Inject RequestIdentity requestIdentity;
 
   private MapStatusDao statusDao;
-  private MapAttributeDao attributeDao;
   private MapTagDao tagDao;
 
   @PostConstruct
   void init() {
     statusDao = new MapStatusDao(jdbi);
-    attributeDao = new MapAttributeDao(jdbi);
     tagDao = new MapTagDao(jdbi);
   }
 
   @CheckedTemplate
   public static class Templates {
     public static native TemplateInstance statusPage(
-        List<MapStatusItem> maps,
-        List<AttributeWithValues> attributes,
-        List<MapTagRow> tags,
-        String csrfToken,
-        Identity identity);
-
-    /// One map's attributes `<td>` — the swap unit after a set/clear.
-    public static native TemplateInstance statusPage$mapAttributes(
-        MapStatusItem map,
-        List<AttributeWithValues> attributes,
-        String csrfToken,
-        Identity identity);
+        List<MapStatusItem> maps, List<MapTagRow> tags, String csrfToken, Identity identity);
 
     /// One map's admin-approval `<td>` — the swap unit after an admin enable/disable.
     public static native TemplateInstance statusPage$adminStatus(
@@ -91,29 +76,7 @@ public class MapsStatusController {
   @Produces(MediaType.TEXT_HTML)
   public TemplateInstance statusPage() {
     var identity = requestIdentity.get();
-    return Templates.statusPage(
-        loadMaps(),
-        attributeDao.listAttributes(),
-        tagDao.listTags(),
-        csrfToken(identity),
-        identity);
-  }
-
-  @POST
-  @Path("{mapId}/attribute/{attributeId}")
-  @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-  @RequiresMapAdmin
-  public Response setMapAttribute(
-      @PathParam("mapId") long mapId,
-      @PathParam("attributeId") int attributeId,
-      @FormParam("valueId") @DefaultValue("") String valueId,
-      @HeaderParam("HX-Request") @DefaultValue("") String hxRequest) {
-    if (valueId.isBlank()) {
-      statusDao.clearAttribute(mapId, attributeId);
-    } else {
-      statusDao.setAttribute(mapId, attributeId, Integer.parseInt(valueId.trim()));
-    }
-    return hxRequest.isBlank() ? redirectHome() : cellFragment(mapId);
+    return Templates.statusPage(loadMaps(), tagDao.listTags(), csrfToken(identity), identity);
   }
 
   /// Adds the tag named `tagName` (trimmed, any case) to the map; an unknown name is ignored.
@@ -170,21 +133,6 @@ public class MapsStatusController {
     return hxRequest.isBlank() ? redirectHome() : adminFragment(mapId);
   }
 
-  /// Re-renders just the edited map's attributes cell for an HTMX `outerHTML` swap.
-  private Response cellFragment(long mapId) {
-    var identity = requestIdentity.get();
-    var map =
-        loadMaps().stream()
-            .filter(m -> m.id() == mapId)
-            .findFirst()
-            .orElseThrow(NotFoundException::new);
-    return Response.ok(
-            Templates.statusPage$mapAttributes(
-                map, attributeDao.listAttributes(), csrfToken(identity), identity))
-        .type(MediaType.TEXT_HTML)
-        .build();
-  }
-
   /// Re-renders just the map's admin-approval cell for an HTMX `outerHTML` swap.
   private Response adminFragment(long mapId) {
     var identity = requestIdentity.get();
@@ -213,7 +161,7 @@ public class MapsStatusController {
   }
 
   private List<MapStatusItem> loadMaps() {
-    return statusDao.listMapsWithAttributes().stream().map(MapStatusItem::of).toList();
+    return statusDao.listMaps().stream().map(MapStatusItem::of).toList();
   }
 
   /// A CSRF token (and thus the issued cookie) only for MapAdmins, who are the only callers that

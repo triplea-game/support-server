@@ -109,8 +109,8 @@ and `Secure` in prod (`app.auth.csrf-cookie-secure`, `true` under `%prod`, `fals
 > SameSite attribute. The CSRF cookie *itself* is `Strict` because it is never involved in any
 > cross-site redirect — it is only ever echoed on our own same-site form posts.
 
-`MapAttributesController` and `MapTagsController` carry `@CsrfProtected` (they own the admin forms;
-the game-client APIs are JSON, not cookie-authenticated). The status-page write controls, when
+`MapTagsController` carries `@CsrfProtected` (it owns the admin forms; the game-client APIs are
+JSON, not cookie-authenticated). The status-page write controls, when
 built, inherit the same machinery by adding `@CsrfProtected` and rendering `_csrf` into their forms.
 
 ### Route posture
@@ -120,7 +120,6 @@ built, inherit the same machinery by adding `@CsrfProtected` and rendering `_csr
 | `/support/maps/status` | `MapsStatusController` | **Public** (GET unannotated). Renders conditionally: read-only for anonymous; logout link + MapAdmin region for MapAdmins. |
 | `/support/maps/status/{mapId}/tags/add` | `MapsStatusController` | **MapAdmins-only** POST (`@RequiresMapAdmin` on the method; CSRF via the class's `@CsrfProtected`). Adds the tag named by form param `tagName` (trimmed, any case); an unknown name is ignored. |
 | `/support/maps/status/{mapId}/tags/{tagId}/remove` | `MapsStatusController` | **MapAdmins-only** POST (as above). Removes the tag from the map. |
-| `/support/admin/map/attributes` | `MapAttributesController` | **MapAdmins-only** (`@RequiresMapAdmin` on the class → GET render + all 8 POSTs gated). |
 | `/support/admin/map/tags` | `MapTagsController` | **MapAdmins-only** (`@RequiresMapAdmin` on the class → GET render + all 4 POSTs gated). |
 
 The status page passes the resolved `Identity` to its template, which branches on

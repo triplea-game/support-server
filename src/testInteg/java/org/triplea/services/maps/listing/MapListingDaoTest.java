@@ -7,14 +7,13 @@ import com.github.database.rider.junit5.DBUnitExtension;
 import io.quarkus.test.junit.QuarkusTest;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.List;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.triplea.DbOnlyExtension;
 import org.triplea.http.client.lobby.maps.listing.MapTag;
 
-@DataSet(value = "map_index.yml,map_attributes.yml", useSequenceFiltering = false)
+@DataSet(value = "map_index.yml", useSequenceFiltering = false)
 @QuarkusTest
 @ExtendWith(DbOnlyExtension.class)
 @ExtendWith(DBUnitExtension.class)
@@ -40,10 +39,7 @@ class MapListingDaoTest {
     assertThat(mapDownloadListing.getLastCommitDateEpochMilli())
         .isEqualTo(
             LocalDateTime.of(2000, 12, 1, 23, 59, 20).toInstant(ZoneOffset.UTC).toEpochMilli());
-
-    List<MapTag> mapTags = mapDownloadListing.getMapTags();
-    assertThat(mapTags).contains(MapTag.builder().name("difficulty").value("easy").build());
-    assertThat(mapTags).contains(MapTag.builder().name("era").value("ancient").build());
+    assertThat(mapDownloadListing.getMapTags()).isEmpty();
   }
 
   @Test
@@ -55,16 +51,12 @@ class MapListingDaoTest {
   }
 
   @Test
-  @DataSet(
-      value = "map_index.yml,map_attributes.yml,map_index_tags.yml",
-      useSequenceFiltering = false)
-  void tagsFollowTheAttributesInTagListOrder() {
+  @DataSet(value = "map_index.yml,map_index_tags.yml", useSequenceFiltering = false)
+  void tagsAreSentInTagListOrder() {
     var mapTags = mapListingDao.fetchMapListings().get(0).getMapTags();
 
     assertThat(mapTags)
         .containsExactly(
-            MapTag.builder().name("era").value("ancient").build(),
-            MapTag.builder().name("difficulty").value("easy").build(),
             MapTag.builder().name("Tags").value("fantasy").displayOrder(10).build(),
             MapTag.builder().name("Tags").value("naval").displayOrder(20).build());
   }

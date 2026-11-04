@@ -11,8 +11,8 @@ import java.lang.annotation.Target;
 /// [CsrfCookieResponseFilter] (issues the double-submit cookie on safe responses).
 ///
 /// Orthogonal to [RequiresMapAdmin]: MapAdmin status is authorization, CSRF is request-forgery
-/// protection. The browser forms behind the cookie session (`MapAttributesController`) need
-/// both; a future public form would need only CSRF.
+/// protection. The browser forms behind the cookie session (`MapTagsController`) need both; a
+/// future public form would need only CSRF.
 @NameBinding
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

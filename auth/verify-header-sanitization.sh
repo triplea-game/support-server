@@ -26,7 +26,7 @@ set -euo pipefail
 NGINX_URL="${NGINX_URL:-http://localhost:8000}"
 APP_URL="${APP_URL:-http://localhost:8080}"
 STATUS_PATH="/support/maps/status"
-ADMIN_PATH="/support/admin/map/attributes"
+ADMIN_PATH="/support/admin/map/tags"
 
 SPOOFED_EMAIL="attacker@evil.example"
 SPOOFED_GROUPS="triplea-maps:MapAdmins"
