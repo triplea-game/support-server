@@ -118,7 +118,8 @@ built, inherit the same machinery by adding `@CsrfProtected` and rendering `_csr
 | Route | Controller | Posture |
 |---|---|---|
 | `/support/maps/status` | `MapsStatusController` | **Public** (GET unannotated). Renders conditionally: read-only for anonymous; logout link + MapAdmin region for MapAdmins. |
-| `/support/maps/status/{mapId}/tags` | `MapsStatusController` | **MapAdmins-only** POST (`@RequiresMapAdmin` on the method; CSRF via the class's `@CsrfProtected`). Replaces the map's tags with the repeated `tagId` form param; none clears them. |
+| `/support/maps/status/{mapId}/tags/add` | `MapsStatusController` | **MapAdmins-only** POST (`@RequiresMapAdmin` on the method; CSRF via the class's `@CsrfProtected`). Adds the tag named by form param `tagName` (trimmed, any case); an unknown name is ignored. |
+| `/support/maps/status/{mapId}/tags/{tagId}/remove` | `MapsStatusController` | **MapAdmins-only** POST (as above). Removes the tag from the map. |
 | `/support/admin/map/attributes` | `MapAttributesController` | **MapAdmins-only** (`@RequiresMapAdmin` on the class → GET render + all 8 POSTs gated). |
 | `/support/admin/map/tags` | `MapTagsController` | **MapAdmins-only** (`@RequiresMapAdmin` on the class → GET render + all 4 POSTs gated). |
 

@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.entry;
 import com.github.database.rider.core.api.dataset.DataSet;
 import com.github.database.rider.junit5.DBUnitExtension;
 import io.quarkus.test.junit.QuarkusTest;
-import java.util.List;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -121,26 +120,37 @@ class MapStatusDaoTest {
 
   @Test
   @DataSet(value = "map_status.yml,map_index_tags.yml", useSequenceFiltering = false)
-  void setTagsReplacesTheMapsTags() {
-    dao.setTags(10, List.of(7200, 7300));
+  void addTagFindsTheTagByNameInAnyCase() {
+    dao.addTag(10, "World War 2");
 
-    assertThat(dao.listMapsWithAttributes().get(0).tagIds()).containsExactlyInAnyOrder(7200, 7300);
+    assertThat(dao.listMapsWithAttributes().get(0).tagIds())
+        .containsExactlyInAnyOrder(7100, 7200, 7300);
   }
 
   @Test
   @DataSet(value = "map_status.yml,map_index_tags.yml", useSequenceFiltering = false)
-  void setTagsWithNoIdsClearsTheMapsTags() {
-    dao.setTags(10, List.of());
+  void addTagWithUnknownNameIsNoOp() {
+    dao.addTag(10, "no such tag");
 
-    assertThat(dao.listMapsWithAttributes().get(0).tagIds()).isEmpty();
+    assertThat(dao.listMapsWithAttributes().get(0).tagIds()).containsExactlyInAnyOrder(7100, 7200);
   }
 
   @Test
   @DataSet(value = "map_status.yml,map_index_tags.yml", useSequenceFiltering = false)
-  void setTagsSkipsIdsMissingFromTheTagList() {
-    dao.setTags(10, List.of(7300, 9999));
+  void addingATagTwiceKeepsOne() {
+    dao.addTag(10, "world war 2");
+    dao.addTag(10, "world war 2");
 
-    assertThat(dao.listMapsWithAttributes().get(0).tagIds()).containsExactly(7300);
+    assertThat(dao.listMapsWithAttributes().get(0).tagIds())
+        .containsExactlyInAnyOrder(7100, 7200, 7300);
+  }
+
+  @Test
+  @DataSet(value = "map_status.yml,map_index_tags.yml", useSequenceFiltering = false)
+  void removeTagRemovesOnlyThatTag() {
+    dao.removeTag(10, 7100);
+
+    assertThat(dao.listMapsWithAttributes().get(0).tagIds()).containsExactly(7200);
   }
 
   @Test

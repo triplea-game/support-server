@@ -129,26 +129,33 @@ public class MapStatusDao {
                 .execute());
   }
 
-  /// Replaces the map's tags with `tagIds` (empty clears them). Ids missing from `map_tag`, such as
-  /// a tag deleted after the page was rendered, are skipped.
-  public void setTags(long mapId, List<Integer> tagIds) {
-    jdbi.useTransaction(
-        handle -> {
-          handle
-              .createUpdate("delete from map_index_tag where map_index_id = :mapId")
-              .bind("mapId", mapId)
-              .execute();
-          handle
-              .createUpdate(
-                  """
-                  insert into map_index_tag (map_index_id, map_tag_id)
-                  select :mapId, id from map_tag where id = any(:tagIds)
-                  on conflict do nothing
-                  """)
-              .bind("mapId", mapId)
-              .bindArray("tagIds", Integer.class, tagIds)
-              .execute();
-        });
+  /// Adds the tag named `tagName` (any case) to the map. A name missing from `map_tag` or a tag the
+  /// map already has is a no-op.
+  public void addTag(long mapId, String tagName) {
+    jdbi.useHandle(
+        handle ->
+            handle
+                .createUpdate(
+                    """
+                    insert into map_index_tag (map_index_id, map_tag_id)
+                    select :mapId, id from map_tag where lower(name) = lower(:name) limit 1
+                    on conflict do nothing
+                    """)
+                .bind("mapId", mapId)
+                .bind("name", tagName)
+                .execute());
+  }
+
+  /// Removes the tag `tagId` from the map (a no-op if the map does not have it).
+  public void removeTag(long mapId, int tagId) {
+    jdbi.useHandle(
+        handle ->
+            handle
+                .createUpdate(
+                    "delete from map_index_tag where map_index_id = :mapId and map_tag_id = :tagId")
+                .bind("mapId", mapId)
+                .bind("tagId", tagId)
+                .execute());
   }
 
   /// Admin-approves the map: sets `admin_enabled` and clears its disable reason. Independent of the

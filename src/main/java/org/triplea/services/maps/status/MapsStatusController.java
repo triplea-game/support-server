@@ -33,10 +33,10 @@ import org.triplea.services.maps.tags.MapTagRow;
 
 /// Renders the public map status page: a listing of all indexed maps, their attributes and tags.
 ///
-/// The GET render is public; the per-map edit controls (one dropdown per attribute dimension, one
-/// multi-select for the tags) are shown only to a MapAdmin. Each change runs through a MapAdmin
-/// mutation below, which — keyed off the `HX-Request` header HTMX sets — answers HTMX with the
-/// re-rendered cell and a no-JavaScript client with the classic POST-redirect-GET.
+/// The GET render is public; the per-map edit controls (one dropdown per attribute dimension, tag
+/// chips with a remove button and an add-tag input) are shown only to a MapAdmin. Each change runs
+/// through a MapAdmin mutation below, which, keyed off the `HX-Request` header HTMX sets, answers
+/// HTMX with the re-rendered cell and a no-JavaScript client with the classic POST-redirect-GET.
 ///
 /// The class is `@CsrfProtected` so the GET issues the CSRF cookie the edit forms need; the GET
 /// itself is a safe method and so bypasses the CSRF check.
@@ -116,16 +116,28 @@ public class MapsStatusController {
     return hxRequest.isBlank() ? redirectHome() : cellFragment(mapId);
   }
 
-  /// Replaces the map's tags with the posted `tagId`s; none clears them.
+  /// Adds the tag named `tagName` (trimmed, any case) to the map; an unknown name is ignored.
   @POST
-  @Path("{mapId}/tags")
+  @Path("{mapId}/tags/add")
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   @RequiresMapAdmin
-  public Response setMapTags(
+  public Response addMapTag(
       @PathParam("mapId") long mapId,
-      @FormParam("tagId") List<Integer> tagIds,
+      @FormParam("tagName") @DefaultValue("") String tagName,
       @HeaderParam("HX-Request") @DefaultValue("") String hxRequest) {
-    statusDao.setTags(mapId, tagIds);
+    statusDao.addTag(mapId, tagName.trim());
+    return hxRequest.isBlank() ? redirectHome() : tagsFragment(mapId);
+  }
+
+  @POST
+  @Path("{mapId}/tags/{tagId}/remove")
+  @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+  @RequiresMapAdmin
+  public Response removeMapTag(
+      @PathParam("mapId") long mapId,
+      @PathParam("tagId") int tagId,
+      @HeaderParam("HX-Request") @DefaultValue("") String hxRequest) {
+    statusDao.removeTag(mapId, tagId);
     return hxRequest.isBlank() ? redirectHome() : tagsFragment(mapId);
   }
 

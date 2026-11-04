@@ -24,6 +24,14 @@
     td.admin-status .admin-reason { margin-top: 0.25em; color: #555; font-size: 0.85em; }
     form.admin-row { display: flex; gap: 0.4em; align-items: center; margin: 0.5em 0 0; }
     form.admin-row input[type=text] { flex: 1; }
+    .chips { display: flex; flex-wrap: wrap; gap: 0.25em; margin-bottom: 0.25em; }
+    .chip { display: inline-flex; align-items: center; gap: 0.15em; margin: 0;
+            padding: 0.1em 0.5em; border: 1px solid #bcd; border-radius: 1em;
+            background: #eef4fa; font-size: 0.85em; white-space: nowrap; }
+    .chip button { border: none; background: none; padding: 0 0.1em; cursor: pointer;
+                   font-size: 1.1em; line-height: 1; color: #555; }
+    .chip button:hover { color: #b00; }
+    form.add-tag input { width: 100%; box-sizing: border-box; min-width: 8em; }
   </style>
 </head>
 <body>
@@ -39,8 +47,14 @@
   {#if identity.mapAdmin}
     <div class="mapadmin-tools" data-mapadmin-tools>
       Editing is enabled for your account. Change a map's attribute with the dropdowns below;
-      pick &mdash; none &mdash; to clear it. In the tags list, Ctrl/Cmd-click selects several tags.
+      pick &mdash; none &mdash; to clear it. Type to add a tag, &times; removes it.
     </div>
+    {! The add-tag inputs all suggest from this one list; it stays outside the swapped cells. !}
+    <datalist id="all-tags">
+      {#for tag in tags}
+        <option value="{tag.name}">
+      {/for}
+    </datalist>
   {/if}
 
   <p>{maps.size} map{#if maps.size != 1}s{/if}</p>
@@ -172,40 +186,49 @@
             </td>
           {/fragment}
           {!
-            The tags cell works like the attributes cell: one multi-select posts every selected
-            `tagId` (none = clear) on change, and the response replaces the whole <td>.
+            The tags cell shows the map's tags as chips in tag-list order. For a MapAdmin each chip
+            is a form whose x button removes the tag, and the input below adds one by name (picking
+            a suggestion from the page's #all-tags datalist saves at once; Enter saves typed text).
+            Like the attributes cell, every form keeps `action` for the no-JavaScript fallback
+            (full-page POST -> 303), and the HTMX response replaces the whole <td>.
           !}
           {#fragment id="mapTags"}
             <td id="map-tags-{map.id}">
+              {#if !map.tagIds.isEmpty}
+                <div class="chips">
+                  {#for tag in tags}
+                    {#if map.hasTag(tag.id)}
+                      {#if identity.mapAdmin}
+                        <form method="post" class="chip"
+                              action="/support/maps/status/{map.id}/tags/{tag.id}/remove"
+                              hx-post="/support/maps/status/{map.id}/tags/{tag.id}/remove"
+                              hx-target="closest td" hx-swap="outerHTML">
+                          <input type="hidden" name="_csrf" value="{csrfToken}">
+                          {tag.name}
+                          <button aria-label="Remove tag {tag.name}">&times;</button>
+                        </form>
+                      {#else}
+                        <span class="chip">{tag.name}</span>
+                      {/if}
+                    {/if}
+                  {/for}
+                </div>
+              {#else if !identity.mapAdmin}
+                &mdash;
+              {/if}
               {#if identity.mapAdmin}
                 {#if tags.isEmpty}
                   <span>No tags defined. <a href="/support/admin/map/tags">Manage tags</a></span>
                 {#else}
-                  <form method="post"
-                        action="/support/maps/status/{map.id}/tags"
-                        class="attr-row"
-                        hx-post="/support/maps/status/{map.id}/tags"
+                  <form method="post" class="add-tag"
+                        action="/support/maps/status/{map.id}/tags/add"
+                        hx-post="/support/maps/status/{map.id}/tags/add"
                         hx-target="closest td" hx-swap="outerHTML"
-                        hx-trigger="change, submit">
+                        hx-trigger="change, input[inputType=='insertReplacementText'], submit">
                     <input type="hidden" name="_csrf" value="{csrfToken}">
-                    <select name="tagId" multiple aria-label="Tags of {map.mapName}"
-                            title="Ctrl/Cmd-click selects several tags">
-                      {#for tag in tags}
-                        <option value="{tag.id}"{#if map.hasTag(tag.id)} selected{/if}>{tag.name}</option>
-                      {/for}
-                    </select>
-                    <button>Set</button>
+                    <input type="text" name="tagName" list="all-tags" placeholder="Add tag&hellip;"
+                           autocomplete="off" aria-label="Add a tag to {map.mapName}">
                   </form>
-                {/if}
-              {#else}
-                {#if map.tagIds.isEmpty}
-                  &mdash;
-                {#else}
-                  <ul class="tags">
-                    {#for tag in tags}
-                      {#if map.hasTag(tag.id)}<li>{tag.name}</li>{/if}
-                    {/for}
-                  </ul>
                 {/if}
               {/if}
             </td>
