@@ -1,0 +1,10 @@
+map_tag:
+  - id: 7100
+    name: naval
+    display_order: 20
+  - id: 7200
+    name: fantasy
+    display_order: 10
+  - id: 7300
+    name: world war 2
+    display_order: 30
